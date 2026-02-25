@@ -1,0 +1,8 @@
+set(SOURCE_BUNDLE "")
+
+add_subdirectory(ECS)
+
+list(APPEND SOURCE_BUNDLE src/main.cpp)
+
+set(SOURCE_BUNDLE "${SOURCE_BUNDLE}" PARENT_SCOPE)
+set(ECS_DIR "${ECS_DIR}" PARENT_SCOPE)
