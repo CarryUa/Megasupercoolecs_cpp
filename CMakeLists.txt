@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.28.0)
 project(Megasupercoolecs_project VERSION 0.1.0)
+include(CTest)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
@@ -26,3 +27,5 @@ add_subdirectory(lib/libglfw)
 target_link_libraries(Megasupercoolecs glfw)
 target_include_directories(Megasupercoolecs INTERFACE lib/libglfw/include)
 
+# Tests
+add_subdirectory(tests)
