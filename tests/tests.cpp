@@ -1,21 +1,9 @@
 #include <gtest/gtest.h>
 
-namespace
-{
-    int add(int a, int b)
-    {
-        return a + b;
-    }
-}
-
-TEST(FooTest, FooSubtest)
-{
-    EXPECT_EQ(add(1, 2), 3);
-    EXPECT_EQ(add(10, 20), 30);
-}
-
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
+    srand(time(nullptr));
+
     return RUN_ALL_TESTS();
 }
