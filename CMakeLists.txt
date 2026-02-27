@@ -12,6 +12,7 @@ add_subdirectory(src)
 message("SOURCE_BUNDLE files are: ${SOURCE_BUNDLE}")
 
 add_executable(Megasupercoolecs
+                src/main.cpp
                 ${SOURCE_BUNDLE})
 
 # ECS includes

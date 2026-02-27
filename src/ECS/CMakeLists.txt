@@ -1,4 +1,5 @@
 add_library(libecs STATIC
+            System/systemManager.cpp
             System/system.cpp
             Component/component.cpp
             Entity/entity.cpp

@@ -1,0 +1,6 @@
+#ifndef _MSCE_TESTS_SYSTEM_REGISTRY_
+#define _MSCE_TESTS_SYSTEM_REGISTRY_
+
+void register_all();
+
+#endif //_MSCE_TESTS_SYSTEM_REGISTRY

@@ -3,10 +3,8 @@
 
 TEST(Vector2DTests, Vector2DComponentConstructorTest)
 {
-
     int ex_x = rand();
     int ex_y = rand();
-
     Vector2D<int> vec2i(ex_x, ex_y);
     EXPECT_EQ(vec2i.x, ex_x);
     EXPECT_EQ(vec2i.y, ex_y);
@@ -28,134 +26,209 @@ TEST(Vector2DTests, Vector2DCopyConstructorTest)
     EXPECT_NE(&vec2i, &vec2i_copy);
 }
 
-TEST(Vector2DTests, Vector2DScalarPlusEqualOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_INT)
 {
-    int ex_x = rand();
-    int ex_y = rand();
+    for (int i = 0; i < 10; i++)
+    {
+        int rand_x = rand();
+        int rand_y = rand();
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        int rand_num = rand() % 1000 + 1;
 
-    int rand_plus = rand();
-    vec2i += rand_plus;
+        Vector2D<int> vec1 = Vector2D(rand_x, rand_y);
 
-    // Bouth components should grow by same amount
-    EXPECT_EQ(vec2i.x, ex_x + rand_plus);
-    EXPECT_EQ(vec2i.y, ex_y + rand_plus);
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
 
-    // Address shouldn't change(no new instancing)
-    EXPECT_EQ(&(vec2i += rand_plus), &vec2i) << "The original object and result have different addresses.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
+}
+TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_INT)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        unsigned int rand_x = rand();
+        unsigned int rand_y = rand();
+
+        // Prevent division by zero
+        unsigned int rand_num = rand() % 1000 + 1;
+
+        Vector2D<unsigned int> vec1 = Vector2D(rand_x, rand_y);
+
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
+
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarPlusOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_FLOAT)
 {
-    int ex_x = rand();
-    int ex_y = rand();
+    for (int i = 0; i < 10; i++)
+    {
+        float rand_x = rand();
+        float rand_y = rand();
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        float rand_num = rand() % 1000 + 1;
 
-    int rand_plus = rand();
+        Vector2D<float> vec1 = Vector2D(rand_x, rand_y);
 
-    Vector2D vec2i_2 = vec2i + rand_plus;
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
 
-    EXPECT_EQ(vec2i + rand_plus, Vector2D(ex_x + rand_plus, ex_y + rand_plus));
-    EXPECT_NE(&vec2i_2, &vec2i) << "The operation should create new Vector2D instance.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarMinusEqualOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_DOUBLE)
 {
-    int ex_x = rand();
-    int ex_y = rand();
+    for (int i = 0; i < 10; i++)
+    {
+        double rand_x = rand();
+        double rand_y = rand();
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        double rand_num = rand() % 1000 + 1;
 
-    int rand_minus = rand();
-    vec2i -= rand_minus;
+        Vector2D<double> vec1 = Vector2D(rand_x, rand_y);
 
-    // Both components should shrink by same amount
-    EXPECT_EQ(vec2i.x, ex_x - rand_minus);
-    EXPECT_EQ(vec2i.y, ex_y - rand_minus);
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
 
-    // Address shouldn't change(no new instancing)
-    EXPECT_EQ(&(vec2i -= rand_minus), &vec2i) << "The original object and result have different addresses.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarMinusOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_CHAR)
 {
-    int ex_x = rand();
-    int ex_y = rand();
+    for (int i = 0; i < 10; i++)
+    {
+        char rand_x = rand() % 127;
+        char rand_y = rand() % 127;
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        char rand_num = rand() % 10 + 1;
 
-    int rand_minus = rand();
+        Vector2D<char> vec1 = Vector2D(rand_x, rand_y);
 
-    Vector2D<int> vec2i_2 = vec2i - rand_minus;
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D<char>(rand_x + rand_num, rand_y + rand_num));
 
-    EXPECT_EQ(vec2i - rand_minus, Vector2D<int>(ex_x - rand_minus, ex_y - rand_minus));
-    EXPECT_NE(&vec2i_2, &vec2i) << "The operation should create new Vector2D instance.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D<char>(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D<char>(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D<char>(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarMultiplyEqualOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_CHAR)
 {
-    int ex_x = rand() % 100 + 1;  // Avoid zero
-    int ex_y = rand() % 100 + 1;
+    for (int i = 0; i < 10; i++)
+    {
+        unsigned char rand_x = rand() % 255;
+        unsigned char rand_y = rand() % 255;
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        unsigned char rand_num = rand() % 10 + 1;
 
-    int rand_multiply = rand() % 10 + 1;  // Avoid zero
-    vec2i *= rand_multiply;
+        Vector2D<unsigned char> vec1 = Vector2D(rand_x, rand_y);
 
-    // Both components should multiply by same amount
-    EXPECT_EQ(vec2i.x, ex_x * rand_multiply);
-    EXPECT_EQ(vec2i.y, ex_y * rand_multiply);
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D<unsigned char>(rand_x + rand_num, rand_y + rand_num));
 
-    // Address shouldn't change(no new instancing)
-    EXPECT_EQ(&(vec2i *= rand_multiply), &vec2i) << "The original object and result have different addresses.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D<unsigned char>(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D<unsigned char>(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D<unsigned char>(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarMultiplyOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_LONG)
 {
-    int ex_x = rand() % 100 + 1;
-    int ex_y = rand() % 100 + 1;
+    for (int i = 0; i < 10; i++)
+    {
+        long rand_x = rand();
+        long rand_y = rand();
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        long rand_num = rand() % 1000 + 1;
 
-    int rand_multiply = rand() % 10 + 1;
+        Vector2D<long> vec1 = Vector2D(rand_x, rand_y);
 
-    Vector2D<int> vec2i_2 = vec2i * rand_multiply;
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
 
-    EXPECT_EQ(vec2i * rand_multiply, Vector2D<int>(ex_x * rand_multiply, ex_y * rand_multiply));
-    EXPECT_NE(&vec2i_2, &vec2i) << "The operation should create new Vector2D instance.";
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
 }
 
-TEST(Vector2DTests, Vector2DScalarDivideEqualOperatorTest)
+TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_LONG)
 {
-    int ex_x = rand() % 100 + 1;
-    int ex_y = rand() % 100 + 1;
+    for (int i = 0; i < 10; i++)
+    {
+        unsigned long rand_x = rand();
+        unsigned long rand_y = rand();
 
-    Vector2D<int> vec2i(ex_x, ex_y);
+        // Prevent division by zero
+        unsigned long rand_num = rand() % 1000 + 1;
 
-    int rand_divide = rand() % 10 + 1;  // Avoid division by zero
-    vec2i /= rand_divide;
+        Vector2D<unsigned long> vec1 = Vector2D(rand_x, rand_y);
 
-    // Both components should divide by same amount
-    EXPECT_EQ(vec2i.x, ex_x / rand_divide);
-    EXPECT_EQ(vec2i.y, ex_y / rand_divide);
+        // Addition
+        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
 
-    // Address shouldn't change(no new instancing)
-    EXPECT_EQ(&(vec2i /= rand_divide), &vec2i) << "The original object and result have different addresses.";
-}
+        // Subtraction
+        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
 
-TEST(Vector2DTests, Vector2DScalarDivideOperatorTest)
-{
-    int ex_x = rand() % 100 + 1;
-    int ex_y = rand() % 100 + 1;
+        // Multiplication
+        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
 
-    Vector2D<int> vec2i(ex_x, ex_y);
-
-    int rand_divide = rand() % 10 + 1;
-
-    Vector2D<int> vec2i_2 = vec2i / rand_divide;
-
-    EXPECT_EQ(vec2i / rand_divide, Vector2D<int>(ex_x / rand_divide, ex_y / rand_divide));
-    EXPECT_NE(&vec2i_2, &vec2i) << "The operation should create new Vector2D instance.";
+        // Division
+        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+    }
 }
