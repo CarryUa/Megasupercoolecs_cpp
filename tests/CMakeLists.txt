@@ -15,5 +15,6 @@ if(BUILD_TESTING)
     target_link_libraries(Megasupercoolecs_tests GTest::gtest GTest::gtest_main libecs)
     target_include_directories(Megasupercoolecs_tests
                                PRIVATE gtest/include
-                               PRIVATE ${ECS_DIR}/..)
+                               PRIVATE ${ECS_DIR}/..
+                               PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

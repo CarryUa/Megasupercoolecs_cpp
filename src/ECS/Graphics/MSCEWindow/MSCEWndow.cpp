@@ -13,19 +13,27 @@ MSCEWindow::MSCEWindow(int width, int height, const char *title)
         throw runtime_error("Failed to initialize GLFW");
     }
 
-    window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    if (window == nullptr)
+    p_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (p_window == nullptr)
     {
         glfwTerminate();
         throw runtime_error("Failed to create GLFW window");
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(p_window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         glfwTerminate();
         cerr << "Failed to initialize GLAD" << endl;
         throw runtime_error("Failed to initialize GLAD");
+    }
+}
+MSCEWindow::~MSCEWindow()
+{
+    if (p_window != nullptr)
+    {
+        glfwDestroyWindow(p_window);
+        p_window = nullptr;
     }
 }

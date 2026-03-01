@@ -1,234 +1,197 @@
 #include <gtest/gtest.h>
+#include <test_constants.h>
 #include <ECS/Graphics/Vectors/vector.h>
+#include <cmath>
 
-TEST(Vector2DTests, Vector2DComponentConstructorTest)
+using VectorComponentTypes = ::testing::Types<int, unsigned int, float, double,
+                                              char, unsigned char, long, unsigned long>;
+
+template <typename VecCT>
+class Vector2DTests : public ::testing::Test
 {
-    int ex_x = rand();
-    int ex_y = rand();
-    Vector2D<int> vec2i(ex_x, ex_y);
-    EXPECT_EQ(vec2i.x, ex_x);
-    EXPECT_EQ(vec2i.y, ex_y);
+};
+
+TYPED_TEST_SUITE(Vector2DTests, VectorComponentTypes);
+
+TYPED_TEST(Vector2DTests, ComponentConstructor)
+{
+    using VecCT = TypeParam;
+
+    VecCT x = static_cast<VecCT>(rand());
+    VecCT y = static_cast<VecCT>(rand());
+
+    Vector2D<VecCT> vec(x, y);
+
+    ASSERT_EQ(x, vec.x);
+    ASSERT_EQ(y, vec.y);
 }
 
-TEST(Vector2DTests, Vector2DCopyConstructorTest)
+TYPED_TEST(Vector2DTests, CopyConstructor)
 {
-    int ex_x = rand();
-    int ex_y = rand();
+    using VecCT = TypeParam;
 
-    Vector2D<int> vec2i(ex_x, ex_y);
-    Vector2D<int> vec2i_copy(vec2i);
+    VecCT x = static_cast<VecCT>(rand());
+    VecCT y = static_cast<VecCT>(rand());
 
-    // Copy's components should be same as original's
-    EXPECT_EQ(vec2i_copy.x, ex_x);
-    EXPECT_EQ(vec2i_copy.y, ex_y);
+    Vector2D<VecCT> vec(x, y);
 
-    // Copy and original addresses should be diferent
-    EXPECT_NE(&vec2i, &vec2i_copy);
+    Vector2D<VecCT> vec2(vec);
+
+    ASSERT_EQ(vec2.x, vec.x);
+    ASSERT_EQ(vec2.y, vec.y);
+
+    ASSERT_NE(&vec, &vec2);
 }
 
-TEST(Vector2DTests, Vector2DScalarMathTest_INT)
+#pragma region Scalar Math
+TYPED_TEST(Vector2DTests, ScalarMathOperations)
 {
-    for (int i = 0; i < 10; i++)
+    using VecCT = TypeParam;
+
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        int rand_x = rand();
-        int rand_y = rand();
 
-        // Prevent division by zero
-        int rand_num = rand() % 1000 + 1;
+        VecCT x = static_cast<VecCT>(rand());
+        VecCT y = static_cast<VecCT>(rand());
 
-        Vector2D<int> vec1 = Vector2D(rand_x, rand_y);
+        VecCT rand_num = static_cast<VecCT>(rand());
+        if (rand_num == 0)
+            rand_num++;
+
+        Vector2D<VecCT> vec(x, y);
 
         // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
+        EXPECT_EQ(vec + rand_num, Vector2D<VecCT>(x + rand_num, y + rand_num));
 
         // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+        EXPECT_EQ(vec - rand_num, Vector2D<VecCT>(x - rand_num, y - rand_num));
 
         // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+        EXPECT_EQ(vec * rand_num, Vector2D<VecCT>(x * rand_num, y * rand_num));
 
         // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+        EXPECT_EQ(vec / rand_num, Vector2D<VecCT>(x / rand_num, y / rand_num));
+
+        // Asign operations
+        vec += rand_num;
+        EXPECT_EQ(vec, Vector2D<VecCT>(x + rand_num, y + rand_num));
+        vec = Vector2D(x, y);
+
+        vec -= rand_num;
+        EXPECT_EQ(vec, Vector2D<VecCT>(x - rand_num, y - rand_num));
+        vec = Vector2D(x, y);
+
+        vec *= rand_num;
+        EXPECT_EQ(vec, Vector2D<VecCT>(x * rand_num, y * rand_num));
+        vec = Vector2D(x, y);
+
+        vec /= rand_num;
+        EXPECT_EQ(vec, Vector2D<VecCT>(x / rand_num, y / rand_num));
+        vec = Vector2D(x, y);
     }
 }
-TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_INT)
+#pragma endregion
+
+#pragma region Vector Math
+TYPED_TEST(Vector2DTests, VectorMathOperations)
 {
-    for (int i = 0; i < 10; i++)
+    using VecCT = TypeParam;
+
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        unsigned int rand_x = rand();
-        unsigned int rand_y = rand();
 
-        // Prevent division by zero
-        unsigned int rand_num = rand() % 1000 + 1;
+        VecCT x = static_cast<VecCT>(rand());
+        if (x == 0)
+            x++;
+        VecCT y = static_cast<VecCT>(rand());
+        if (y == 0)
+            y++;
 
-        Vector2D<unsigned int> vec1 = Vector2D(rand_x, rand_y);
+        VecCT x2 = static_cast<VecCT>(rand());
+        if (x2 == 0)
+            x2++;
+
+        VecCT y2 = static_cast<VecCT>(rand());
+        if (y2 == 0)
+            y2++;
+
+        Vector2D<VecCT> vec1(x, y);
+        Vector2D<VecCT> vec2(x2, y2);
 
         // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
+        EXPECT_EQ(vec1 + vec2, Vector2D<VecCT>(x + x2, y + y2));
 
         // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+        EXPECT_EQ(vec1 - vec2, Vector2D<VecCT>(x - x2, y - y2));
 
         // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+        EXPECT_EQ(vec1 * vec2, Vector2D<VecCT>(x * x2, y * y2));
 
         // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+        EXPECT_EQ(vec1 / vec2, Vector2D<VecCT>(x / x2, y / y2));
+
+        // Asign operations
+        vec1 += vec2;
+        EXPECT_EQ(vec1, Vector2D<VecCT>(x + x2, y + y2));
+        vec1 = Vector2D<VecCT>(x, y);
+
+        vec1 -= vec2;
+        EXPECT_EQ(vec1, Vector2D<VecCT>(x - x2, y - y2));
+        vec1 = Vector2D<VecCT>(x, y);
+
+        vec1 *= vec2;
+        EXPECT_EQ(vec1, Vector2D<VecCT>(x * x2, y * y2));
+        vec1 = Vector2D<VecCT>(x, y);
+
+        vec1 /= vec2;
+        EXPECT_EQ(vec1, Vector2D<VecCT>(x / x2, y / y2));
+        vec1 = Vector2D<VecCT>(x, y);
     }
 }
+#pragma endregion
 
-TEST(Vector2DTests, Vector2DScalarMathTest_FLOAT)
+#pragma region Other Functions
+
+TYPED_TEST(Vector2DTests, VectorFunctions)
 {
-    for (int i = 0; i < 10; i++)
+    using VecCT = TypeParam;
+
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        float rand_x = rand();
-        float rand_y = rand();
+        VecCT x = static_cast<VecCT>(rand());
+        VecCT y = static_cast<VecCT>(rand());
 
-        // Prevent division by zero
-        float rand_num = rand() % 1000 + 1;
+        VecCT x2 = static_cast<VecCT>(rand());
+        VecCT y2 = static_cast<VecCT>(rand());
 
-        Vector2D<float> vec1 = Vector2D(rand_x, rand_y);
+        Vector2D<VecCT> vec1(x, y);
+        Vector2D<VecCT> vec2(x2, y2);
 
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
+        // Length
+        double ex_len = sqrt(static_cast<double>(x) * static_cast<double>(x) +
+                             static_cast<double>(y) * static_cast<double>(y));
+        EXPECT_NEAR(vec1.length(), ex_len, TEST_FLOATING_POINT_TOLERANCE);
 
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
+        // Dot
+        double ex_dot = static_cast<double>(x) * static_cast<double>(x2) +
+                        static_cast<double>(y) * static_cast<double>(y2);
+        EXPECT_NEAR(vec1.dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
 
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
+        // Normalized
+        Vector2D<double>
+            ex_normalized_vec(static_cast<double>(x) / ex_len, static_cast<double>(y) / ex_len);
+        EXPECT_EQ(vec1.normalized(), ex_normalized_vec);
 
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
-    }
-}
+        // Normalized Dot
+        double ex_len2 = sqrt(static_cast<double>(x2) * static_cast<double>(x2) +
+                              static_cast<double>(y2) * static_cast<double>(y2));
 
-TEST(Vector2DTests, Vector2DScalarMathTest_DOUBLE)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        double rand_x = rand();
-        double rand_y = rand();
-
-        // Prevent division by zero
-        double rand_num = rand() % 1000 + 1;
-
-        Vector2D<double> vec1 = Vector2D(rand_x, rand_y);
-
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
-
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
-
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
-
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
-    }
-}
-
-TEST(Vector2DTests, Vector2DScalarMathTest_CHAR)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        char rand_x = rand() % 127;
-        char rand_y = rand() % 127;
-
-        // Prevent division by zero
-        char rand_num = rand() % 10 + 1;
-
-        Vector2D<char> vec1 = Vector2D(rand_x, rand_y);
-
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D<char>(rand_x + rand_num, rand_y + rand_num));
-
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D<char>(rand_x - rand_num, rand_y - rand_num));
-
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D<char>(rand_x * rand_num, rand_y * rand_num));
-
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D<char>(rand_x / rand_num, rand_y / rand_num));
-    }
-}
-
-TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_CHAR)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        unsigned char rand_x = rand() % 255;
-        unsigned char rand_y = rand() % 255;
-
-        // Prevent division by zero
-        unsigned char rand_num = rand() % 10 + 1;
-
-        Vector2D<unsigned char> vec1 = Vector2D(rand_x, rand_y);
-
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D<unsigned char>(rand_x + rand_num, rand_y + rand_num));
-
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D<unsigned char>(rand_x - rand_num, rand_y - rand_num));
-
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D<unsigned char>(rand_x * rand_num, rand_y * rand_num));
-
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D<unsigned char>(rand_x / rand_num, rand_y / rand_num));
-    }
-}
-
-TEST(Vector2DTests, Vector2DScalarMathTest_LONG)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        long rand_x = rand();
-        long rand_y = rand();
-
-        // Prevent division by zero
-        long rand_num = rand() % 1000 + 1;
-
-        Vector2D<long> vec1 = Vector2D(rand_x, rand_y);
-
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
-
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
-
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
-
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
+        ex_dot = static_cast<double>(x) / ex_len * static_cast<double>(x2) / ex_len2 +
+                 static_cast<double>(y) / ex_len * static_cast<double>(y2) / ex_len2;
+        EXPECT_NEAR(vec1.normalized_dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
+        EXPECT_GE(vec1.normalized_dot(vec2), -1.0);
+        EXPECT_LE(vec1.normalized_dot(vec2), 1.0);
     }
 }
 
-TEST(Vector2DTests, Vector2DScalarMathTest_UNSIGNED_LONG)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        unsigned long rand_x = rand();
-        unsigned long rand_y = rand();
-
-        // Prevent division by zero
-        unsigned long rand_num = rand() % 1000 + 1;
-
-        Vector2D<unsigned long> vec1 = Vector2D(rand_x, rand_y);
-
-        // Addition
-        EXPECT_EQ(vec1 + rand_num, Vector2D(rand_x + rand_num, rand_y + rand_num));
-
-        // Subtraction
-        EXPECT_EQ(vec1 - rand_num, Vector2D(rand_x - rand_num, rand_y - rand_num));
-
-        // Multiplication
-        EXPECT_EQ(vec1 * rand_num, Vector2D(rand_x * rand_num, rand_y * rand_num));
-
-        // Division
-        EXPECT_EQ(vec1 / rand_num, Vector2D(rand_x / rand_num, rand_y / rand_num));
-    }
-}
+#pragma endregion

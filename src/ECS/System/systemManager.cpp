@@ -11,11 +11,19 @@ SystemManager::SystemManager()
     }
 }
 
+SystemManager::~SystemManager()
+{
+    for (const auto &uprt_system : this->AllSystems)
+    {
+        // Free memory of all unique_pointers
+        AllSystems.clear();
+    }
+}
+
 void SystemManager::InitAllSystems()
 {
     for (const auto &system : this->AllSystems)
     {
-        cout << "Initializing: " << typeid(*system).name() << endl;
         system->Init();
     }
 }

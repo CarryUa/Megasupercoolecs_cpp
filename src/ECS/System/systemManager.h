@@ -15,6 +15,9 @@ public:
     /// @brief Creates all previously registered systems.
     SystemManager();
 
+    /// @brief Deletes all previously created systems.
+    ~SystemManager();
+
     /// @brief List of all existing system instances.
     vector<unique_ptr<System>> AllSystems;
 
