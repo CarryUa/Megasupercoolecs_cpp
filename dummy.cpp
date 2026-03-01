@@ -1,0 +1,1 @@
+// This is a dummy file for CMake to determain language correctly when creating library.

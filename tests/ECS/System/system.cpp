@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <ECS/Managers/systemManager.h>
+#include <Managers/systemManager.h>
 #include <ECS/system.h>
 
 using namespace msce;

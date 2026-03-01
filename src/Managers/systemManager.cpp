@@ -1,4 +1,5 @@
 #include "systemManager.h"
+#include <built_in_system_registry.hpp>
 #include <typeindex>
 
 using namespace std;
@@ -8,6 +9,8 @@ map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_
 
 SystemManager::SystemManager()
 {
+    register_built_in_systems();
+
     for (const auto &pair : SystemManager::_registered_type_constructor_pairs)
     {
         this->AllSystems.push_back(pair.second());

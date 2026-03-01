@@ -12,9 +12,9 @@ if(BUILD_TESTING)
                 ECS/System/system.cpp
                 )
 
-    target_link_libraries(Megasupercoolecs_tests GTest::gtest GTest::gtest_main libecs)
+    target_link_libraries(Megasupercoolecs_tests GTest::gtest GTest::gtest_main ${MSCE_TARGET})
     target_include_directories(Megasupercoolecs_tests
                                PRIVATE gtest/include
-                               PRIVATE ${ECS_DIR}/..
+                               PRIVATE src
                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
