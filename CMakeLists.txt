@@ -7,9 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)
 
 # Add source files
-set(SOURCE_BUNDLE "")
 add_subdirectory(src)
-message("SOURCE_BUNDLE files are: ${SOURCE_BUNDLE}")
 
 add_executable(Megasupercoolecs
                 src/main.cpp

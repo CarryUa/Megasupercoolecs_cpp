@@ -1,5 +1,7 @@
-#include <ECS/Graphics/Colors/rgba.h>
+#include "rgba.h"
 #include <cmath>
+
+using namespace msce;
 
 RGBAFloat::RGBAFloat(const RGBAByte &byteColor)
 {

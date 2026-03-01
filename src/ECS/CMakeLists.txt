@@ -1,11 +1,13 @@
 add_library(libecs STATIC
-            System/systemManager.cpp
-            System/system.cpp
-            Component/component.cpp
-            Entity/entity.cpp
-            Graphics/Colors/rgba.cpp
-            Graphics/MSCEWindow/MSCEWndow.cpp
-            Graphics/Vectors/vector.cpp)
+            system_registry.hpp
+            Managers/systemManager.cpp
+            system.cpp
+            component.cpp
+            entity.cpp
+            Common/Colors/rgba.cpp
+            Graphics/MSCEWndow.cpp
+            Common/vector.cpp
+            )
 
 target_link_libraries(libecs glad glfw)            
 # Setup variables

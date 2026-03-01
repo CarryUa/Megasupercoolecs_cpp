@@ -1,6 +1,8 @@
 #include "vector.h"
 #include <cmath>
 
+using namespace msce;
+
 template <typename VecCT>
 Vector2D<VecCT>::Vector2D(VecCT x, VecCT y)
 {
@@ -195,11 +197,11 @@ double Vector2D<VecCT>::normalized_dot(const Vector2D &other) const
 }
 #pragma endregion
 
-template class Vector2D<int>;
-template class Vector2D<unsigned int>;
-template class Vector2D<float>;
-template class Vector2D<char>;
-template class Vector2D<unsigned char>;
-template class Vector2D<double>;
-template class Vector2D<long>;
-template class Vector2D<unsigned long>;
+template class msce::Vector2D<int>;
+template class msce::Vector2D<unsigned int>;
+template class msce::Vector2D<float>;
+template class msce::Vector2D<char>;
+template class msce::Vector2D<unsigned char>;
+template class msce::Vector2D<double>;
+template class msce::Vector2D<long>;
+template class msce::Vector2D<unsigned long>;

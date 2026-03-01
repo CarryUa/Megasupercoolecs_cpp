@@ -1,6 +1,3 @@
-set(SOURCE_BUNDLE "")
-
 add_subdirectory(ECS)
 
-set(SOURCE_BUNDLE "${SOURCE_BUNDLE}" PARENT_SCOPE)
 set(ECS_DIR "${ECS_DIR}" PARENT_SCOPE)

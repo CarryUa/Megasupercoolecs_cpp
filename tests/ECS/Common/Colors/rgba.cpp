@@ -1,5 +1,7 @@
-#include <ECS/Graphics/Colors/rgba.h>
+#include <ECS/Common/Colors/rgba.h>
 #include <gtest/gtest.h>
+
+using namespace msce;
 
 TEST(RGBAFloatTest, ConstructorTest)
 {

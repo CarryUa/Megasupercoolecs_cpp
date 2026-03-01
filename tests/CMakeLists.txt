@@ -6,9 +6,9 @@ if(BUILD_TESTING)
     # Add source files to executable
     add_executable(Megasupercoolecs_tests 
                 main.cpp
-                system_registry.cpp
-                ECS/Graphics/Colors/rgba.cpp
-                ECS/Graphics/Vectors/vector.cpp
+                system_registry.hpp
+                ECS/Common/Colors/rgba.cpp
+                ECS/Common/vector.cpp
                 ECS/System/system.cpp
                 )
 

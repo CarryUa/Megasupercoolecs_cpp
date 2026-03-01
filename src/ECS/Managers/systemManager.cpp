@@ -1,6 +1,9 @@
 #include "systemManager.h"
 #include <typeindex>
 
+using namespace std;
+using namespace msce;
+
 map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_constructor_pairs;
 
 SystemManager::SystemManager()
@@ -20,18 +23,22 @@ SystemManager::~SystemManager()
     }
 }
 
-void SystemManager::InitAllSystems()
+void SystemManager::init_all_systems()
 {
     for (const auto &system : this->AllSystems)
     {
-        system->Init();
+        system->pre_init();
+    }
+    for (const auto &system : this->AllSystems)
+    {
+        system->init();
     }
 }
 
-void SystemManager::UpdateAllSystems()
+void SystemManager::update_all_systems()
 {
     for (auto &system : this->AllSystems)
     {
-        system->Update(0.00016);
+        system->update(0.00016);
     }
 }

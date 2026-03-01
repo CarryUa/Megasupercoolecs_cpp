@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include <test_constants.h>
-#include <ECS/Graphics/Vectors/vector.h>
+#include <ECS/Common/vector.h>
 #include <cmath>
 
+using namespace msce;
 using VectorComponentTypes = ::testing::Types<int, unsigned int, float, double,
                                               char, unsigned char, long, unsigned long>;
 
