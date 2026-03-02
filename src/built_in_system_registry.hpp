@@ -8,6 +8,7 @@ using namespace msce;
 void register_built_in_systems()
 {
     SystemManager::register_system<System>();
+    SystemManager::register_system<TimeSystem>();
 }
 
 #endif

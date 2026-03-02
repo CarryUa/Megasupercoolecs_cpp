@@ -5,12 +5,14 @@
 #include <typeindex>
 #include <functional>
 #include <ECS/system.h>
+#include <BuiltInSystems/timeSystem.h>
 
 namespace msce
 {
     class SystemManager
     {
     private:
+        TimeSystem *_time_sys;
         static std::map<std::type_index, std::function<std::unique_ptr<System>()>> _registered_type_constructor_pairs;
 
     public:

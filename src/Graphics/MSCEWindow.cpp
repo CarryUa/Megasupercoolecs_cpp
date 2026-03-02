@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 using namespace std;
+using namespace msce;
 
 MSCEWindow::MSCEWindow(int width, int height, const char *title) : p_window(glfwCreateWindow(width, height, title, nullptr, nullptr), &glfwDestroyWindow)
 {

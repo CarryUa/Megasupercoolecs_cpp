@@ -15,6 +15,8 @@ SystemManager::SystemManager()
     {
         this->AllSystems.push_back(pair.second());
     }
+
+    this->_time_sys = this->get_system<TimeSystem>();
 }
 
 SystemManager::~SystemManager()
@@ -42,6 +44,6 @@ void SystemManager::update_all_systems()
 {
     for (auto &system : this->AllSystems)
     {
-        system->update(0.00016);
+        system->update(this->_time_sys->get_delta_time());
     }
 }
