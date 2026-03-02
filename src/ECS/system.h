@@ -8,13 +8,17 @@
 
 namespace msce
 {
+    // Forward declaration to prevent co-dependency
+    class SystemManager;
+
     class System
     {
     public:
         /// @brief Determains if system is going to recive update() calls. init() and pre_init() are recived regardless.
         bool active = true;
 
-        System();
+        /// @brief Pointer to SystemManager that created this system. Usefull for getting dependency-systems.
+        SystemManager *p_sys_man;
 
         /// @brief Ran during SystemManager.InitAllSystems before init(). Use it to get dependencies pointers, but dont expect other systems being initialized.
         virtual void pre_init();

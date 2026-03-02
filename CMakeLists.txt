@@ -14,6 +14,7 @@ add_library(${MSCE_TARGET} SHARED dummy.cpp)
 
 # Subdirs
 add_subdirectory(src)
+add_subdirectory(src/BuiltInComponents)
 add_subdirectory(src/BuiltInSystems)
 add_subdirectory(src/Common)
 add_subdirectory(src/Common/Colors)

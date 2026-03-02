@@ -3,9 +3,6 @@
 #include <iostream>
 using namespace msce;
 
-System::System()
-{
-}
 void System::pre_init()
 {
 }

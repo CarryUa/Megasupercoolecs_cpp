@@ -1,6 +1,8 @@
 // This is a dummy file for CMake to determain language correctly when creating library.
 // Also used for testing diferent parts of engine
 #include <Managers/systemManager.h>
+#include <Managers/componentManager.h>
+#include <BuiltInComponents/transformComponent.hpp>
 #include <BuiltInSystems/graphicsSystem.h>
 #include <Graphics/MSCEWindow.h>
 #include <iostream>
@@ -10,6 +12,7 @@ using namespace msce;
 int main(int argc, char **argv)
 {
     SystemManager sys_man = SystemManager();
+    ComponentManager comp_man = ComponentManager();
     sys_man.init_all_systems();
 
     GraphicsSystem *graphics_sys = sys_man.get_system<GraphicsSystem>();
@@ -17,6 +20,14 @@ int main(int argc, char **argv)
     cout << graphics_sys << endl;
     MSCEWindow *window = graphics_sys->create_window();
     MSCEWindow *window2 = graphics_sys->create_window(Vector2D<int>(300, 300));
+
+    TransformComponent *t1 = comp_man.create_component<TransformComponent>();
+    TransformComponent *t2 = comp_man.create_component<TransformComponent>();
+
+    t2->position.x = 10.0;
+
+    std::cout << "t1 position with id " << t1->get_id() << ": (" << t1->position.x << ", " << t1->position.y << ")" << std::endl;
+    std::cout << "t2 position with id " << t2->get_id() << ": (" << t2->position.x << ", " << t2->position.y << ")" << std::endl;
 
     while (!window->should_close() || !window2->should_close())
     {
