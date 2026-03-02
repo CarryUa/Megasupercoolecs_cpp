@@ -12,7 +12,7 @@ namespace msce
     {
     public:
         /// @brief Determains if system is going to recive update() calls. init() and pre_init() are recived regardless.
-        bool active;
+        bool active = true;
 
         System();
 

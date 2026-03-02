@@ -10,7 +10,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE on)
 # definitions
 set(MSCE_TARGET "libmsce")
 
-add_executable(${MSCE_TARGET} dummy.cpp)
+add_library(${MSCE_TARGET} SHARED dummy.cpp)
 
 # Subdirs
 add_subdirectory(src)

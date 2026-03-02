@@ -53,7 +53,7 @@ namespace msce
                 TSys *return_sys = dynamic_cast<TSys *>(sys.get());
                 if (return_sys == nullptr)
                 {
-                    std::cout << "couldn't cast " << typeid((sys.get())).name() << " to " << typeid(TSys *).name() << std::endl;
+                    std::cout << "Couldn't cast " << typeid((sys.get())).name() << " to " << typeid(TSys *).name() << std::endl;
                     continue;
                 }
 

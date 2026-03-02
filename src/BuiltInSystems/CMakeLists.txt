@@ -1,4 +1,5 @@
 # /src/BuiltInSystems
 
 target_sources(${MSCE_TARGET}
-                PUBLIC timeSystem.cpp)
+                PUBLIC timeSystem.cpp
+                PUBLIC graphicsSystem.cpp)

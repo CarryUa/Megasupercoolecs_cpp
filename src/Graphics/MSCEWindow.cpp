@@ -4,10 +4,9 @@
 using namespace std;
 using namespace msce;
 
-MSCEWindow::MSCEWindow(int width, int height, const char *title) : p_window(glfwCreateWindow(width, height, title, nullptr, nullptr), &glfwDestroyWindow)
+MSCEWindow::MSCEWindow(Vector2D<int> window_size_, const char *title, GLFWmonitor *glfw_monitor, GLFWwindow *glfw_share) : p_window(glfwCreateWindow(window_size_.x, window_size_.y, title, glfw_monitor, glfw_share), &glfwDestroyWindow)
 {
-    this->width = width;
-    this->height = height;
+    this->window_size = Vector2D(window_size_);
     this->title = title;
 
     if (p_window.get() == nullptr)
@@ -16,6 +15,7 @@ MSCEWindow::MSCEWindow(int width, int height, const char *title) : p_window(glfw
 
         throw runtime_error("Failed to create GLFW window");
     }
+
     glfwMakeContextCurrent(p_window.get());
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -24,6 +24,12 @@ MSCEWindow::MSCEWindow(int width, int height, const char *title) : p_window(glfw
         throw runtime_error("Failed to initialize GLAD");
     }
 }
+
+void MSCEWindow::make_curent_context()
+{
+    glfwMakeContextCurrent(p_window.get());
+}
+
 bool MSCEWindow::should_close()
 {
     return glfwWindowShouldClose(this->p_window.get());

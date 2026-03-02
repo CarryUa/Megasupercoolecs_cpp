@@ -44,6 +44,7 @@ void SystemManager::update_all_systems()
 {
     for (auto &system : this->AllSystems)
     {
-        system->update(this->_time_sys->get_delta_time());
+        if (system->active)
+            system->update(this->_time_sys->get_delta_time());
     }
 }

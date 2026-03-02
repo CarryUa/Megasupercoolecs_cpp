@@ -2,6 +2,7 @@
 #define _MSCE_WINDOW_H_
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <Common/vector.h>
 #include <memory>
 
 using namespace std;
@@ -13,12 +14,12 @@ namespace msce
         unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window;
 
     public:
-        int width;
-        int height;
+        Vector2D<int> window_size;
         const char *title;
-        MSCEWindow(int width = 500, int height = 500, const char *title = "MSCE Window");
+        MSCEWindow(Vector2D<int> window_size_ = Vector2D<int>(500, 500), const char *title = "Window", GLFWmonitor *glfw_monitor = nullptr, GLFWwindow *glfw_share = nullptr);
         bool should_close();
         void swap_buffers();
+        void make_curent_context();
     };
 }
 
