@@ -12,6 +12,7 @@ using namespace msce;
 int main(int argc, char **argv)
 {
     SystemManager sys_man = SystemManager();
+
     ComponentManager comp_man = ComponentManager();
     sys_man.init_all_systems();
 

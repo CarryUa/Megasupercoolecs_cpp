@@ -11,6 +11,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE on)
 set(MSCE_TARGET "libmsce")
 
 add_library(${MSCE_TARGET} SHARED dummy.cpp)
+add_executable(run dummy.cpp)
 
 # Subdirs
 add_subdirectory(src)
@@ -32,6 +33,9 @@ target_link_libraries(${MSCE_TARGET}
                         glad
                         glfw)   
 
+target_link_libraries(run ${MSCE_TARGET})
+
 # Include dirs
 target_include_directories(${MSCE_TARGET} PUBLIC src)
+target_include_directories(run PUBLIC src)
 target_include_directories(${MSCE_TARGET} PRIVATE lib/libglfw/include)

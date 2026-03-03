@@ -5,18 +5,28 @@
 using namespace std;
 using namespace msce;
 
+SystemManager *SystemManager::instance = nullptr;
 map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_constructor_pairs;
 
 SystemManager::SystemManager()
 {
+    if (SystemManager::instance != nullptr)
+    {
+        cerr << "Tried to create second instance of SystemManager, when only one is allowed." << endl;
+        throw new runtime_error("Tried to create second instance of SystemManager, when only one is allowed.");
+    }
+
     register_built_in_systems();
 
     for (const auto &pair : SystemManager::_registered_type_constructor_pairs)
     {
         this->AllSystems.push_back(pair.second());
+        this->AllSystems.back().get()->p_sys_man = this;
     }
 
     this->_time_sys = this->get_system<TimeSystem>();
+
+    SystemManager::instance = this;
 }
 
 SystemManager::~SystemManager()
