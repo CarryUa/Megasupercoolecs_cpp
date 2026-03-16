@@ -5,10 +5,9 @@
 
 namespace msce
 {
-    class TransformComponent : public Component
+    class TransformComponent : public BaseComponent<TransformComponent>
     {
     public:
-        using Component::Component;
         Vector2D<double> position = Vector2D(0.5, 0.5);
         Vector2D<double> scale = Vector2D(1.0, 1.0);
     };

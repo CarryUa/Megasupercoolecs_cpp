@@ -4,16 +4,18 @@ add_subdirectory(gtest)
 
 if(BUILD_TESTING)
     # Add source files to executable
-    add_executable(Megasupercoolecs_tests 
+    add_executable(run_tests 
                 main.cpp
                 system_registry.hpp
                 ECS/Common/Colors/rgba.cpp
                 ECS/Common/vector.cpp
-                ECS/System/system.cpp
+                ECS/system.cpp
+                ECS/component.cpp
+                ECS/entity.cpp
                 )
 
-    target_link_libraries(Megasupercoolecs_tests GTest::gtest GTest::gtest_main ${MSCE_TARGET})
-    target_include_directories(Megasupercoolecs_tests
+    target_link_libraries(run_tests GTest::gtest GTest::gtest_main ${MSCE_TARGET})
+    target_include_directories(run_tests
                                PRIVATE gtest/include
                                PRIVATE src
                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

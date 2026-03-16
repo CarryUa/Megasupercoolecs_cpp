@@ -1,24 +1,61 @@
 #include "componentManager.h"
+#include <iostream>
+#include <ECS/component.h>
+
 using namespace msce;
 
-template <typename TComp>
-TComp *ComponentManager::get_component(size_t id) const
+ComponentManager::ComponentManager()
 {
-    if (_components.size() <= id)
-        return nullptr;
-
-    return _components[id].get();
-}
-
-template <typename TComp>
-std::vector<TComp *> ComponentManager::get_components() const
-{
-    std::vector<TComp *> return_vec;
-
-    for (auto &comp : this->_components)
+    if (ComponentManager::instance == nullptr)
     {
-        return_vec.push_back(&comp);
+        ComponentManager::instance = this;
+        return;
     }
 
-    return return_vec;
+    std::cerr << "Tried to create second instance of SystemManager, when only one is allowed." << std::endl;
+    throw new std::runtime_error("Tried to create second instance of SystemManager, when only one is allowed.");
+}
+
+void msce::ComponentManager::register_component(IComponent *comp)
+{
+    for (auto &c : this->_components)
+    {
+        if (c.get() == comp)
+            return;
+    }
+
+    this->_components.push_back(std::unique_ptr<IComponent>(comp));
+}
+
+void msce::ComponentManager::destroy_component(IComponent *comp)
+{
+    bool found = false;
+    size_t i = 0;
+    for (auto &c : this->_components)
+    {
+        if (c.get() == comp)
+        {
+            found = true;
+            break;
+        }
+
+        ++i;
+    }
+
+    if (!found)
+        return;
+
+    this->_components.erase(_components.begin() + i);
+}
+
+size_t msce::ComponentManager::get_component_id(IComponent *comp)
+{
+    size_t i = 0;
+    for (; i < this->_components.size(); ++i)
+    {
+        if (this->_components[i].get() == comp)
+            break;
+    }
+
+    return i;
 }

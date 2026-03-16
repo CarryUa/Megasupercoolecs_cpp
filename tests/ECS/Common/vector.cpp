@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <test_constants.h>
+#include <test_configs.h>
 #include <Common/vector.h>
 #include <cmath>
 

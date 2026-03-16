@@ -1,17 +1,32 @@
 #ifndef _MSCE_COMPONENT_H_
 #define _MSCE_COMPONENT_H_
 #include <iostream>
+#include <Managers/componentManager.h>
 namespace msce
 {
-    class Component
+    class IComponent
     {
-    protected:
-        size_t _id;
-
     public:
-        Component(size_t id);
-        virtual ~Component() = default;
-        size_t get_id() const;
+        virtual ~IComponent() = default;
+        virtual size_t get_id() = 0;
+        virtual IComponent *clone() = 0;
+    };
+
+    template <typename TComp>
+    class BaseComponent : public IComponent
+    {
+    public:
+        size_t get_id() override
+        {
+            return ComponentManager::instance->get_component_id(dynamic_cast<IComponent *>(this));
+        }
+
+        /// @brief This method is used by ComponentManager, dont relly on it for cloning components
+        /// @return
+        IComponent *clone() override
+        {
+            return new TComp(static_cast<const TComp &>(*this));
+        }
     };
 }
 

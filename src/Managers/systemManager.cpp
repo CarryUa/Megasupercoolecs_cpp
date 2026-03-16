@@ -5,7 +5,6 @@
 using namespace std;
 using namespace msce;
 
-SystemManager *SystemManager::instance = nullptr;
 map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_constructor_pairs;
 
 SystemManager::SystemManager()
