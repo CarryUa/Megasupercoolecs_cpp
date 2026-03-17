@@ -1,13 +1,15 @@
 #ifndef _MSCE_GRAPHICS_SYSTEM_H_
 #define _MSCE_GRAPHICS_SYSTEM_H_
+#include <Graphics/MSCEWindow.h>
 #include <ECS/system.h>
 #include <vector>
 #include <Common/vector.h>
-#include <Graphics/MSCEWindow.h>
 #include <memory>
-
+class GLFWmonitor;
+class GLFWwindow;
 namespace msce
 {
+
     /// @brief Handles GL-related stuff. Uses several sub-systems like ShaderSystem, ect.
     class GraphicsSystem : public System
     {

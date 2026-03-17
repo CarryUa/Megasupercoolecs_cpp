@@ -1,11 +1,5 @@
 #ifndef _MSCE_SYSTEM_H_
 #define _MSCE_SYSTEM_H_
-#include <memory>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <typeindex>
-
 namespace msce
 {
     // Forward declaration to prevent co-dependency
