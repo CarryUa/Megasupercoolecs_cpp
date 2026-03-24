@@ -1,7 +1,7 @@
 #ifndef MSCE_ENTITY_MANAGER_H_
 #define MSCE_ENTITY_MANAGER_H_
-#include <ECS/entity.h>
-#include <Common/Interfaces/iSingleton.hpp>
+#include <MSCE/ECS/entity.h>
+#include <MSCE/Common/Interfaces/iSingleton.hpp>
 #include <memory>
 namespace msce
 {

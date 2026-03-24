@@ -1,7 +1,7 @@
 #ifndef _MSCE_COMPONENT_H_
 #define _MSCE_COMPONENT_H_
 #include <iostream>
-#include <Managers/componentManager.h>
+#include <MSCE/Managers/componentManager.h>
 namespace msce
 {
     class IComponent

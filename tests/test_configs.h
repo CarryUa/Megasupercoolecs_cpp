@@ -3,13 +3,13 @@
 #include <gtest/gtest.h>
 #include <cstddef>
 
-#include <ECS/system.h>
-#include <ECS/component.h>
-#include <ECS/entity.h>
+#include <MSCE/ECS/system.h>
+#include <MSCE/ECS/component.h>
+#include <MSCE/ECS/entity.h>
 
-#include <Managers/systemManager.h>
-#include <Managers/componentManager.h>
-#include <Managers/entityManager.h>
+#include <MSCE/Managers/systemManager.h>
+#include <MSCE/Managers/componentManager.h>
+#include <MSCE/Managers/entityManager.h>
 
 /// @brief The number of iterations in test using it.
 const size_t TEST_ITERATIONS = 10;

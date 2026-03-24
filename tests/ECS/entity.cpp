@@ -1,7 +1,7 @@
 #include <test_configs.h>
-#include <ECS/entity.h>
-#include <ECS/component.h>
-#include <BuiltInComponents/transformComponent.hpp>
+#include <MSCE/ECS/entity.h>
+#include <MSCE/ECS/component.h>
+#include <MSCE/BuiltInComponents/transformComponent.hpp>
 using namespace msce;
 
 TEST(EntityTests, CreationTest)

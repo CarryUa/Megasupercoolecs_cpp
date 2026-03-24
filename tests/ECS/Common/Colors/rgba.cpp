@@ -1,4 +1,4 @@
-#include <Common/Colors/rgba.h>
+#include <MSCE/Common/Colors/rgba.h>
 #include <gtest/gtest.h>
 
 using namespace msce;

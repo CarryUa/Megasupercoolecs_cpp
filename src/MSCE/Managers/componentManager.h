@@ -2,7 +2,7 @@
 #define _MSCE_COMPONENT_MANAGER_H_
 #include <vector>
 #include <memory>
-#include <Common/Interfaces/iSingleton.hpp>
+#include <MSCE/Common/Interfaces/iSingleton.hpp>
 
 namespace msce
 {

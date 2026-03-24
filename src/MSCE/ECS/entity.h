@@ -1,7 +1,7 @@
 #ifndef MSCE_ENTITY_H_
 #define MSCE_ENTITY_H_
 #include <vector>
-#include <ECS/component.h>
+#include <MSCE/ECS/component.h>
 
 namespace msce
 {

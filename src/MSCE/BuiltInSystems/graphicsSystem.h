@@ -1,9 +1,9 @@
 #ifndef _MSCE_GRAPHICS_SYSTEM_H_
 #define _MSCE_GRAPHICS_SYSTEM_H_
-#include <Graphics/MSCEWindow.h>
-#include <ECS/system.h>
+#include <MSCE/Graphics/MSCEWindow.h>
+#include <MSCE/ECS/system.h>
+#include <MSCE/Common/vector.h>
 #include <vector>
-#include <Common/vector.h>
 #include <memory>
 class GLFWmonitor;
 class GLFWwindow;

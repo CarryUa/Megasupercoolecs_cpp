@@ -14,15 +14,15 @@ add_library(${MSCE_TARGET} SHARED dummy.cpp)
 add_executable(run dummy.cpp)
 
 # Subdirs
-add_subdirectory(src)
-add_subdirectory(src/BuiltInComponents)
-add_subdirectory(src/BuiltInSystems)
-add_subdirectory(src/Common)
-add_subdirectory(src/Common/Colors)
-add_subdirectory(src/Common/Interfaces)
-add_subdirectory(src/ECS)
-add_subdirectory(src/Graphics)
-add_subdirectory(src/Managers)
+add_subdirectory(src/MSCE)
+add_subdirectory(src/MSCE/BuiltInComponents)
+add_subdirectory(src/MSCE/BuiltInSystems)
+add_subdirectory(src/MSCE/Common)
+add_subdirectory(src/MSCE/Common/Colors)
+add_subdirectory(src/MSCE/Common/Interfaces)
+add_subdirectory(src/MSCE/ECS)
+add_subdirectory(src/MSCE/Graphics)
+add_subdirectory(src/MSCE/Managers)
 
 add_subdirectory(tests)
 
@@ -38,5 +38,6 @@ target_link_libraries(run ${MSCE_TARGET})
 
 # Include dirs
 target_include_directories(${MSCE_TARGET} PUBLIC src)
-target_include_directories(run PUBLIC src)
+target_include_directories(${MSCE_TARGET} PRIVATE src/MSCE)
+target_include_directories(run PUBLIC src/MSCE)
 target_include_directories(${MSCE_TARGET} PRIVATE lib/libglfw/include)

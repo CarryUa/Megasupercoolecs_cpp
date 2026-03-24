@@ -1,7 +1,7 @@
 #ifndef _MSCE_TRANSFORM_COMPONENT_H_
 #define _MSCE_TRANSFORM_COMPONENT_H_
-#include <ECS/component.h>
-#include <Common/vector.h>
+#include <MSCE/ECS/component.h>
+#include <MSCE/Common/vector.h>
 
 namespace msce
 {

@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <test_configs.h>
+#include <gtest/gtest.h>
 #include "system_registry.hpp"
 
 int main(int argc, char **argv)

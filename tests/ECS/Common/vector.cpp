@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
-#include <Common/vector.h>
+#include <MSCE/Common/vector.h>
 #include <cmath>
 
 using namespace msce;

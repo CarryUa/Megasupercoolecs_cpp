@@ -1,6 +1,6 @@
 #include "componentManager.h"
 #include <iostream>
-#include <ECS/component.h>
+#include <MSCE/ECS/component.h>
 
 using namespace msce;
 

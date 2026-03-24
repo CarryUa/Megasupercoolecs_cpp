@@ -1,7 +1,7 @@
 #include "entityManager.h"
 #include <iostream>
-#include <ECS/component.h>
-#include <Managers/componentManager.h>
+#include <MSCE/ECS/component.h>
+#include <MSCE/Managers/componentManager.h>
 
 msce::EntityManager::EntityManager()
 {

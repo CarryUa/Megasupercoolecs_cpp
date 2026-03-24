@@ -17,6 +17,6 @@ if(BUILD_TESTING)
     target_link_libraries(run_tests GTest::gtest GTest::gtest_main ${MSCE_TARGET})
     target_include_directories(run_tests
                                PRIVATE gtest/include
-                               PRIVATE src
+                               PRIVATE src/MSCE
                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

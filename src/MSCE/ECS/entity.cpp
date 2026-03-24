@@ -1,6 +1,6 @@
 #include "entity.h"
 
-#include <Managers/entityManager.h>
+#include <MSCE/Managers/entityManager.h>
 
 size_t msce::Entity::get_entity_id()
 {

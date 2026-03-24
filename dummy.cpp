@@ -1,10 +1,10 @@
 // This is a dummy file for CMake to determain language correctly when creating library.
 // Also used for testing diferent parts of engine
-#include <Managers/systemManager.h>
-#include <Managers/componentManager.h>
-#include <BuiltInComponents/transformComponent.hpp>
-#include <BuiltInSystems/graphicsSystem.h>
-#include <Graphics/MSCEWindow.h>
+#include <MSCE/Managers/systemManager.h>
+#include <MSCE/Managers/componentManager.h>
+#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/BuiltInSystems/graphicsSystem.h>
+#include <MSCE/Graphics/MSCEWindow.h>
 #include <iostream>
 #include <string>
 using namespace msce;

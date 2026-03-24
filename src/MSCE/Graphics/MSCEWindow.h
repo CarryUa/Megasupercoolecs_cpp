@@ -2,7 +2,7 @@
 #define _MSCE_WINDOW_H_
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <Common/vector.h>
+#include <MSCE/Common/vector.h>
 #include <memory>
 
 using namespace std;

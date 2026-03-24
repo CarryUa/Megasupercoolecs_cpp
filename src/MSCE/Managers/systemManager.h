@@ -1,8 +1,8 @@
 #ifndef _MSCE_SYSTEM_MANAGER_H_
 #define _MSCE_SYSTEM_MANAGER_H_
-#include <Common/Interfaces/iSingleton.hpp>
-#include <ECS/system.h>
-#include <BuiltInSystems/timeSystem.h>
+#include <MSCE/Common/Interfaces/iSingleton.hpp>
+#include <MSCE/ECS/system.h>
+#include <MSCE/BuiltInSystems/timeSystem.h>
 #include <vector>
 #include <map>
 #include <memory>
