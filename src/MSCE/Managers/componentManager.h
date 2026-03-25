@@ -2,21 +2,19 @@
 #define _MSCE_COMPONENT_MANAGER_H_
 #include <vector>
 #include <memory>
-#include <MSCE/Common/Interfaces/iSingleton.hpp>
+#include <MSCE/Common/Interfaces/Singleton.hpp>
 
 namespace msce
 {
     class IComponent;
 
-    class ComponentManager : public ISingleton<ComponentManager>
+    class ComponentManager : public Singleton<ComponentManager>
     {
     private:
         std::vector<std::unique_ptr<IComponent>>
             _components;
 
     public:
-        ComponentManager();
-
         /// @brief Creates new instance of component of given type.
         /// @tparam TComp Type of component to be created
         /// @return Pointer to newly created component.

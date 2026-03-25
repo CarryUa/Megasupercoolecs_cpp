@@ -28,11 +28,13 @@ add_subdirectory(tests)
 
 add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
+add_subdirectory(lib/libyaml-cpp)
 
 # Link libraries
 target_link_libraries(${MSCE_TARGET}
                         glad
-                        glfw)   
+                        glfw
+                        yaml-cpp)   
 
 target_link_libraries(run ${MSCE_TARGET})
 

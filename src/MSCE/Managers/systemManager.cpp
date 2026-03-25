@@ -9,11 +9,6 @@ map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_
 
 SystemManager::SystemManager()
 {
-    if (SystemManager::instance != nullptr)
-    {
-        cerr << "Tried to create second instance of SystemManager, when only one is allowed." << endl;
-        throw new runtime_error("Tried to create second instance of SystemManager, when only one is allowed.");
-    }
 
     register_built_in_systems();
 
@@ -24,17 +19,6 @@ SystemManager::SystemManager()
     }
 
     this->_time_sys = this->get_system<TimeSystem>();
-
-    SystemManager::instance = this;
-}
-
-SystemManager::~SystemManager()
-{
-    for (const auto &uprt_system : this->AllSystems)
-    {
-        // Free memory of all unique_pointers
-        AllSystems.clear();
-    }
 }
 
 void SystemManager::init_all_systems()

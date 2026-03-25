@@ -1,2 +1,2 @@
 target_sources(${MSCE_TARGET}
-                PUBLIC iSingleton.hpp)
+                PUBLIC Singleton.hpp)

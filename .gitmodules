@@ -6,3 +6,6 @@
 	path = tests/gtest
 	url = https://github.com/google/googletest.git
 	branch = main
+[submodule "lib/libyaml-cpp"]
+	path = lib/libyaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

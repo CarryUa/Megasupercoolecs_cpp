@@ -3,18 +3,6 @@
 #include <MSCE/ECS/component.h>
 #include <MSCE/Managers/componentManager.h>
 
-msce::EntityManager::EntityManager()
-{
-    if (EntityManager::instance == nullptr)
-    {
-        EntityManager::instance = this;
-        return;
-    }
-
-    std::cerr << "Tried to create second instance of SystemManager, when only one is allowed." << std::endl;
-    throw new std::runtime_error("Tried to create second instance of SystemManager, when only one is allowed.");
-}
-
 msce::Entity *msce::EntityManager::create_entity()
 {
     {

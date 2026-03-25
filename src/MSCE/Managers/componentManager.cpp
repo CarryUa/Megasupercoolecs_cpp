@@ -4,18 +4,6 @@
 
 using namespace msce;
 
-ComponentManager::ComponentManager()
-{
-    if (ComponentManager::instance == nullptr)
-    {
-        ComponentManager::instance = this;
-        return;
-    }
-
-    std::cerr << "Tried to create second instance of SystemManager, when only one is allowed." << std::endl;
-    throw new std::runtime_error("Tried to create second instance of SystemManager, when only one is allowed.");
-}
-
 void msce::ComponentManager::register_component(IComponent *comp)
 {
     for (auto &c : this->_components)

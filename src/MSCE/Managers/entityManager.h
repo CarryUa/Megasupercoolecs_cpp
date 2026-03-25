@@ -1,18 +1,16 @@
 #ifndef MSCE_ENTITY_MANAGER_H_
 #define MSCE_ENTITY_MANAGER_H_
 #include <MSCE/ECS/entity.h>
-#include <MSCE/Common/Interfaces/iSingleton.hpp>
+#include <MSCE/Common/Interfaces/Singleton.hpp>
 #include <memory>
 namespace msce
 {
-    class EntityManager : public ISingleton<EntityManager>
+    class EntityManager : public Singleton<EntityManager>
     {
     private:
         std::vector<std::unique_ptr<Entity>> _entities;
 
     public:
-        EntityManager();
-
         /// @brief Creates new entity.
         /// @return Pointer to newly created entity.
         Entity *create_entity();

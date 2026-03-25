@@ -1,6 +1,6 @@
 #ifndef _MSCE_SYSTEM_MANAGER_H_
 #define _MSCE_SYSTEM_MANAGER_H_
-#include <MSCE/Common/Interfaces/iSingleton.hpp>
+#include <MSCE/Common/Interfaces/Singleton.hpp>
 #include <MSCE/ECS/system.h>
 #include <MSCE/BuiltInSystems/timeSystem.h>
 #include <vector>
@@ -16,7 +16,7 @@ namespace msce
     /// @brief Manages the life-cycle of all registered systems.
     /// All systems should be registered before SystemManager is created.
     /// Only one instance of SystemManager can exist in a programs, or else constructor will throw std::runtime_error.
-    class SystemManager : public ISingleton<SystemManager>
+    class SystemManager : public Singleton<SystemManager>
     {
     private:
         TimeSystem *_time_sys;
@@ -26,9 +26,6 @@ namespace msce
         /// @brief Creates all previously registered systems.
         /// @exception throws is another instance of SystemManager exists in the program.
         SystemManager();
-
-        /// @brief Deletes all previously created systems.
-        ~SystemManager();
 
         /// @brief List of all existing system instances.
         std::vector<std::unique_ptr<System>> AllSystems;
