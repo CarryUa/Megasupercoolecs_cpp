@@ -6,6 +6,3 @@
 	path = tests/gtest
 	url = https://github.com/google/googletest.git
 	branch = main
-[submodule "lib/nlohmannjson"]
-	path = lib/nlohmannjson
-	url = https://github.com/nlohmann/json
