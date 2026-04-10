@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 
     ComponentManager compMan;
     EntityManager entMan;
+    PrototypeManager protoMan;
 
     return RUN_ALL_TESTS();
 }

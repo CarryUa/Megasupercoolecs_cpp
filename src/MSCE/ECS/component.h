@@ -2,6 +2,7 @@
 #define _MSCE_COMPONENT_H_
 #include <iostream>
 #include <MSCE/Managers/componentManager.h>
+#include <MSCE/msce_macros.hpp>
 namespace msce
 {
     class IComponent
@@ -10,11 +11,18 @@ namespace msce
         virtual ~IComponent() = default;
         virtual size_t get_id() = 0;
         virtual IComponent *clone() = 0;
+
+        friend class ::cereal::access;
+        template <class Archive>
+        void save(Archive &ar) const {}
+        template <class Archive>
+        void load(Archive &ar) {}
     };
 
     template <typename TComp>
     class BaseComponent : public IComponent
     {
+
     public:
         size_t get_id() override
         {

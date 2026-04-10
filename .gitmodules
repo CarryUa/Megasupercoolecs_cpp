@@ -6,3 +6,9 @@
 	path = tests/gtest
 	url = https://github.com/google/googletest.git
 	branch = main
+[submodule "lib/cereal"]
+	path = lib/cereal
+	url = https://github.com/USCiLab/cereal
+[submodule "lib/boost/preprocessor"]
+	path = lib/boost/preprocessor
+	url = https://github.com/boostorg/preprocessor.git

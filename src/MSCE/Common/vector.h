@@ -1,5 +1,6 @@
 #ifndef _MSCE_VECTORS_H_
 #define _MSCE_VECTORS_H_
+#include <MSCE/msce_macros.hpp>
 
 namespace msce
 {
@@ -64,6 +65,8 @@ namespace msce
         // Casts
         template <typename NewVecCT>
         operator Vector2D<NewVecCT>() const;
+
+        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y);
     };
 }
 

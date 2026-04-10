@@ -6,6 +6,7 @@ if(BUILD_TESTING)
     # Add source files to executable
     add_executable(run_tests 
                 main.cpp
+                prototypes.cpp
                 system_registry.hpp
                 ECS/Common/Colors/rgba.cpp
                 ECS/Common/vector.cpp
