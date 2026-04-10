@@ -42,7 +42,13 @@ add_subdirectory(tests)
 
 add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
+
+set(BUILD_DOC OFF CACHE BOOL "" FORCE)
+set(BUILD_SANDBOX OFF CACHE BOOL "" FORCE)
+set(SKIP_PERFORMANCE_COMPARISON ON CACHE BOOL "" FORCE)
+set(WITH_WERROR OFF CACHE BOOL "" FORCE)
 add_subdirectory(lib/cereal)
+
 add_subdirectory(lib/boost/preprocessor)
 
 # Link libraries
@@ -50,7 +56,7 @@ target_link_libraries(${MSCE_TARGET}
                         glad
                         glfw
                         cereal
-                        boost_preprocessor)   
+                        boost_preprocessor)    
 
 
 # Include dirs
