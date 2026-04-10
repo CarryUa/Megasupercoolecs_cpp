@@ -66,3 +66,14 @@ msce::IPrototype *msce::PrototypeManager::get_prototype(const std::string &id)
 
     return this->_prototypes[id].get();
 }
+
+unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
+{
+    unordered_set<IPrototype *> result = unordered_set<IPrototype *>();
+    for (const auto &[_, p] : this->_prototypes)
+    {
+        result.insert(p.get());
+    }
+
+    return result;
+};
