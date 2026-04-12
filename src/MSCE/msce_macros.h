@@ -17,6 +17,10 @@
 namespace msce
 {
     class PrototypeManager;
+
+    template <typename T>
+    struct Registration;
+
     template <typename TProto>
     void register_prototype(const std::string &name);
 }
@@ -63,14 +67,15 @@ namespace msce
     CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, ::msce::Type) \
     namespace msce                                                         \
     {                                                                      \
-        struct Type##Registration                                          \
+        template <>                                                        \
+        struct Registration<Type>                                          \
         {                                                                  \
-            Type##Registration()                                           \
+            Registration()                                                 \
             {                                                              \
                 register_prototype<Type>(#Type);                           \
             }                                                              \
         };                                                                 \
-        inline Type##Registration registered##Type;                        \
+        inline Registration<Type> registered;                              \
     }
 
 #pragma endregion

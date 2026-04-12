@@ -44,3 +44,21 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
         EXPECT_NE(p, nullptr);
     }
 }
+
+TEST(PrototypeTests, PrototypeRegistryTest)
+{
+    auto protoMan = PrototypeManager::instance;
+    std::set<const std::type_info *> encountered_types;
+
+    size_t unique_count = 0;
+    for (const auto &entry : protoMan->enumerate_prototypes())
+    {
+        if (encountered_types.contains(&typeid(entry)))
+            continue;
+
+        unique_count++;
+        encountered_types.insert(&typeid(entry));
+    }
+
+    EXPECT_EQ(unique_count, protoMan->registered_prototypes.enumerate_registry().size());
+}
