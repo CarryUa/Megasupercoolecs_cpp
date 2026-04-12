@@ -11,7 +11,6 @@ namespace msce
         MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(IPrototype, components);
     };
 }
-CEREAL_REGISTER_TYPE(msce::EntityPrototype)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::IPrototype, msce::EntityPrototype)
+MSCE_CEREAL_REGISTER_PROTOTYPE(EntityPrototype)
 
 #endif // MSCE_ENTITY_PROTOTYPE_HPP_

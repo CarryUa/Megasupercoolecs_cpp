@@ -2,7 +2,7 @@
 #define _MSCE_COMPONENT_H_
 #include <iostream>
 #include <MSCE/Managers/componentManager.h>
-#include <MSCE/msce_macros.hpp>
+#include <MSCE/msce_macros.h>
 namespace msce
 {
     class IComponent

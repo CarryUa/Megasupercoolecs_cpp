@@ -14,6 +14,13 @@
 #pragma region cereal
 #define WRAP_NVP(r, data, x) CEREAL_NVP(x)
 
+namespace msce
+{
+    class PrototypeManager;
+    template <typename TProto>
+    void register_prototype(const std::string &name);
+}
+
 /// @brief Generates serialize() method for object it's called in for cereal to use.
 ///  Needs to be placed inside a class defenition.
 ///  This macro also adds cereal::access as friend class.
@@ -49,6 +56,21 @@
     {                                                                                                      \
         ar(cereal::base_class<ParentClass>(this),                                                          \
            BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))); \
+    }
+
+#define MSCE_CEREAL_REGISTER_PROTOTYPE(Type)                               \
+    CEREAL_REGISTER_TYPE(::msce::Type)                                     \
+    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, ::msce::Type) \
+    namespace msce                                                         \
+    {                                                                      \
+        struct Type##Registration                                          \
+        {                                                                  \
+            Type##Registration()                                           \
+            {                                                              \
+                register_prototype<Type>(#Type);                           \
+            }                                                              \
+        };                                                                 \
+        inline Type##Registration registered##Type;                        \
     }
 
 #pragma endregion

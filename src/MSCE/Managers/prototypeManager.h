@@ -2,8 +2,10 @@
 #define MSCE_PROTOTYPE_MANAGER_H_
 #include <memory>
 #include <unordered_map>
+#include <functional>
 
 #include <MSCE/Common/Interfaces/Singleton.hpp>
+#include <MSCE/Common/registry.hpp>
 #include <MSCE/Prototypes/prototype.hpp>
 
 namespace msce
@@ -14,6 +16,7 @@ namespace msce
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> _prototypes;
 
     public:
+        static Registry<std::string, std::reference_wrapper<const std::type_info>> registered_prototypes;
         /// @brief Tries do deserialize cereal file and create a prototype based on it.
         /// @param path The path to cereal file.
         void deserialize_prototype(const std::string &path);
@@ -41,6 +44,9 @@ namespace msce
         /// @return Returns an unordered set of pointers to all TProto* castable prototypes.
         template <typename TProto>
         std::unordered_set<TProto *> enumerate_prototypes();
+
+        template <typename TProto>
+        static void register_prototype(const std::string &name);
     };
 
     template <typename TProto>
@@ -61,7 +67,7 @@ namespace msce
     }
 
     template <typename TProto>
-    std::unordered_set<TProto *> msce::PrototypeManager::enumerate_prototypes()
+    std::unordered_set<TProto *> PrototypeManager::enumerate_prototypes()
     {
         std::unordered_set<TProto *> result = std::unordered_set<TProto *>();
         for (const auto &[_, p] : this->_prototypes)
@@ -75,5 +81,19 @@ namespace msce
 
         return result;
     };
+
+    template <typename TProto>
+    void PrototypeManager::register_prototype(const std::string &name)
+    {
+        registered_prototypes.register_entry(name, std::cref(typeid(TProto)));
+        std::cout << "Registered prototype '" << name << "'" << std::endl;
+    }
+
+    template <typename TProto>
+    inline void register_prototype(const std::string &name)
+    {
+        PrototypeManager::register_prototype<TProto>(name);
+    }
+
 }
 #endif // MSCE_PROTOTYPE_MANAGER_H_

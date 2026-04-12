@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <cstddef>
 
-#include <MSCE/msce_macros.hpp>
+#include <MSCE/msce_macros.h>
 
 #include <MSCE/ECS/system.h>
 #include <MSCE/ECS/component.h>

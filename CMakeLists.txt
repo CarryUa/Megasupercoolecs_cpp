@@ -5,6 +5,15 @@ if(NOT MSCE_SKIP_TESTS)
     include(CTest)
 endif ()
 
+# Colorfull output
+if(NOT WIN32)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-fcolor-diagnostics)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    add_compile_options(-fdiagnostics-color=always)
+  endif()
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)

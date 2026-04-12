@@ -1,10 +1,12 @@
 #include "prototypeManager.h"
 #include <fstream>
-
+#include <functional>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/memory.hpp>
 
 using namespace std;
+
+msce::Registry<std::string, std::reference_wrapper<const std::type_info>> msce::PrototypeManager::registered_prototypes;
 
 void msce::PrototypeManager::deserialize_prototype(const string &path)
 {
@@ -22,7 +24,6 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
         ar(proto);
 
         this->_prototypes[proto->id] = std::move(proto);
-        cout << "Deserialized prototype at '" << path << "'!" << endl;
     }
     catch (const exception &e)
     {
@@ -76,4 +77,4 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
     }
 
     return result;
-};
+}

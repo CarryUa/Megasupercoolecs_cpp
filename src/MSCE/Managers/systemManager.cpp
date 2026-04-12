@@ -5,16 +5,16 @@
 using namespace std;
 using namespace msce;
 
-map<type_index, function<unique_ptr<System>()>> SystemManager::_registered_type_constructor_pairs;
+Registry<std::type_index, std::function<std::unique_ptr<System>()>> SystemManager::_system_registry;
 
 SystemManager::SystemManager()
 {
 
     register_built_in_systems();
 
-    for (const auto &pair : SystemManager::_registered_type_constructor_pairs)
+    for (const auto &[type, constructor] : SystemManager::_system_registry.enumerate_registry())
     {
-        this->AllSystems.push_back(pair.second());
+        this->AllSystems.push_back(constructor());
         this->AllSystems.back().get()->p_sys_man = this;
     }
 

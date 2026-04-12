@@ -3,6 +3,7 @@
 #include <MSCE/Common/Interfaces/Singleton.hpp>
 #include <MSCE/ECS/system.h>
 #include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/Common/registry.hpp>
 #include <vector>
 #include <map>
 #include <memory>
@@ -19,8 +20,8 @@ namespace msce
     class SystemManager : public Singleton<SystemManager>
     {
     private:
+        static Registry<std::type_index, std::function<std::unique_ptr<System>()>> _system_registry;
         TimeSystem *_time_sys;
-        static std::map<std::type_index, std::function<std::unique_ptr<System>()>> _registered_type_constructor_pairs;
 
     public:
         /// @brief Creates all previously registered systems.
@@ -30,15 +31,16 @@ namespace msce
         /// @brief List of all existing system instances.
         std::vector<std::unique_ptr<System>> AllSystems;
 
-        /// @brief Registers the system for creation during SystemManager construction.
+        /// @brief Facade function for Registry::register_entry. Registers system by its type_index.
         /// @tparam TSys The type of system being registered.
         template <typename TSys>
         static void register_system()
         {
-            SystemManager::_registered_type_constructor_pairs[typeid(TSys)] = []() -> std::unique_ptr<System>
-            {
-                return std::unique_ptr<System>(std::make_unique<TSys>().release());
-            };
+            _system_registry.register_entry(typeid(TSys),
+                                            []() -> std::unique_ptr<System>
+                                            {
+                                                return std::unique_ptr<System>(std::make_unique<TSys>().release());
+                                            });
         }
 
         /// @brief Initializes all system using System.Init();
@@ -57,15 +59,13 @@ namespace msce
             {
                 TSys *return_sys = dynamic_cast<TSys *>(sys.get());
                 if (return_sys == nullptr)
-                {
-                    std::cout << "Couldn't cast " << typeid((sys.get())).name() << " to " << typeid(TSys *).name() << std::endl;
                     continue;
-                }
 
                 return return_sys;
             }
             return nullptr;
         }
     };
+
 }
 #endif //_MSCE_SYSTEM_MANAGER_H_

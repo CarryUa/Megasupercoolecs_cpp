@@ -1,7 +1,7 @@
 #ifndef MSCE_ENGINE_H_
 #define MSCE_ENGINE_H_
 
-#include <MSCE/msce_macros.hpp>
+#include <MSCE/msce_macros.h>
 #include <MSCE/Graphics/MSCEWindow.h>
 
 #include <MSCE/ECS/component.h>

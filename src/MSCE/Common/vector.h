@@ -1,6 +1,6 @@
 #ifndef _MSCE_VECTORS_H_
 #define _MSCE_VECTORS_H_
-#include <MSCE/msce_macros.hpp>
+#include <MSCE/msce_macros.h>
 
 namespace msce
 {

@@ -1,7 +1,7 @@
 #ifndef MSCE_I_PROTOTYPE_H_
 #define MSCE_I_PROTOTYPE_H_
 #include <string>
-#include <MSCE/msce_macros.hpp>
+#include <MSCE/msce_macros.h>
 
 namespace msce
 {
@@ -16,6 +16,6 @@ namespace msce
     };
 
 }
-CEREAL_REGISTER_TYPE(msce::IPrototype);
+CEREAL_REGISTER_TYPE(msce::IPrototype)
 
 #endif // MSCE_I_PROTOTYPE_H_
