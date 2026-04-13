@@ -62,20 +62,20 @@ namespace msce
            BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))); \
     }
 
-#define MSCE_CEREAL_REGISTER_PROTOTYPE(Type)                               \
-    CEREAL_REGISTER_TYPE(::msce::Type)                                     \
-    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, ::msce::Type) \
-    namespace msce                                                         \
-    {                                                                      \
-        template <>                                                        \
-        struct Registration<Type>                                          \
-        {                                                                  \
-            Registration()                                                 \
-            {                                                              \
-                register_prototype<Type>(#Type);                           \
-            }                                                              \
-        };                                                                 \
-        inline Registration<Type> registered;                              \
+#define MSCE_CEREAL_REGISTER_PROTOTYPE(Type, Name)                 \
+    CEREAL_REGISTER_TYPE(Type)                                     \
+    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, Type) \
+    namespace msce                                                 \
+    {                                                              \
+        template <>                                                \
+        struct Registration<Type>                                  \
+        {                                                          \
+            Registration()                                         \
+            {                                                      \
+                register_prototype<Type>(#Name);                   \
+            }                                                      \
+        };                                                         \
+        inline Registration<Type> registered_##Name;               \
     }
 
 #pragma endregion
