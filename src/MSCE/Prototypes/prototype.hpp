@@ -8,7 +8,7 @@ namespace msce
     class IPrototype
     {
     public:
-        std::string id;
+        std::string id = "Invalid default prototype!";
 
         virtual ~IPrototype() = default;
 

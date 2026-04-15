@@ -16,7 +16,7 @@ TEST(PrototypeTests, PrototypeSerializationTest)
 
     TestPrototype1 default_tp = TestPrototype1();
 
-    EXPECT_EQ(default_tp.id, tp1_deserialized->id);
+    EXPECT_NE(default_tp.id, tp1_deserialized->id);
 }
 
 TEST(PrototypeTests, PrototypeEnumerationTest)
@@ -49,6 +49,9 @@ TEST(PrototypeTests, PrototypeRegistryTest)
 {
     auto protoMan = PrototypeManager::instance;
     EXPECT_GE(protoMan->registered_prototypes.enumerate_registry().size(), 1);
+
+    EXPECT_EQ(protoMan->registered_factories.enumerate_registry().size(),
+              protoMan->registered_prototypes.enumerate_registry().size());
 }
 
 TEST(PrototypeTests, ByNameFieldsTest)
@@ -76,4 +79,22 @@ TEST(PrototypeTests, ByNameFieldsTest)
     EXPECT_NE(int_value_start, tp1->test_int);
 
     delete[] str_value_start;
+}
+
+TEST(PrototypeTests, PrototypeByIdCreationTest)
+{
+    auto protoMan = PrototypeManager::instance;
+
+    auto dtp1 = protoMan->instantiate_prototype("TestPrototype1", "dynamic_test_prototype_1");
+
+    auto dtp1_concrete = protoMan->instantiate_prototype<TestPrototype1>("TestPrototype1", "dynamic_test_prototype_concrete_1");
+
+    EXPECT_NE(dtp1, nullptr) << "Something went wrong during prototype creation. See the log output for details.";
+    EXPECT_NE(dtp1_concrete, nullptr) << "Something went wrong during prototype creation. See the log output for details.";
+
+    EXPECT_EQ(dtp1->id, "dynamic_test_prototype_1") << "The id wasn't properly assigned to new prototype!";
+    EXPECT_EQ(dtp1_concrete->id, "dynamic_test_prototype_concrete_1") << "The id wasn't properly assigned to new prototype with template implementation!";
+
+    auto dtp1_same_id = protoMan->instantiate_prototype("TestPrototype1", "dynamic_test_prototype_1");
+    EXPECT_EQ(dtp1_same_id, nullptr) << "New prototype has probably overwritten the old one with same Id!";
 }

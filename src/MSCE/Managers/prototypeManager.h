@@ -16,6 +16,7 @@ namespace msce
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> _prototypes;
 
     public:
+        static Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> registered_factories;
         static Registry<std::string, std::reference_wrapper<const std::type_info>> registered_prototypes;
         /// @brief Tries do deserialize cereal file and create a prototype based on it.
         /// @param path The path to cereal file.
@@ -47,6 +48,20 @@ namespace msce
 
         template <typename TProto>
         static void register_prototype(const std::string &name);
+
+        /// @brief Creates registered prototype by its typename string at runtime.
+        /// @param type The type of the prototype, that it was registered with.
+        /// @param id Id that will be asigned to the prototype.
+        /// @return Pointer to newly-created prototype or nullptr.
+        IPrototype *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
+
+        /// @brief Creates registered prototype by its type-name string at runtime.
+        /// @tparam TProto Type that prototype will be cast to.
+        /// @param type The type of the prototype, that it was registered with.
+        /// @param id Id that will be asigned to the prototype.
+        /// @return Pointer to newly-created prototype or nullptr.
+        template <typename TProto>
+        TProto *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
     };
 
     template <typename TProto>
@@ -86,7 +101,40 @@ namespace msce
     void PrototypeManager::register_prototype(const std::string &name)
     {
         registered_prototypes.register_entry(name, std::cref(typeid(TProto)));
-        std::cout << "Registered prototype '" << name << "'" << std::endl;
+        registered_factories.register_entry(name,
+                                            []()
+                                            {
+                                                return std::make_unique<TProto>();
+                                            });
+        std::cout
+            << "Registered prototype '" << name << "'" << std::endl;
+    }
+
+    template <typename TProto>
+    TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
+    {
+        if (!registered_factories.is_registered(type))
+        {
+            std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' wasn't ever registered!" << std::endl;
+            return nullptr;
+        }
+        if (this->_prototypes.contains(id))
+        {
+            std::cerr << "[PROTO]: Error: Prototype with id '" << id << "' already exist!" << std::endl;
+            return nullptr;
+        }
+
+        this->_prototypes[id] = registered_factories.get_entry(type)();
+        this->_prototypes[id]->id = id;
+
+        auto ptr = dynamic_cast<TProto *>(this->_prototypes[id].get());
+        if (ptr == nullptr)
+        {
+            std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' cant exist!" << std::endl;
+            return nullptr;
+        }
+
+        return ptr;
     }
 
     template <typename TProto>
@@ -94,6 +142,5 @@ namespace msce
     {
         PrototypeManager::register_prototype<TProto>(name);
     }
-
 }
 #endif // MSCE_PROTOTYPE_MANAGER_H_

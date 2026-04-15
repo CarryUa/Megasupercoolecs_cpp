@@ -7,6 +7,7 @@
 using namespace std;
 
 msce::Registry<std::string, std::reference_wrapper<const std::type_info>> msce::PrototypeManager::registered_prototypes;
+msce::Registry<std::string, std::function<std::unique_ptr<msce::IPrototype>()>> msce::PrototypeManager::registered_factories;
 
 void msce::PrototypeManager::deserialize_prototype(const string &path)
 {
@@ -78,3 +79,22 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
 
     return result;
 }
+
+msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
+{
+    if (!registered_factories.is_registered(type))
+    {
+        std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' wasn't ever registered!" << std::endl;
+        return nullptr;
+    }
+    if (this->_prototypes.contains(id))
+    {
+        std::cerr << "[PROTO]: Error: Prototype with id '" << id << "' already exist!" << std::endl;
+        return nullptr;
+    }
+
+    this->_prototypes[id] = registered_factories.get_entry(type)();
+    _prototypes[id]->id = id;
+
+    return this->_prototypes[id].get();
+};

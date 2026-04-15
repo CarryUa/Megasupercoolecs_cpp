@@ -50,7 +50,6 @@ public:
 
 struct TestPrototype1 : public msce::IPrototype
 {
-    std::string id = "TestPrototype1";
     int test_int;
     bool test_bool = true;
     std::string test_str = "Hello World!";
