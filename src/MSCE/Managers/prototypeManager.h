@@ -62,6 +62,23 @@ namespace msce
         /// @return Pointer to newly-created prototype or nullptr.
         template <typename TProto>
         TProto *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
+
+        /// @param id Try and guess.
+        /// @return True if prototype with given ID exists, and false otherwise.
+        bool prototype_id_exists(const std::string &id) const noexcept;
+
+        /// @param type Try and guess.
+        /// @return True if prototype with given type was registered in bouth regestries, and false otherwise.
+        bool prototype_type_registered(const std::string &type) const noexcept;
+
+        /// @param id Try and guess.
+        /// @return True if prototype was successfully deleted, and false otherwise.
+        bool delete_prototype(const std::string &id) noexcept;
+
+        /// @brief This variant also sets proto argument to nullptr if deleted successfully.
+        /// @param proto Pointer to the prototype to be deleted.
+        /// @return True if prototype was successfully deleted, and false otherwise.
+        bool delete_prototype(IPrototype *proto) noexcept;
     };
 
     template <typename TProto>

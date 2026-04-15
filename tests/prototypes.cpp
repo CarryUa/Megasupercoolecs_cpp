@@ -98,3 +98,28 @@ TEST(PrototypeTests, PrototypeByIdCreationTest)
     auto dtp1_same_id = protoMan->instantiate_prototype("TestPrototype1", "dynamic_test_prototype_1");
     EXPECT_EQ(dtp1_same_id, nullptr) << "New prototype has probably overwritten the old one with same Id!";
 }
+
+TEST(PrototypeTests, PrototypeDeletionTest)
+{
+    auto protoMan = PrototypeManager::instance;
+
+    auto new_proto = protoMan->instantiate_prototype<TestPrototype1>("TestPrototype1", "deletion_test_prototype_1");
+    size_t start_size = protoMan->enumerate_prototypes().size();
+
+    ASSERT_GE(start_size, 1) << "Prototypes count must be non-zero at this point of testing.";
+    protoMan->delete_prototype(new_proto->id);
+    EXPECT_LT(protoMan->enumerate_prototypes().size(), start_size) << "By-id deletion failed!";
+
+    try
+    {
+        new_proto = protoMan->instantiate_prototype<TestPrototype1>("TestPrototype1", "deletion_test_prototype_1");
+        start_size = protoMan->enumerate_prototypes().size();
+
+        protoMan->delete_prototype(new_proto);
+        EXPECT_LT(protoMan->enumerate_prototypes().size(), start_size) << "By-pointer deletion failed!";
+    }
+    catch (std::exception &ex)
+    {
+        FAIL() << "By-id failed, used id is still taken-up.";
+    }
+}

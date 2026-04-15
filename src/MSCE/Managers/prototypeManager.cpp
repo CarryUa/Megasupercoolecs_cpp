@@ -97,4 +97,24 @@ msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::strin
     _prototypes[id]->id = id;
 
     return this->_prototypes[id].get();
+}
+bool msce::PrototypeManager::prototype_id_exists(const std::string &id) const noexcept
+{
+    return this->_prototypes.contains(id);
+}
+bool msce::PrototypeManager::prototype_type_registered(const std::string &type) const noexcept
+{
+    return this->registered_prototypes.is_registered(type) && this->registered_factories.is_registered(type);
+}
+bool msce::PrototypeManager::delete_prototype(const std::string &id) noexcept
+{
+    if (!prototype_id_exists(id))
+        return false;
+
+    this->_prototypes.erase(id);
+    return true;
+}
+bool msce::PrototypeManager::delete_prototype(IPrototype *proto) noexcept
+{
+    return delete_prototype(proto->id);
 };
