@@ -51,13 +51,12 @@ public:
 struct TestPrototype1 : public msce::IPrototype
 {
     std::string id = "TestPrototype1";
-    int test_int = 0;
+    int test_int;
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(msce::IPrototype, test_int, test_bool, test_str);
+    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(msce::IPrototype, test_int, test_bool, test_str)
 };
-CEREAL_REGISTER_TYPE(TestPrototype1);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::IPrototype, TestPrototype1);
+MSCE_CEREAL_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
 
 #endif // MSCE_TEST_CONFIGS_H

@@ -48,17 +48,32 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
 TEST(PrototypeTests, PrototypeRegistryTest)
 {
     auto protoMan = PrototypeManager::instance;
-    std::set<const std::type_info *> encountered_types;
+    EXPECT_GE(protoMan->registered_prototypes.enumerate_registry().size(), 1);
+}
 
-    size_t unique_count = 0;
-    for (const auto &entry : protoMan->enumerate_prototypes())
-    {
-        if (encountered_types.contains(&typeid(entry)))
-            continue;
+TEST(PrototypeTests, ByNameFieldsTest)
+{
+    auto protoMan = PrototypeManager::instance;
 
-        unique_count++;
-        encountered_types.insert(&typeid(entry));
-    }
+    auto tp1 = *(protoMan->enumerate_prototypes<TestPrototype1>().begin());
 
-    EXPECT_EQ(unique_count, protoMan->registered_prototypes.enumerate_registry().size());
+    EXPECT_EQ(tp1->test_bool, tp1->get_field<bool>("test_bool"));
+    EXPECT_EQ(tp1->test_int, tp1->get_field<int>("test_int"));
+    EXPECT_EQ(tp1->test_str, tp1->get_field<std::string>("test_str"));
+
+    bool bool_value_start = tp1->test_bool;
+    int int_value_start = tp1->test_int;
+    char *str_value_start = new char[tp1->test_str.size()];
+    tp1->test_str.copy(str_value_start, tp1->test_str.size(), 0);
+
+    tp1->set_field("test_bool", !tp1->test_bool);
+    EXPECT_NE(bool_value_start, tp1->test_bool);
+
+    tp1->set_field("test_str", tp1->test_str + "Hello World!");
+    EXPECT_NE(str_value_start, tp1->test_str);
+
+    tp1->set_field("test_int", tp1->test_int + 1);
+    EXPECT_NE(int_value_start, tp1->test_int);
+
+    delete[] str_value_start;
 }

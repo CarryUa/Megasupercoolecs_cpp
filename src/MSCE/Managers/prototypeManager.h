@@ -72,7 +72,7 @@ namespace msce
         std::unordered_set<TProto *> result = std::unordered_set<TProto *>();
         for (const auto &[_, p] : this->_prototypes)
         {
-            TProto *cast_p = dynamic_cast<TProto *>(p);
+            TProto *cast_p = dynamic_cast<TProto *>(p.get());
             if (cast_p == nullptr)
                 continue;
 
