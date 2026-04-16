@@ -26,3 +26,18 @@ TEST(ReflectionTests, BasicMethodsTest)
 
     delete[] str_value_start;
 }
+
+TEST(ReflectionTests, RTTI_Test)
+{
+    auto twrd = new TestTypeWithReflectionDerived();
+    auto downcast = dynamic_cast<TestTypeWithReflection *>(twrd);
+
+    auto base_class_fields = downcast->get_field_name_type_pairs_static();
+    auto derived_class_fields = downcast->get_field_name_type_pairs();
+
+    EXPECT_NE(base_class_fields.size(), derived_class_fields.size()) << "RTTI-deduced derived reflection returned same amount of fields, as base class.";
+    EXPECT_EQ(twrd->get_field_name_type_pairs_static().size(), derived_class_fields.size());
+    EXPECT_EQ(downcast->get_field_name_type_pairs_static().size(), base_class_fields.size());
+
+    delete twrd;
+}

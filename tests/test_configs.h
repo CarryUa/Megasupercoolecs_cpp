@@ -66,5 +66,13 @@ struct TestTypeWithReflection
 
     MSCE_GENERATE_REFLECTION_METHODS(TestTypeWithReflection, test_int, test_bool, test_str)
 };
+struct TestTypeWithReflectionDerived : public TestTypeWithReflection
+{
+    int derived_test_int = 22222;
+    bool derived_test_bool = false;
+    std::string derived_test_str = "Bye Bye, Earth!";
+
+    MSCE_GENERATE_REFLECTION_METHODS(TestTypeWithReflectionDerived, test_int, test_bool, test_str, derived_test_int, derived_test_bool, derived_test_str)
+};
 
 #endif // MSCE_TEST_CONFIGS_H
