@@ -7,6 +7,7 @@ if(BUILD_TESTING)
     add_executable(run_tests 
                 main.cpp
                 prototypes.cpp
+                reflection.cpp
                 system_registry.hpp
                 ECS/Common/Colors/rgba.cpp
                 ECS/Common/vector.cpp

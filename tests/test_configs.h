@@ -50,12 +50,21 @@ public:
 
 struct TestPrototype1 : public msce::IPrototype
 {
-    int test_int;
+    int test_int = 15556;
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(msce::IPrototype, test_int, test_bool, test_str)
+    MSCE_DEFINE_PROTOTYPE(TestPrototype1, test_int, test_bool, test_str)
 };
-MSCE_CEREAL_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
+MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
+
+struct TestTypeWithReflection
+{
+    int test_int = 15556;
+    bool test_bool = true;
+    std::string test_str = "Hello World!";
+
+    MSCE_GENERATE_REFLECTION_METHODS(TestTypeWithReflection, test_int, test_bool, test_str)
+};
 
 #endif // MSCE_TEST_CONFIGS_H

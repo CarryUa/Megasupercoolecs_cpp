@@ -54,33 +54,6 @@ TEST(PrototypeTests, PrototypeRegistryTest)
               protoMan->registered_prototypes.enumerate_registry().size());
 }
 
-TEST(PrototypeTests, ByNameFieldsTest)
-{
-    auto protoMan = PrototypeManager::instance;
-
-    auto tp1 = *(protoMan->enumerate_prototypes<TestPrototype1>().begin());
-
-    EXPECT_EQ(tp1->test_bool, tp1->get_field<bool>("test_bool"));
-    EXPECT_EQ(tp1->test_int, tp1->get_field<int>("test_int"));
-    EXPECT_EQ(tp1->test_str, tp1->get_field<std::string>("test_str"));
-
-    bool bool_value_start = tp1->test_bool;
-    int int_value_start = tp1->test_int;
-    char *str_value_start = new char[tp1->test_str.size()];
-    tp1->test_str.copy(str_value_start, tp1->test_str.size(), 0);
-
-    tp1->set_field("test_bool", !tp1->test_bool);
-    EXPECT_NE(bool_value_start, tp1->test_bool);
-
-    tp1->set_field("test_str", tp1->test_str + "Hello World!");
-    EXPECT_NE(str_value_start, tp1->test_str);
-
-    tp1->set_field("test_int", tp1->test_int + 1);
-    EXPECT_NE(int_value_start, tp1->test_int);
-
-    delete[] str_value_start;
-}
-
 TEST(PrototypeTests, PrototypeByIdCreationTest)
 {
     auto protoMan = PrototypeManager::instance;

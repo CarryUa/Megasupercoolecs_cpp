@@ -13,7 +13,7 @@ namespace msce
         virtual ~IPrototype() = default;
 
         MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(id)
-    };
+        };
 
 }
 CEREAL_REGISTER_TYPE(msce::IPrototype)
