@@ -16,6 +16,10 @@
 
 #include <boost/preprocessor.hpp>
 
+// #ifdef LINUX
+#include <cxxabi.h>
+// #endif
+
 #pragma region pseudo reflection
 template <typename T, typename U>
 static constexpr const std::type_info &get_member_type(U T::*)
@@ -67,6 +71,10 @@ static constexpr const std::type_info &get_member_type(U T::*)
 #define MSCE_GET_FIELD_WRAPPER(r, data, x) MSCE_GET_FIELD_IMPL(x)
 
 #define MSCE_GENERATE_REFLECTION_METHODS(ClassType, ...)                                                                                       \
+    static std::string_view get_unmangled_type_name()                                                                                          \
+    {                                                                                                                                          \
+        return #ClassType;                                                                                                                     \
+    }                                                                                                                                          \
     static std::unordered_map<std::string_view, std::reference_wrapper<const std::type_info>> get_field_name_type_pairs_static()               \
     {                                                                                                                                          \
         return {BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(GET_FIELD_NAME_TYPE_PAIR_HELPER, ClassType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}; \

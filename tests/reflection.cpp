@@ -1,10 +1,14 @@
 #include "test_configs.h"
 
+#define STRINGIFY(x) #x
+
 TEST(ReflectionTests, BasicMethodsTest)
 {
     auto twr = TestTypeWithReflection();
 
     ASSERT_EQ(twr.get_field_name_type_pairs().size(), 3) << "Some or all fields of testing object weren't picked up by reflection.";
+
+    EXPECT_EQ(twr.get_unmangled_type_name(), STRINGIFY(TestTypeWithReflection));
 
     EXPECT_EQ(twr.test_bool, twr.get_field<bool>("test_bool"));
     EXPECT_EQ(twr.test_int, twr.get_field<int>("test_int"));
@@ -41,3 +45,5 @@ TEST(ReflectionTests, RTTI_Test)
 
     delete twrd;
 }
+
+#undef STRINGIFY
