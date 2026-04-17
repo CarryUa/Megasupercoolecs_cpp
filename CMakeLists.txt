@@ -27,9 +27,10 @@ endif()
 message(STATUS "CMAKE BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(MSCE_BUILD_TYPE_DEBUG)
+    add_compile_definitions(DEBUG)
 else()
-    add_compile_definitions(MSCE_BUILD_TYPE_RELEASE)
+    add_compile_definitions(RELEASE)
+    add_compile_options(-O2)
 endif()
 
 

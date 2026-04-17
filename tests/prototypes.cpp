@@ -14,9 +14,12 @@ TEST(PrototypeTests, PrototypeSerializationTest)
     protoMan->deserialize_prototype(cereal_file_path);
     TestPrototype1 *tp1_deserialized = protoMan->get_prototype<TestPrototype1>("test_prototype_0");
 
-    TestPrototype1 default_tp = TestPrototype1();
+    TestPrototype1 *tp1_serialized = dynamic_cast<TestPrototype1 *>(tp1.get());
 
-    EXPECT_NE(default_tp.id, tp1_deserialized->id);
+    EXPECT_EQ(tp1_serialized->id, tp1_deserialized->id);
+    EXPECT_EQ(tp1_serialized->test_bool, tp1_deserialized->test_bool);
+    EXPECT_EQ(tp1_serialized->test_int, tp1_deserialized->test_int);
+    EXPECT_EQ(tp1_serialized->test_str, tp1_deserialized->test_str);
 }
 
 TEST(PrototypeTests, PrototypeEnumerationTest)

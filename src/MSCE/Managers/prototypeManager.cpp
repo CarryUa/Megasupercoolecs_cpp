@@ -1,7 +1,12 @@
 #include "prototypeManager.h"
 #include <fstream>
 #include <functional>
+#ifdef DEBUG
 #include <cereal/archives/json.hpp>
+#endif
+#ifdef RELEASE
+#include <cereal/archives/binary.hpp>
+#endif
 #include <cereal/types/memory.hpp>
 
 using namespace std;
@@ -20,9 +25,16 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
 
     try
     {
-        cereal::JSONInputArchive ar(file);
         std::unique_ptr<msce::IPrototype> proto;
+
+#ifdef DEBUG
+        cereal::JSONInputArchive ar(file);
         ar(proto);
+#endif
+#ifdef RELEASE
+        cereal::BinaryInputArchive ar(file);
+        ar(proto);
+#endif
 
         this->_prototypes[proto->id] = std::move(proto);
     }
@@ -46,8 +58,14 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
 
     try
     {
+#ifdef DEBUG
         cereal::JSONOutputArchive ar(file);
         ar(prototype);
+#endif
+#ifdef RELEASE
+        cereal::BinaryOutputArchive ar(file);
+        ar(prototype);
+#endif
     }
     catch (const exception &e)
     {

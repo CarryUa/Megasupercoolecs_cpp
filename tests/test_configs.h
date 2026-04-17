@@ -54,7 +54,7 @@ struct TestPrototype1 : public msce::IPrototype
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_DEFINE_PROTOTYPE(TestPrototype1, test_int, test_bool, test_str)
+    MSCE_DEFINE_PROTOTYPE(TestPrototype1, id, test_int, test_bool, test_str)
 };
 MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
 
