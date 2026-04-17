@@ -54,7 +54,7 @@ struct TestPrototype1 : public msce::IPrototype
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_DEFINE_PROTOTYPE(TestPrototype1, id, test_int, test_bool, test_str)
+    MSCE_DEFINE_PROTOTYPE(TestPrototype1, test_int, test_bool, test_str)
 };
 MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
 
@@ -72,7 +72,7 @@ struct TestTypeWithReflectionDerived : public TestTypeWithReflection
     bool derived_test_bool = false;
     std::string derived_test_str = "Bye Bye, Earth!";
 
-    MSCE_GENERATE_REFLECTION_METHODS(TestTypeWithReflectionDerived, test_int, test_bool, test_str, derived_test_int, derived_test_bool, derived_test_str)
+    MSCE_GENERATE_REFLECTION_METHODS_DERIVED(TestTypeWithReflectionDerived, TestTypeWithReflection, derived_test_int, derived_test_bool, derived_test_str)
 };
 
 #endif // MSCE_TEST_CONFIGS_H

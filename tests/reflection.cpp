@@ -36,12 +36,21 @@ TEST(ReflectionTests, RTTI_Test)
     auto twrd = new TestTypeWithReflectionDerived();
     auto downcast = dynamic_cast<TestTypeWithReflection *>(twrd);
 
-    auto base_class_fields = downcast->get_field_name_type_pairs_static();
+    auto base_class_fields = TestTypeWithReflection::get_field_name_type_pairs_static();
     auto derived_class_fields = downcast->get_field_name_type_pairs();
 
     EXPECT_NE(base_class_fields.size(), derived_class_fields.size()) << "RTTI-deduced derived reflection returned same amount of fields, as base class.";
     EXPECT_EQ(twrd->get_field_name_type_pairs_static().size(), derived_class_fields.size());
     EXPECT_EQ(downcast->get_field_name_type_pairs_static().size(), base_class_fields.size());
+
+    auto derived_fields_checklist = TestTypeWithReflectionDerived::get_field_name_type_pairs_static();
+
+    for (const auto &[name, type] : derived_class_fields)
+    {
+        std::cout << "Going over '" << name << "'" << std::endl;
+        derived_fields_checklist.erase(name);
+    }
+    EXPECT_EQ(derived_fields_checklist.size(), 0) << "Some or all fields are missing in TestTypeWithReflectionDerived RTTI output.";
 
     delete twrd;
 }

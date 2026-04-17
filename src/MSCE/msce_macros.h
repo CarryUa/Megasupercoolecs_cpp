@@ -71,7 +71,7 @@ static constexpr const std::type_info &get_member_type(U T::*)
 #define MSCE_GET_FIELD_WRAPPER(r, data, x) MSCE_GET_FIELD_IMPL(x)
 
 #define MSCE_GENERATE_REFLECTION_METHODS(ClassType, ...)                                                                                       \
-    static std::string_view get_unmangled_type_name()                                                                                          \
+    static constexpr std::string_view get_unmangled_type_name()                                                                                \
     {                                                                                                                                          \
         return #ClassType;                                                                                                                     \
     }                                                                                                                                          \
@@ -93,6 +93,33 @@ static constexpr const std::type_info &get_member_type(U T::*)
     {                                                                                                                                          \
         BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                \
         throw std::runtime_error("Field '" + name + "' not found");                                                                            \
+    }
+
+#define MSCE_GENERATE_REFLECTION_METHODS_DERIVED(ClassType, BaseClass, ...)                                                                                 \
+    static constexpr std::string_view get_unmangled_type_name()                                                                                             \
+    {                                                                                                                                                       \
+        return #ClassType;                                                                                                                                  \
+    }                                                                                                                                                       \
+    static std::unordered_map<std::string_view, std::reference_wrapper<const std::type_info>> get_field_name_type_pairs_static()                            \
+    {                                                                                                                                                       \
+        auto base_fields = BaseClass::get_field_name_type_pairs_static();                                                                                   \
+        base_fields.insert({BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(GET_FIELD_NAME_TYPE_PAIR_HELPER, ClassType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}); \
+        return base_fields;                                                                                                                                 \
+    }                                                                                                                                                       \
+    virtual std::unordered_map<std::string_view, std::reference_wrapper<const std::type_info>> get_field_name_type_pairs() const                            \
+    {                                                                                                                                                       \
+        return ClassType::get_field_name_type_pairs_static();                                                                                               \
+    }                                                                                                                                                       \
+    template <typename T>                                                                                                                                   \
+    void set_field(const std::string &name, T value) noexcept                                                                                               \
+    {                                                                                                                                                       \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_SET_FIELD_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                             \
+    }                                                                                                                                                       \
+    template <typename T>                                                                                                                                   \
+    T get_field(const std::string &name) const                                                                                                              \
+    {                                                                                                                                                       \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                             \
+        throw std::runtime_error("Field '" + name + "' not found");                                                                                         \
     }
 
 #pragma endregion
@@ -155,7 +182,7 @@ public:                                                                         
 
 #define MSCE_DEFINE_PROTOTYPE(Type, ...)                                            \
     MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__) \
-    MSCE_GENERATE_REFLECTION_METHODS(Type, __VA_ARGS__)
+    MSCE_GENERATE_REFLECTION_METHODS_DERIVED(Type, ::msce::IPrototype, __VA_ARGS__)
 
 #define MSCE_REGISTER_PROTOTYPE(Type, Name)                        \
     CEREAL_REGISTER_TYPE(Type)                                     \
