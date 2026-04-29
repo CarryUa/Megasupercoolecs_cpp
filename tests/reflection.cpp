@@ -70,10 +70,53 @@ TEST(ReflectionTests, RTTI_Test)
 
     for (const auto &[name, type] : derived_class_fields)
     {
-        std::cout << "Going over '" << name << "'" << std::endl;
         derived_fields_checklist.erase(name);
     }
     EXPECT_EQ(derived_fields_checklist.size(), 0) << "Some or all fields are missing in TestTypeWithReflectionDerived RTTI output.";
+
+    EXPECT_EQ(downcast->get_field<int>("test_int"), twrd->test_int);
+    EXPECT_EQ(downcast->get_field<bool>("test_bool"), twrd->test_bool);
+    EXPECT_EQ(downcast->get_field<std::string>("test_str"), twrd->test_str);
+
+    // get_field() isn't virtual.
+    // EXPECT_EQ(downcast->get_field<int>("derived_test_int"), twrd->derived_test_int);
+    // EXPECT_EQ(downcast->get_field<bool>("derived_test_bool"), twrd->derived_test_bool);
+    // EXPECT_EQ(downcast->get_field<std::string>("derived_test_str"), twrd->derived_test_str);
+
+    downcast->set_field("test_int", 99999);
+    EXPECT_EQ(twrd->test_int, 99999);
+
+    downcast->set_field("test_bool", false);
+    EXPECT_EQ(twrd->test_bool, false);
+
+    downcast->set_field("test_str", std::string("Modified base field"));
+    EXPECT_EQ(twrd->test_str, "Modified base field");
+
+    EXPECT_EQ(std::any_cast<int>(downcast->get_field_any("test_int")), twrd->test_int);
+    EXPECT_EQ(std::any_cast<bool>(downcast->get_field_any("test_bool")), twrd->test_bool);
+    EXPECT_EQ(std::any_cast<std::string>(downcast->get_field_any("test_str")), twrd->test_str);
+
+    EXPECT_EQ(std::any_cast<int>(downcast->get_field_any("derived_test_int")), twrd->derived_test_int);
+    EXPECT_EQ(std::any_cast<bool>(downcast->get_field_any("derived_test_bool")), twrd->derived_test_bool);
+    EXPECT_EQ(std::any_cast<std::string>(downcast->get_field_any("derived_test_str")), twrd->derived_test_str);
+
+    downcast->set_field_any("test_int", std::any(55555));
+    EXPECT_EQ(twrd->test_int, 55555);
+
+    downcast->set_field_any("test_bool", std::any(true));
+    EXPECT_EQ(twrd->test_bool, true);
+
+    downcast->set_field_any("test_str", std::any(std::string("Any modified base")));
+    EXPECT_EQ(twrd->test_str, "Any modified base");
+
+    downcast->set_field_any("derived_test_int", std::any(77777));
+    EXPECT_EQ(twrd->derived_test_int, 77777);
+
+    downcast->set_field_any("derived_test_bool", std::any(false));
+    EXPECT_EQ(twrd->derived_test_bool, false);
+
+    downcast->set_field_any("derived_test_str", std::any(std::string("Any modified derived")));
+    EXPECT_EQ(twrd->derived_test_str, "Any modified derived");
 
     delete twrd;
 }
