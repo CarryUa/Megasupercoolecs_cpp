@@ -50,6 +50,25 @@ static constexpr const std::type_info &get_member_type(U T::*)
     }
 #define MSCE_SET_FIELD_WRAPPER(r, data, x) MSCE_SET_FIELD_IMPL(x)
 
+#define MSCE_SET_FIELD_ANY_IMPL(x)                            \
+    if (name == #x)                                           \
+    {                                                         \
+        if (value.type() != typeid(this->x))                  \
+        {                                                     \
+            std::cerr << "Wrong type for "                    \
+                      << typeid(this).name()                  \
+                      << " object's '"                        \
+                      << name                                 \
+                      << "' field. Expected '"                \
+                      << typeid(this->x).name()               \
+                      << "' but got '" << value.type().name() \
+                      << "'!" << std::endl;                   \
+            return;                                           \
+        }                                                     \
+        this->x = std::any_cast<decltype(this->x)>(value);    \
+    }
+#define MSCE_SET_FIELD_ANY_WRAPPER(r, data, x) MSCE_SET_FIELD_ANY_IMPL(x)
+
 #define MSCE_GET_FIELD_IMPL(x)                                    \
     if (name == #x)                                               \
     {                                                             \
@@ -69,6 +88,14 @@ static constexpr const std::type_info &get_member_type(U T::*)
         return std::any_cast<T>(a);                               \
     }
 #define MSCE_GET_FIELD_WRAPPER(r, data, x) MSCE_GET_FIELD_IMPL(x)
+
+#define MSCE_GET_FIELD_ANY_IMPL(x) \
+    if (name == #x)                \
+    {                              \
+                                   \
+        return (this->x);          \
+    }
+#define MSCE_GET_FIELD_ANY_WRAPPER(r, data, x) MSCE_GET_FIELD_ANY_IMPL(x)
 
 #define MSCE_GENERATE_REFLECTION_METHODS(ClassType, ...)                                                                                       \
     static constexpr std::string_view get_unmangled_type_name()                                                                                \
@@ -92,6 +119,15 @@ static constexpr const std::type_info &get_member_type(U T::*)
     T get_field(const std::string &name) const                                                                                                 \
     {                                                                                                                                          \
         BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                \
+        throw std::runtime_error("Field '" + name + "' not found");                                                                            \
+    }                                                                                                                                          \
+    void set_field_any(const std::string &name, std::any value) noexcept                                                                       \
+    {                                                                                                                                          \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_SET_FIELD_ANY_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__));                                           \
+    }                                                                                                                                          \
+    std::any get_field_any(const std::string &name) const                                                                                      \
+    {                                                                                                                                          \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_ANY_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                            \
         throw std::runtime_error("Field '" + name + "' not found");                                                                            \
     }
 
@@ -119,6 +155,15 @@ static constexpr const std::type_info &get_member_type(U T::*)
     T get_field(const std::string &name) const                                                                                                              \
     {                                                                                                                                                       \
         BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                             \
+        throw std::runtime_error("Field '" + name + "' not found");                                                                                         \
+    }                                                                                                                                                       \
+    virtual void set_field_any(const std::string &name, std::any value) noexcept                                                                            \
+    {                                                                                                                                                       \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_SET_FIELD_ANY_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__));                                                        \
+    }                                                                                                                                                       \
+    virtual std::any get_field_any(const std::string &name) const                                                                                           \
+    {                                                                                                                                                       \
+        BOOST_PP_SEQ_FOR_EACH(MSCE_GET_FIELD_ANY_WRAPPER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))                                                         \
         throw std::runtime_error("Field '" + name + "' not found");                                                                                         \
     }
 

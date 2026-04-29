@@ -28,6 +28,29 @@ TEST(ReflectionTests, BasicMethodsTest)
     twr.set_field("test_int", twr.test_int + 1);
     EXPECT_NE(int_value_start, twr.test_int);
 
+    EXPECT_EQ(twr.test_bool, std::any_cast<bool>(twr.get_field_any("test_bool")));
+    EXPECT_EQ(twr.test_int, std::any_cast<int>(twr.get_field_any("test_int")));
+    EXPECT_EQ(twr.test_str, std::any_cast<std::string>(twr.get_field_any("test_str")));
+
+    twr.set_field_any("test_bool", std::any(false));
+    EXPECT_EQ(twr.test_bool, false);
+
+    twr.set_field_any("test_int", std::any(42));
+    EXPECT_EQ(twr.test_int, 42);
+
+    twr.set_field_any("test_str", std::any(std::string("Updated String")));
+    EXPECT_EQ(twr.test_str, "Updated String");
+
+    twr.set_field_any("test_bool", std::any(true));
+    EXPECT_EQ(twr.test_bool, true);
+    EXPECT_EQ(twr.get_field<bool>("test_bool"), true);
+
+    twr.set_field_any("test_int", std::any(999));
+    EXPECT_EQ(twr.get_field<int>("test_int"), 999);
+
+    twr.set_field_any("test_str", std::any(std::string("New Value")));
+    EXPECT_EQ(twr.get_field<std::string>("test_str"), "New Value");
+
     delete[] str_value_start;
 }
 
