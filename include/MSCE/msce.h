@@ -2,6 +2,7 @@
 #define MSCE_ENGINE_H_
 
 #include <MSCE/msce_macros.h>
+#include <MSCE/logger.hpp>
 #include <MSCE/Graphics/MSCEWindow.h>
 
 #include <MSCE/ECS/component.h>

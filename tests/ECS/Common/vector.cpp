@@ -93,7 +93,9 @@ TYPED_TEST(Vector2DTests, ScalarMathOperations)
 }
 #pragma endregion
 
-#pragma region Vector Math
+#pragma region Vector
+static auto logger = Logger("testing");
+
 TYPED_TEST(Vector2DTests, VectorMathOperations)
 {
     using VecCT = TypeParam;
