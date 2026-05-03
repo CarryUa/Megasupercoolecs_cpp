@@ -24,5 +24,9 @@ int main(int argc, char **argv)
     log.log_info("Hello world{}", "!!!!");
     log.log_info("Current runtime is {} nanosec.", std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - t));
 
-    return RUN_ALL_TESTS();
+    int result = RUN_ALL_TESTS();
+
+    log.log_info("Tests finished {}", result == 0 ? "Successfuly" : "Un-successfuly");
+
+    return result;
 }

@@ -1,4 +1,5 @@
 #include <test_configs.h>
+#include <filesystem>
 using namespace msce;
 
 TEST(PrototypeTests, PrototypeSerializationTest)
@@ -38,6 +39,9 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
     {
         protoMan->deserialize_prototype(cereal_file_path + std::to_string(i));
     }
+
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
+        std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str());
 
     const auto prototypes = protoMan->enumerate_prototypes();
     EXPECT_EQ(prototypes.size(), TEST_ITERATIONS);

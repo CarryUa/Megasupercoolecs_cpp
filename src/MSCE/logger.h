@@ -16,7 +16,7 @@ namespace msce
         static std::size_t millis_at_start;
         static std::ofstream log_file;
 
-        void append_to_log_file(const std::string_view &message = "") const noexcept;
+        void append_to_log_file(const std::string_view &message) const noexcept;
 
     public:
         Logger(const std::string &owner_name);
@@ -32,7 +32,8 @@ namespace msce
         void log_debug(const std::string &message, Args... args) const;
     };
 
-    inline std::size_t Logger::millis_at_start = 0;
+    inline std::size_t Logger::millis_at_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+
     inline std::ofstream Logger::log_file = std::ofstream(std::filesystem::temp_directory_path() / "msce_log.txt");
 
     inline void Logger::append_to_log_file(const std::string_view &message) const noexcept
@@ -45,7 +46,7 @@ namespace msce
 
         std::size_t cur_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
-        log_file << "[" << cur_t - this->millis_at_start << "ms] | " << message.data() << "\n";
+        log_file << "[" << (double)(cur_t - millis_at_start) / 1000 << "s] | " << message.data() << "\n";
     }
 
     inline msce::Logger::Logger(const std::string &owner_name)
@@ -86,12 +87,11 @@ namespace msce
     inline void Logger::log_debug(const std::string &message, Args... args) const
     {
         const std::string formatted_msg = std::vformat(message, std::make_format_args(args...));
-#ifdef DEBUG
         append_to_log_file(std::string_view("[DEBUG]: [" + owner_name + "]: " + formatted_msg));
+#ifdef DEBUG
         std::cout << "[DEBUG]: [" << this->owner_name << "]: " << formatted_msg << std::endl;
         return;
 #endif
-        append_to_log_file(std::string_view("[DEBUG]: [" + owner_name + "]: " + formatted_msg + " | (NOPRINT)"));
     }
 }
 
