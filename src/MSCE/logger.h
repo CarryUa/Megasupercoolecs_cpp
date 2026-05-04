@@ -13,6 +13,7 @@ namespace msce
         std::string owner_name;
         static std::size_t millis_at_start;
         static std::ofstream log_file;
+        static std::size_t instance_count;
 
         void append_to_log_file(const std::string_view &message) const noexcept;
 
