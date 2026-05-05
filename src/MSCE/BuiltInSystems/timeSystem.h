@@ -27,5 +27,6 @@ namespace msce
         std::chrono::high_resolution_clock::time_point get_last_frame_time() const;
     };
 }
+MSCE_REGISTER_SYSTEM(msce::TimeSystem, TimeSystem)
 
 #endif

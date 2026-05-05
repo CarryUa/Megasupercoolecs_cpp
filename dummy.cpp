@@ -1,45 +1,29 @@
 // This is a dummy file for CMake to determain language correctly when creating library.
 // Also used for testing diferent parts of engine
-#include <MSCE/Managers/systemManager.h>
-#include <MSCE/Managers/componentManager.h>
-#include <MSCE/BuiltInComponents/transformComponent.hpp>
-#include <MSCE/BuiltInSystems/graphicsSystem.h>
-#include <MSCE/Graphics/MSCEWindow.h>
-#include <iostream>
-#include <string>
+#include <MSCE/msce.h>
 using namespace msce;
 
 int main(int argc, char **argv)
 {
-    SystemManager sys_man = SystemManager();
+    static auto gLogger = Logger("GLOBAL");
+    gLogger.log_info("STARTING...");
+    gLogger.log_info("Initializing SystemManager...");
+    static auto gSysMan = SystemManager();
+    gSysMan.init_all_systems();
+    gLogger.log_info("Initializing ComponentManager...");
+    static auto gCompMan = ComponentManager();
+    gLogger.log_info("Initializing PrototypeManager...");
+    static auto gProtoMan = PrototypeManager();
 
-    ComponentManager comp_man = ComponentManager();
-    sys_man.init_all_systems();
+    auto graphicSys = gSysMan.get_system<GraphicsSystem>();
 
-    GraphicsSystem *graphics_sys = sys_man.get_system<GraphicsSystem>();
-    TimeSystem *time = sys_man.get_system<TimeSystem>();
-    cout << graphics_sys << endl;
-    MSCEWindow *window = graphics_sys->create_window();
-    MSCEWindow *window2 = graphics_sys->create_window(Vector2D<int>(300, 300));
+    static auto rootWindow = graphicSys->create_window();
 
-    TransformComponent *t1 = comp_man.create_component<TransformComponent>();
-    TransformComponent *t2 = comp_man.create_component<TransformComponent>();
-
-    t2->position.x = 10.0;
-
-    while (!window->should_close() || !window2->should_close())
+    while (!rootWindow->should_close())
     {
+        rootWindow->make_curent_context();
         glfwPollEvents();
-        window->make_curent_context();
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        window->swap_buffers();
-
-        window2->make_curent_context();
-        glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        window2->swap_buffers();
+        rootWindow->swap_buffers();
     }
 
     return 0;

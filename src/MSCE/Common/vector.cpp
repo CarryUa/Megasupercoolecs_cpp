@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <cmath>
+#include <MSCE/logger.h>
 
 using namespace msce;
 
@@ -184,7 +185,14 @@ double Vector2D<VecCT>::dot(const Vector2D &other) const
 template <typename VecCT>
 Vector2D<double> Vector2D<VecCT>::normalized() const
 {
-    return static_cast<Vector2D<double>>(*this) / this->length();
+    auto len = this->length();
+    if (len == 0)
+    {
+        auto l = msce::Logger("Vector Math");
+        l.log_warning("Prevented division by zero in vector.normalized()! Returning (0, 0)...");
+        return Vector2D<double>();
+    }
+    return static_cast<Vector2D<double>>(*this) / len;
 }
 
 template <typename VecCT>

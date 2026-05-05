@@ -20,7 +20,7 @@ namespace msce
     class SystemManager : public Singleton<SystemManager>
     {
     private:
-        static Registry<std::type_index, std::function<std::unique_ptr<System>()>> _system_registry;
+        static Registry<std::type_index, std::function<std::unique_ptr<System>()>> &get_system_registry();
         TimeSystem *_time_sys;
 
     public:
@@ -36,11 +36,11 @@ namespace msce
         template <typename TSys>
         static void register_system()
         {
-            _system_registry.register_entry(typeid(TSys),
-                                            []() -> std::unique_ptr<System>
-                                            {
-                                                return std::unique_ptr<System>(std::make_unique<TSys>().release());
-                                            });
+            get_system_registry().register_entry(typeid(TSys),
+                                                 []() -> std::unique_ptr<System>
+                                                 {
+                                                     return std::unique_ptr<System>(std::make_unique<TSys>().release());
+                                                 });
         }
 
         /// @brief Initializes all system using System.Init();
@@ -66,6 +66,11 @@ namespace msce
             return nullptr;
         }
     };
+    template <typename TSys>
+    inline void register_system()
+    {
+        SystemManager::register_system<TSys>();
+    }
 
 }
 #endif //_MSCE_SYSTEM_MANAGER_H_

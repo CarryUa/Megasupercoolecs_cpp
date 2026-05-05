@@ -53,6 +53,10 @@ add_subdirectory(src/MSCE/Prototypes)
 
 add_subdirectory(tests)
 
+add_executable(run dummy.cpp)
+target_link_libraries(run ${MSCE_TARGET})
+target_include_directories(run PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
 add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
 
@@ -71,9 +75,9 @@ target_link_libraries(${MSCE_TARGET}
                         cereal
                         boost_preprocessor)    
 
-
 # Include dirs
 target_include_directories(${MSCE_TARGET} PUBLIC src)
+target_include_directories(${MSCE_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(${MSCE_TARGET} PRIVATE src/MSCE)
 target_include_directories(${MSCE_TARGET} PUBLIC lib/cereal/include)
 target_include_directories(${MSCE_TARGET} PRIVATE lib/boost/include)

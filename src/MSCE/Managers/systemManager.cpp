@@ -1,18 +1,18 @@
 #include "systemManager.h"
-#include <MSCE/built_in_system_registry.hpp>
 #include <typeindex>
 
 using namespace std;
 using namespace msce;
 
-Registry<std::type_index, std::function<std::unique_ptr<System>()>> SystemManager::_system_registry;
+Registry<std::type_index, std::function<std::unique_ptr<System>()>> &msce::SystemManager::get_system_registry()
+{
+    static auto instance = Registry<std::type_index, std::function<std::unique_ptr<System>()>>();
+    return instance;
+}
 
 SystemManager::SystemManager()
 {
-
-    register_built_in_systems();
-
-    for (const auto &[type, constructor] : SystemManager::_system_registry.enumerate_registry())
+    for (const auto &[type, constructor] : SystemManager::get_system_registry().enumerate_registry())
     {
         this->AllSystems.push_back(constructor());
         this->AllSystems.back().get()->p_sys_man = this;

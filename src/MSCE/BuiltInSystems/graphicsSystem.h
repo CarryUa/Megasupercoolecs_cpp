@@ -24,5 +24,6 @@ namespace msce
         void init() override;
     };
 }
+MSCE_REGISTER_SYSTEM(msce::GraphicsSystem, GraphicsSystem)
 
 #endif //_MSCE_GRAPHICS_SYSTEM_H_

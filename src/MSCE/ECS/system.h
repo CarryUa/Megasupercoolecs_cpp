@@ -1,5 +1,7 @@
 #ifndef _MSCE_SYSTEM_H_
 #define _MSCE_SYSTEM_H_
+#include <MSCE/msce_macros.h>
+
 namespace msce
 {
     // Forward declaration to prevent co-dependency
@@ -25,5 +27,6 @@ namespace msce
         virtual void update(double delta_t);
     };
 }
+MSCE_REGISTER_SYSTEM(msce::System, System)
 
 #endif // _MSCE_SYSTEM_H_

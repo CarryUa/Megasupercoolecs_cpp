@@ -20,6 +20,19 @@
 #include <cxxabi.h>
 // #endif
 
+namespace msce
+{
+    class PrototypeManager;
+
+    template <typename T>
+    struct Registration;
+
+    template <typename TProto>
+    void register_prototype(const std::string &name);
+    template <typename TSys>
+    void register_system();
+}
+
 #pragma region pseudo reflection
 template <typename T, typename U>
 static constexpr const std::type_info &get_member_type(U T::*)
@@ -180,17 +193,6 @@ static constexpr const std::type_info &get_member_type(U T::*)
 #pragma region cereal serialization
 #define WRAP_NVP(r, data, x) CEREAL_NVP(x)
 
-namespace msce
-{
-    class PrototypeManager;
-
-    template <typename T>
-    struct Registration;
-
-    template <typename TProto>
-    void register_prototype(const std::string &name);
-}
-
 /// @brief Generates serialize() method for object it's called in for cereal to use.
 ///  Needs to be placed inside a class defenition.
 ///  This macro also adds cereal::access as friend class.
@@ -251,6 +253,23 @@ public:                                                                         
             }                                                      \
         };                                                         \
         inline Registration<Type> registered_##Name;               \
+    }
+
+#pragma endregion
+
+#pragma region Systems
+#define MSCE_REGISTER_SYSTEM(Type, Name)             \
+    namespace msce                                   \
+    {                                                \
+        template <>                                  \
+        struct Registration<Type>                    \
+        {                                            \
+            Registration()                           \
+            {                                        \
+                register_system<Type>();             \
+            }                                        \
+        };                                           \
+        inline Registration<Type> registered_##Name; \
     }
 
 #pragma endregion

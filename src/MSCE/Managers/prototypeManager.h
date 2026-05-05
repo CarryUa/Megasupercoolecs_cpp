@@ -16,8 +16,8 @@ namespace msce
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> _prototypes;
 
     public:
-        static Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> registered_factories;
-        static Registry<std::string, std::reference_wrapper<const std::type_info>> registered_prototypes;
+        static Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &get_registered_factories();
+        static Registry<std::string, std::reference_wrapper<const std::type_info>> &get_registered_prototypes();
         /// @brief Tries do deserialize cereal file and create a prototype based on it.
         /// @param path The path to cereal file.
         void deserialize_prototype(const std::string &path);
@@ -117,12 +117,12 @@ namespace msce
     template <typename TProto>
     void PrototypeManager::register_prototype(const std::string &name)
     {
-        registered_prototypes.register_entry(name, std::cref(typeid(TProto)));
-        registered_factories.register_entry(name,
-                                            []()
-                                            {
-                                                return std::make_unique<TProto>();
-                                            });
+        get_registered_prototypes().register_entry(name, std::cref(typeid(TProto)));
+        get_registered_factories().register_entry(name,
+                                                  []()
+                                                  {
+                                                      return std::make_unique<TProto>();
+                                                  });
         std::cout
             << "Registered prototype '" << name << "'" << std::endl;
     }
@@ -130,7 +130,7 @@ namespace msce
     template <typename TProto>
     TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
     {
-        if (!registered_factories.is_registered(type))
+        if (!get_registered_factories().is_registered(type))
         {
             std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' wasn't ever registered!" << std::endl;
             return nullptr;
@@ -141,7 +141,7 @@ namespace msce
             return nullptr;
         }
 
-        this->_prototypes[id] = registered_factories.get_entry(type)();
+        this->_prototypes[id] = get_registered_factories().get_entry(type)();
         this->_prototypes[id]->id = id;
 
         auto ptr = dynamic_cast<TProto *>(this->_prototypes[id].get());
