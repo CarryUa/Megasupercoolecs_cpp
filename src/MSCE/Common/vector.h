@@ -4,7 +4,7 @@
 
 namespace msce
 {
-    // 2D Vector structure with basic operations.
+    /// @brief 2D Vector structure with basic operations.
     template <typename VecCT>
     struct Vector2D
     {
@@ -66,8 +66,75 @@ namespace msce
         template <typename NewVecCT>
         operator Vector2D<NewVecCT>() const;
 
-        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y);
+        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y)
     };
+
+    /// @brief 3D Vector structure with basic operations.
+    template <typename VecCT>
+    struct Vector3D
+    {
+        VecCT x;
+        VecCT y;
+        VecCT z;
+        Vector3D(VecCT x = 0, VecCT y = 0, VecCT z = 0);
+        // Vector3D(const Vector3D<VecCT>&Other);
+
+        // Scalar operations
+        Vector3D<VecCT> &operator+=(const VecCT &scalar);
+        Vector3D<VecCT> operator+(const VecCT &scalar) const;
+
+        Vector3D<VecCT> &operator-=(const VecCT &scalar);
+        Vector3D<VecCT> operator-(const VecCT &scalar) const;
+
+        Vector3D<VecCT> &operator*=(const VecCT &scalar);
+        Vector3D<VecCT> operator*(const VecCT &scalar) const;
+
+        Vector3D<VecCT> &operator/=(const VecCT &scalar);
+        Vector3D<VecCT> operator/(const VecCT &scalar) const;
+
+        /// @brief Calculates the length of a vector.
+        /// @return Length of the vector of given type.
+        double length() const;
+
+        /// @brief Calculates the dot(aka scalar) product of 2 vectors.
+        /// @param other The second vector.
+        /// @return The dot(aka scalar) product of given type.
+        double dot(const Vector3D<VecCT> &other) const;
+
+        /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were normalized
+        /// @param other The second vector.
+        /// @return The dot(aka scalar) product of given type.
+        double normalized_dot(const Vector3D<VecCT> &other) const;
+
+        bool operator==(const VecCT &scalar) const;
+
+        // Vector functions
+
+        Vector3D<VecCT> &operator+=(const Vector3D<VecCT> &other);
+        Vector3D<VecCT> operator+(const Vector3D<VecCT> &other) const;
+
+        Vector3D<VecCT> &operator-=(const Vector3D<VecCT> &other);
+        Vector3D<VecCT> operator-(const Vector3D<VecCT> &other) const;
+
+        Vector3D<VecCT> &operator*=(const Vector3D<VecCT> &other);
+        Vector3D<VecCT> operator*(const Vector3D<VecCT> &other) const;
+
+        Vector3D<VecCT> &operator/=(const Vector3D<VecCT> &other);
+        Vector3D<VecCT> operator/(const Vector3D<VecCT> &other) const;
+
+        /// @brief Calculates the normalized vector that points in a same direction as on current one.
+        /// @return Normalized vector.
+        Vector3D<double> normalized() const;
+
+        bool operator==(const Vector3D<VecCT> &other) const;
+
+        // Casts
+        template <typename NewVecCT>
+        operator Vector3D<NewVecCT>() const;
+
+        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y, z)
+    };
+
 }
 
 #endif // _MSCE_VECTORS_H

@@ -4,13 +4,13 @@
 #include <MSCE/msce_macros.h>
 #include <MSCE/logger.h>
 #include <MSCE/Graphics/MSCEWindow.h>
+#include <MSCE/Graphics/color.h>
 
 #include <MSCE/ECS/component.h>
 #include <MSCE/ECS/entity.h>
 #include <MSCE/ECS/system.h>
 
 #include <MSCE/Common/vector.h>
-#include <MSCE/Common/Colors/rgba.h>
 #include <MSCE/Common/Interfaces/Singleton.hpp>
 
 #include <MSCE/BuiltInComponents/transformComponent.hpp>

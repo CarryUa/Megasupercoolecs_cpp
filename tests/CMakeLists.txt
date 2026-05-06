@@ -9,8 +9,8 @@ if(BUILD_TESTING)
                 prototypes.cpp
                 reflection.cpp
                 system_registry.hpp
-                ECS/Common/Colors/rgba.cpp
-                ECS/Common/vector.cpp
+                Common/vector.cpp
+                Graphics/color.cpp
                 ECS/system.cpp
                 ECS/component.cpp
                 ECS/entity.cpp
@@ -20,5 +20,7 @@ if(BUILD_TESTING)
     target_include_directories(run_tests
                                PRIVATE gtest/include
                                PRIVATE src/MSCE
-                               PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+                               PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+                               PRIVATE ${CMAKE_SOURCE_DIR}/include
+                               )
 endif()
