@@ -11,10 +11,9 @@ namespace msce
         Vector2D<double> position = Vector2D(0.5, 0.5);
         Vector2D<double> scale = Vector2D(1.0, 1.0);
 
-        MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(IComponent, position, scale);
+        MSCE_DEFINE_COMPONENT(TransformComponent, position, scale)
     };
 }
-CEREAL_REGISTER_TYPE(msce::TransformComponent);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::IComponent, msce::TransformComponent)
+MSCE_REGISTER_COMPONENT(msce::TransformComponent)
 
 #endif //_MSCE_TRANSFORM_COMPONENT_H_

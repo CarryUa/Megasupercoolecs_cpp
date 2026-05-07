@@ -16,10 +16,6 @@
 
 #include <boost/preprocessor.hpp>
 
-// #ifdef LINUX
-#include <cxxabi.h>
-// #endif
-
 namespace msce
 {
     class PrototypeManager;
@@ -271,6 +267,21 @@ public:                                                                         
         };                                           \
         inline Registration<Type> registered_##Name; \
     }
+
+#pragma endregion
+
+#pragma region Components
+#define MSCE_DEFINE_COMPONENT(Type, ...)                                                                        \
+private:                                                                                                        \
+    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>, __VA_ARGS__)                    \
+public:                                                                                                         \
+    /**  @brief This overload is used by cereal. All components must be instantiated using ComponentManager. */ \
+    Type() {}                                                                                                   \
+    Type(size_t id) : BaseComponent(id) {}
+
+#define MSCE_REGISTER_COMPONENT(Type) \
+    CEREAL_REGISTER_TYPE(Type)        \
+    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::BaseComponent<Type>, Type)
 
 #pragma endregion
 

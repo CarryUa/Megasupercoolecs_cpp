@@ -4,46 +4,49 @@
 
 using namespace msce;
 
-void msce::ComponentManager::register_component(IComponent *comp)
+void msce::ComponentManager::update_smallest_available_id()
 {
-    for (auto &c : this->_components)
+
+    if (this->smallest_available_id_ - _components.size() - 1 > this->min_distance_to_reuse_)
     {
-        if (c.get() == comp)
-            return;
+        this->_components.push_back(nullptr);
+        this->smallest_available_id_++;
+        return;
     }
 
-    this->_components.push_back(std::unique_ptr<IComponent>(comp));
+    for (size_t i = this->_components.size() - 1; i > 0; --i)
+        if (this->_components[i] == nullptr)
+        {
+            this->smallest_available_id_ = i;
+            return;
+        }
+
+    this->_components.resize(this->_components.size() + 1);
+    this->smallest_available_id_ = this->_components.size() - 1;
+}
+
+msce::ComponentManager::ComponentManager()
+{
+    this->_components.push_back(nullptr);
 }
 
 void msce::ComponentManager::destroy_component(IComponent *comp)
 {
-    bool found = false;
-    size_t i = 0;
-    for (auto &c : this->_components)
-    {
-        if (c.get() == comp)
-        {
-            found = true;
-            break;
-        }
-
-        ++i;
-    }
-
-    if (!found)
-        return;
-
-    this->_components.erase(_components.begin() + i);
+    this->destroy_component(comp->id_);
 }
 
-size_t msce::ComponentManager::get_component_id(IComponent *comp)
+void msce::ComponentManager::destroy_component(size_t id)
 {
-    size_t i = 0;
-    for (; i < this->_components.size(); ++i)
-    {
-        if (this->_components[i].get() == comp)
-            break;
-    }
+    if (id > this->_components.size())
+        return;
 
-    return i;
+    this->_components[id].reset();
+    this->smallest_available_id_ = id;
+
+    alive_components_count_--;
+}
+
+std::size_t msce::ComponentManager::count() const noexcept
+{
+    return this->alive_components_count_;
 }
