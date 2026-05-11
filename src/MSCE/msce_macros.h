@@ -28,14 +28,6 @@ namespace msce
     template <typename TSys>
     [[gnu::used]] void register_system();
 
-    template <typename T>
-    struct SystemRegistration
-    {
-        [[gnu::used]] SystemRegistration()
-        {
-            register_system<T>();
-        }
-    };
 }
 
 #pragma region pseudo reflection
@@ -264,10 +256,19 @@ public:                                                                         
 #pragma endregion
 
 #pragma region Systems
-#define MSCE_REGISTER_SYSTEM(Type, Name)                          \
-    namespace msce                                                \
-    {                                                             \
-        static inline SystemRegistration<Type> registered_##Name; \
+#define MSCE_REGISTER_SYSTEM(Type, Name)             \
+    namespace msce                                   \
+    {                                                \
+        template <>                                  \
+        class Registration<Type>                     \
+        {                                            \
+        public:                                      \
+            [[gnu::used]] Registration()             \
+            {                                        \
+                register_system<Type>();             \
+            }                                        \
+        };                                           \
+        inline Registration<Type> registered_##Name; \
     }
 
 #pragma endregion

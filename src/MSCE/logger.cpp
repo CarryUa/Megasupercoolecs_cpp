@@ -1,14 +1,11 @@
 #include "logger.h"
-#include <filesystem>
 #include <chrono>
 
 using namespace msce;
 
 std::size_t Logger::millis_at_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
-std::ofstream Logger::log_file = std::ofstream(std::filesystem::temp_directory_path() / "msce_log.txt");
-
-std::size_t Logger::instance_count = 0;
+// std::ofstream Logger::log_file = ;
 
 void Logger::append_to_log_file(const std::string_view &message) const noexcept
 {
@@ -29,11 +26,7 @@ msce::Logger::Logger(const std::string &owner_name)
         this->millis_at_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
     this->owner_name = owner_name;
-    instance_count++;
 }
 Logger::~Logger()
 {
-    if (instance_count == 1)
-        this->log_file.close();
-    instance_count--;
 }

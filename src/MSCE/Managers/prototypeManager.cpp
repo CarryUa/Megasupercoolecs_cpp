@@ -28,7 +28,7 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
     ifstream file(path);
     if (!file)
     {
-        cerr << "[PROTO]: " << "Couldn't open prototype file at " << path << endl;
+        logger_.log_error("Couldn't open prototype file at '{}'", path);
         return;
     }
 
@@ -49,11 +49,13 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
     }
     catch (const exception &e)
     {
-        cerr << "[PROTO]: " << "Couldn't deserialize prototype at '" << path << "': " << e.what() << endl;
+        logger_.log_error("Couldn't deserialize prototype at '{}': ", e.what());
     }
-
-    file.close();
-    return;
+    catch (...)
+    {
+        file.close();
+        return;
+    }
 }
 
 void msce::PrototypeManager::serialize_prototype(const std::string &path, const unique_ptr<IPrototype> &prototype)
@@ -61,7 +63,7 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
     ofstream file(path);
     if (!file)
     {
-        cerr << "[PROTO]: " << "Couldn't create prototype cereal file at " << path << endl;
+        logger_.log_error("Couldn't create prototype cereal file at '{}'", path);
         return;
     }
 
@@ -78,18 +80,20 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
     }
     catch (const exception &e)
     {
-        cerr << "[PROTO]: " << "Couldn't serialize '" << prototype->id << "' into file at '" << path << "': " << e.what() << endl;
+        logger_.log_error("Couldn't serialize '{}' into file at '{}': {}", prototype->id, path, e.what());
     }
-
-    file.close();
-    return;
+    catch (...)
+    {
+        file.close();
+        return;
+    }
 }
 
 msce::IPrototype *msce::PrototypeManager::get_prototype(const std::string &id)
 {
     if (!this->_prototypes.contains(id))
     {
-        cerr << "[PROTO]: " << "Prototype '" << id << "' doesn't exist." << endl;
+        logger_.log_error("Prototype '{}' doesn't exist.", id);
         return nullptr;
     }
 
@@ -111,12 +115,12 @@ msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::strin
 {
     if (!get_registered_factories().is_registered(type))
     {
-        std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' wasn't ever registered!" << std::endl;
+        logger_.log_error("Error: Prototype with type '{}' wasn't ever registered!", type);
         return nullptr;
     }
     if (this->_prototypes.contains(id))
     {
-        std::cerr << "[PROTO]: Error: Prototype with id '" << id << "' already exist!" << std::endl;
+        logger_.log_error("Error: Prototype with id '{}' already exist!", id);
         return nullptr;
     }
 

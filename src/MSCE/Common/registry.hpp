@@ -1,5 +1,7 @@
 #ifndef MSCE_I_REGISTRY_HPP
 #define MSCE_I_REGISTRY_HPP
+#include <MSCE/logger.h>
+
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
@@ -17,7 +19,6 @@ namespace msce
         {
             if (is_registered(id))
             {
-                std::cerr << "[warning]: Double registration detected!" << std::endl;
                 return;
             }
 

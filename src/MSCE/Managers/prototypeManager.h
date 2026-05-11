@@ -7,6 +7,7 @@
 #include <MSCE/Common/Interfaces/Singleton.hpp>
 #include <MSCE/Common/registry.hpp>
 #include <MSCE/Prototypes/prototype.hpp>
+#include <MSCE/logger.h>
 
 namespace msce
 {
@@ -14,6 +15,7 @@ namespace msce
     {
     private:
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> _prototypes;
+        inline static Logger logger_ = Logger("PrototypeManager");
 
     public:
         static Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &get_registered_factories();
@@ -86,13 +88,14 @@ namespace msce
     {
         if (!this->_prototypes.contains(id))
         {
-            std::cerr << "[PROTO]: Prototype with id '" << id << "' doesn't exist" << std::endl;
+            logger_.log_warning("[PROTO]: Prototype with id '{}' doesn't exist", id);
             return nullptr;
         }
         TProto *p = dynamic_cast<TProto *>(this->_prototypes[id].get());
         if (p == nullptr)
         {
-            std::cerr << "[PROTO]: Prototype with id '" << id << "' doesn't match type provided: " << typeid(TProto).name() << std::endl;
+            logger_.log_warning("[PROTO]: Prototype with id '{}' doesn't match type provided: {}", id, typeid(TProto).name());
+            return nullptr;
         }
 
         return p;
@@ -123,8 +126,8 @@ namespace msce
                                                   {
                                                       return std::make_unique<TProto>();
                                                   });
-        std::cout
-            << "Registered prototype '" << name << "'" << std::endl;
+
+        logger_.log_info("Registered prototype with name: '{}'", name);
     }
 
     template <typename TProto>
@@ -132,12 +135,12 @@ namespace msce
     {
         if (!get_registered_factories().is_registered(type))
         {
-            std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' wasn't ever registered!" << std::endl;
+            logger_.log_error("Prototype with type '{} ' wasn't ever registered!", type);
             return nullptr;
         }
         if (this->_prototypes.contains(id))
         {
-            std::cerr << "[PROTO]: Error: Prototype with id '" << id << "' already exist!" << std::endl;
+            logger_.log_error("Prototype with id '{}' already exist!", id);
             return nullptr;
         }
 
@@ -147,7 +150,7 @@ namespace msce
         auto ptr = dynamic_cast<TProto *>(this->_prototypes[id].get());
         if (ptr == nullptr)
         {
-            std::cerr << "[PROTO]: Error: Prototype with type '" << type << "' cant exist!" << std::endl;
+            logger_.log_error("Prototype with type '{}' cant exist!", type);
             return nullptr;
         }
 

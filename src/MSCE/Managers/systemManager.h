@@ -1,8 +1,7 @@
 #ifndef _MSCE_SYSTEM_MANAGER_H_
 #define _MSCE_SYSTEM_MANAGER_H_
 #include <MSCE/Common/Interfaces/Singleton.hpp>
-#include <MSCE/ECS/system.h>
-#include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/logger.h>
 #include <MSCE/Common/registry.hpp>
 #include <vector>
 #include <map>
@@ -10,6 +9,8 @@
 #include <typeindex>
 #include <functional>
 #include <iostream>
+#include <MSCE/ECS/system.h>
+#include <MSCE/BuiltInSystems/timeSystem.h>
 
 namespace msce
 {
@@ -20,6 +21,7 @@ namespace msce
     class SystemManager : public Singleton<SystemManager>
     {
     private:
+        inline static Logger logger_ = Logger("SystemManager");
         static Registry<std::type_index, std::function<std::unique_ptr<System>()>> &get_system_registry();
         TimeSystem *_time_sys;
 
@@ -36,11 +38,17 @@ namespace msce
         template <typename TSys>
         static void register_system()
         {
+            if (get_system_registry().is_registered(typeid(TSys)))
+            {
+                logger_.log_warning("Double registration of {} detected!", typeid(TSys).name());
+                return;
+            }
             get_system_registry().register_entry(typeid(TSys),
                                                  []() -> std::unique_ptr<System>
                                                  {
                                                      return std::unique_ptr<System>(std::make_unique<TSys>().release());
                                                  });
+            logger_.log_info("Registered system of type: {}", typeid(TSys).name());
         }
 
         /// @brief Initializes all system using System.Init();
@@ -71,6 +79,6 @@ namespace msce
     {
         SystemManager::register_system<TSys>();
     }
-
 }
+
 #endif //_MSCE_SYSTEM_MANAGER_H_

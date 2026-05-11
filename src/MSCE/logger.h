@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include <format>
 
 namespace msce
@@ -12,13 +13,13 @@ namespace msce
     private:
         std::string owner_name;
         static std::size_t millis_at_start;
-        static std::ofstream log_file;
-        static std::size_t instance_count;
+        inline static std::ofstream log_file = std::ofstream(std::filesystem::temp_directory_path() / "msce_log.txt");
 
         void append_to_log_file(const std::string_view &message) const noexcept;
 
     public:
         Logger(const std::string &owner_name);
+        Logger(const Logger &other) = default;
         ~Logger();
 
         template <typename... Args>
