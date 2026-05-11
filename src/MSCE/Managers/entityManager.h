@@ -1,14 +1,19 @@
 #ifndef MSCE_ENTITY_MANAGER_H_
 #define MSCE_ENTITY_MANAGER_H_
-#include <MSCE/ECS/entity.h>
-#include <MSCE/Common/Interfaces/Singleton.hpp>
+
+#include <vector>
 #include <memory>
+
+#include <MSCE/ECS/entity.h>
+#include <MSCE/Common/smartPointerList.h>
+#include <MSCE/Common/Interfaces/Singleton.hpp>
+
 namespace msce
 {
     class EntityManager : public Singleton<EntityManager>
     {
     private:
-        std::vector<std::unique_ptr<Entity>> _entities;
+        SmartUniquePointerList<Entity> entities_;
 
     public:
         /// @brief Creates new entity.
@@ -19,13 +24,11 @@ namespace msce
         /// @return Pointer to newly created entity.
         Entity *copy_entity(Entity *other);
 
-        void destroy_entity();
+        bool destroy_entity(Entity *other);
 
         /// @brief Finds entity class by id.
         /// @return Pointer to an entity with given id or nullptr.
         Entity *get_entity(size_t id);
-
-        size_t get_entity_id(Entity *ent);
     };
 }
 

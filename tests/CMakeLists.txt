@@ -8,7 +8,6 @@ if(BUILD_TESTING)
                 main.cpp
                 prototypes.cpp
                 reflection.cpp
-                system_registry.hpp
                 Common/vector.cpp
                 Graphics/color.cpp
                 ECS/system.cpp

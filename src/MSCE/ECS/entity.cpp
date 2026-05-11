@@ -2,9 +2,14 @@
 
 #include <MSCE/Managers/entityManager.h>
 
-size_t msce::Entity::get_entity_id()
+void msce::Entity::set_id(size_t id)
 {
-    return EntityManager::instance->get_entity_id(this);
+    this->entity_id_ = id;
+}
+
+size_t msce::Entity::get_id() const
+{
+    return this->entity_id_;
 }
 
 bool msce::Entity::has_component(IComponent *component)

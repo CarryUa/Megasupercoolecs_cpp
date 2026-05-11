@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28.0)
 project(Megasupercoolecs VERSION 0.1.0 LANGUAGES CXX)
 
+set(CMAKE_COMPILER_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
+
 if(NOT MSCE_SKIP_TESTS)
     include(CTest)
 endif ()
@@ -28,9 +30,6 @@ message(STATUS "CMAKE BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(DEBUG)
-else()
-    add_compile_definitions(RELEASE)
-    add_compile_options(-O2)
 endif()
 
 

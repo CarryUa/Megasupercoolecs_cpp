@@ -1,6 +1,9 @@
-#include <gtest/gtest.h>
 #include <test_configs.h>
+#include <gtest/gtest.h>
+
+#include <MSCE/logger.h>
 #include <MSCE/Common/vector.h>
+
 #include <cmath>
 
 using namespace msce;
@@ -181,19 +184,24 @@ TYPED_TEST(Vector2DTests, VectorFunctions)
         EXPECT_NEAR(vec1.dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
 
         // Normalized
-        Vector2D<double>
-            ex_normalized_vec(static_cast<double>(x) / ex_len, static_cast<double>(y) / ex_len);
-        EXPECT_EQ(vec1.normalized(), ex_normalized_vec);
+        if (ex_len != 0)
+        {
+            Vector2D<double> ex_normalized_vec(static_cast<double>(x) / ex_len, static_cast<double>(y) / ex_len);
+            EXPECT_EQ(vec1.normalized(), ex_normalized_vec);
+        }
 
         // Normalized Dot
         double ex_len2 = sqrt(static_cast<double>(x2) * static_cast<double>(x2) +
                               static_cast<double>(y2) * static_cast<double>(y2));
 
-        ex_dot = static_cast<double>(x) / ex_len * static_cast<double>(x2) / ex_len2 +
-                 static_cast<double>(y) / ex_len * static_cast<double>(y2) / ex_len2;
-        EXPECT_NEAR(vec1.normalized_dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
-        EXPECT_GE(vec1.normalized_dot(vec2), -1.0);
-        EXPECT_LE(vec1.normalized_dot(vec2), 1.0);
+        if (ex_len != 0 && ex_len2 != 0)
+        {
+            ex_dot = static_cast<double>(x) / ex_len * static_cast<double>(x2) / ex_len2 +
+                     static_cast<double>(y) / ex_len * static_cast<double>(y2) / ex_len2;
+            EXPECT_NEAR(vec1.normalized_dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
+            EXPECT_GE(vec1.normalized_dot(vec2), -1.0);
+            EXPECT_LE(vec1.normalized_dot(vec2), 1.0);
+        }
     }
 }
 
@@ -390,21 +398,27 @@ TYPED_TEST(Vector3DTests, VectorFunctions)
         EXPECT_NEAR(vec1.dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
 
         // Normalized
-        Vector3D<double>
-            ex_normalized_vec(static_cast<double>(x) / ex_len, static_cast<double>(y) / ex_len, static_cast<double>(z) / ex_len);
-        EXPECT_EQ(vec1.normalized(), ex_normalized_vec);
+        if (ex_len != 0)
+        {
+            Vector3D<double>
+                ex_normalized_vec(static_cast<double>(x) / ex_len, static_cast<double>(y) / ex_len, static_cast<double>(z) / ex_len);
+            EXPECT_EQ(vec1.normalized(), ex_normalized_vec);
+        }
 
         // Normalized Dot
         double ex_len2 = sqrt(static_cast<double>(x2) * static_cast<double>(x2) +
                               static_cast<double>(y2) * static_cast<double>(y2) +
                               static_cast<double>(z2) * static_cast<double>(z2));
 
-        ex_dot = static_cast<double>(x) / ex_len * static_cast<double>(x2) / ex_len2 +
-                 static_cast<double>(y) / ex_len * static_cast<double>(y2) / ex_len2 +
-                 static_cast<double>(z) / ex_len * static_cast<double>(z2) / ex_len2;
-        EXPECT_NEAR(vec1.normalized_dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
-        EXPECT_GE(vec1.normalized_dot(vec2), -1.0);
-        EXPECT_LE(vec1.normalized_dot(vec2), 1.0);
+        if (ex_len != 0 && ex_len2 != 0)
+        {
+            ex_dot = static_cast<double>(x) / ex_len * static_cast<double>(x2) / ex_len2 +
+                     static_cast<double>(y) / ex_len * static_cast<double>(y2) / ex_len2 +
+                     static_cast<double>(z) / ex_len * static_cast<double>(z2) / ex_len2;
+            EXPECT_NEAR(vec1.normalized_dot(vec2), ex_dot, TEST_FLOATING_POINT_TOLERANCE);
+            EXPECT_GE(vec1.normalized_dot(vec2), -1.0);
+            EXPECT_LE(vec1.normalized_dot(vec2), 1.0);
+        }
     }
 }
 

@@ -5,6 +5,12 @@
 using namespace msce;
 #pragma region Vector2D
 
+static double round_to_digits(double value, int digits)
+{
+    double multiplier = std::pow(10.0, digits);
+    return std::round(value * multiplier) / multiplier;
+}
+
 template <typename VecCT>
 Vector2D<VecCT>::Vector2D(VecCT x, VecCT y)
 {
@@ -178,6 +184,9 @@ template <typename VecCT>
 Vector2D<double> Vector2D<VecCT>::normalized() const
 {
     auto len = this->length();
+    if (len == 0.0)
+        return Vector2D<double>(0.0, 0.0);
+
     return static_cast<Vector2D<double>>(*this) / len;
 }
 
@@ -187,7 +196,7 @@ double Vector2D<VecCT>::normalized_dot(const Vector2D &other) const
     Vector2D<double> this_normalized = this->normalized();
     Vector2D<double> other_normalized = other.normalized();
 
-    return this_normalized.dot(other_normalized);
+    return round_to_digits(this_normalized.dot(other_normalized), 15);
 }
 template <typename VecCT>
 template <typename NewVecCT>
@@ -299,7 +308,7 @@ double msce::Vector3D<VecCT>::normalized_dot(const Vector3D<VecCT> &other) const
 {
     const Vector3D<double> other_normalized = other.normalized();
     const Vector3D<double> this_normalized = this->normalized();
-    return this_normalized.dot(other_normalized);
+    return round_to_digits(this_normalized.dot(other_normalized), 15);
 }
 
 template <typename VecCT>
@@ -382,6 +391,8 @@ template <typename VecCT>
 Vector3D<double> msce::Vector3D<VecCT>::normalized() const
 {
     auto len = this->length();
+    if (len == 0)
+        return Vector3D<double>(0, 0);
     return static_cast<Vector3D<double>>(*this) / len;
 }
 

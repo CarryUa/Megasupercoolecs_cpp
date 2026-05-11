@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
 
+#include <MSCE/Graphics/color.h>
+
+#include <format>
+
 using namespace msce;
 
 TEST(ColorTests, CreationTest)

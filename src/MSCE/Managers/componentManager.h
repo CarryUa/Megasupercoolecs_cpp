@@ -2,6 +2,7 @@
 #define _MSCE_COMPONENT_MANAGER_H_
 #include <vector>
 #include <memory>
+#include <MSCE/Common/smartPointerList.h>
 #include <MSCE/Common/Interfaces/Singleton.hpp>
 #include <MSCE/ECS/component.h>
 #include <MSCE/logger.h>
@@ -13,16 +14,7 @@ namespace msce
     class ComponentManager : public Singleton<ComponentManager>
     {
     private:
-        /// @brief This value controls how far should pointer be from end of the vector to be reused.
-        size_t min_distance_to_reuse_ = 5;
-        size_t alive_components_count_ = 0;
-
-        std::vector<std::unique_ptr<IComponent>>
-            _components = std::vector<std::unique_ptr<IComponent>>();
-
-        size_t smallest_available_id_ = 0;
-
-        void update_smallest_available_id();
+        SmartUniquePointerList<IComponent> components_;
 
     public:
         ComponentManager();
@@ -62,43 +54,34 @@ namespace msce
     template <typename TComp>
     inline TComp *ComponentManager::create_component()
     {
-        TComp *p = new TComp(smallest_available_id_);
-        this->_components[smallest_available_id_].reset(dynamic_cast<IComponent *>(p));
-
-        alive_components_count_++;
-
-        update_smallest_available_id();
-        return p;
+        static_assert(std::is_base_of_v<IComponent, TComp>,
+                      "TComp must derive from IComponent");
+        TComp *c = new TComp();
+        this->components_.insert(c);
+        return c;
     }
 
     template <typename TComp>
     inline TComp *ComponentManager::clone_component(TComp *other)
     {
         IComponent *cloned = other->clone();
-        this->_components[smallest_available_id_].reset(cloned);
-        cloned->id_ = smallest_available_id_;
-
-        alive_components_count_++;
-
-        update_smallest_available_id();
+        this->components_.insert(cloned);
         return dynamic_cast<TComp *>(cloned);
     }
 
     template <typename TComp>
     inline TComp *ComponentManager::get_component(std::size_t id) const
     {
-        if (_components.size() <= id)
-            return nullptr;
-
-        return dynamic_cast<TComp *>(_components[id].get());
+        return dynamic_cast<TComp *>(this->components_.get_item(id));
     }
     template <typename TComp>
     inline std::vector<TComp *> ComponentManager::get_all_components_of_type()
     {
         std::vector<TComp *> return_vec;
-        for (auto &comp : this->_components)
+        for (auto *comp : this->components_)
         {
-            TComp *result = dynamic_cast<TComp *>(comp.get());
+
+            TComp *result = dynamic_cast<TComp *>(comp);
             if (result != nullptr)
                 return_vec.push_back(result);
         }

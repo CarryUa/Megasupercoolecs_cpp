@@ -24,9 +24,18 @@ namespace msce
     struct Registration;
 
     template <typename TProto>
-    void register_prototype(const std::string &name);
+    [[gnu::used]] void register_prototype(const std::string &name);
     template <typename TSys>
-    void register_system();
+    [[gnu::used]] void register_system();
+
+    template <typename T>
+    struct SystemRegistration
+    {
+        [[gnu::used]] SystemRegistration()
+        {
+            register_system<T>();
+        }
+    };
 }
 
 #pragma region pseudo reflection
@@ -241,9 +250,10 @@ public:                                                                         
     namespace msce                                                 \
     {                                                              \
         template <>                                                \
-        struct Registration<Type>                                  \
+        class Registration<Type>                                   \
         {                                                          \
-            Registration()                                         \
+        public:                                                    \
+            [[gnu::used]] Registration()                           \
             {                                                      \
                 register_prototype<Type>(#Name);                   \
             }                                                      \
@@ -254,18 +264,10 @@ public:                                                                         
 #pragma endregion
 
 #pragma region Systems
-#define MSCE_REGISTER_SYSTEM(Type, Name)             \
-    namespace msce                                   \
-    {                                                \
-        template <>                                  \
-        struct Registration<Type>                    \
-        {                                            \
-            Registration()                           \
-            {                                        \
-                register_system<Type>();             \
-            }                                        \
-        };                                           \
-        inline Registration<Type> registered_##Name; \
+#define MSCE_REGISTER_SYSTEM(Type, Name)                          \
+    namespace msce                                                \
+    {                                                             \
+        static inline SystemRegistration<Type> registered_##Name; \
     }
 
 #pragma endregion

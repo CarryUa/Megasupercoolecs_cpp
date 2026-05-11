@@ -1,5 +1,26 @@
+#include <MSCE/msce_macros.h>
+
 #include <gtest/gtest.h>
-#include <test_configs.h>
+#include <MSCE/ECS/system.h>
+#include <MSCE/Managers/systemManager.h>
+
+class TestSystem1 : public msce::System
+{
+private:
+    void SwitchValue()
+    {
+        value = !value;
+    }
+
+public:
+    bool value = false;
+    void init() override
+    {
+        System::init();
+        SwitchValue();
+    }
+};
+MSCE_REGISTER_SYSTEM(TestSystem1, TestSystem1)
 
 using namespace msce;
 

@@ -1,16 +1,20 @@
-#include <test_configs.h>
 #include <gtest/gtest.h>
-#include "system_registry.hpp"
+#include <test_configs.h>
+
+#include <MSCE/Managers/componentManager.h>
+#include <MSCE/Managers/entityManager.h>
+#include <MSCE/Managers/systemManager.h>
+#include <MSCE/Managers/prototypeManager.h>
 
 #include <chrono>
+
+using namespace msce;
 
 int main(int argc, char **argv)
 {
 
     testing::InitGoogleTest(&argc, argv);
     srand(RAND_FUNCTION_SEED);
-
-    register_all();
 
     SystemManager sysMan;
     sysMan.init_all_systems();

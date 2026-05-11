@@ -1,4 +1,9 @@
+#include <gtest/gtest.h>
 #include <test_configs.h>
+
+#include <MSCE/ECS/component.h>
+#include <MSCE/Managers/componentManager.h>
+
 using namespace msce;
 
 namespace

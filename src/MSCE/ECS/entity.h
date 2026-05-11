@@ -2,16 +2,21 @@
 #define MSCE_ENTITY_H_
 #include <vector>
 #include <MSCE/ECS/component.h>
+#include <MSCE/Common/iHasIdMember.h>
 
 namespace msce
 {
-    class Entity
+    class Entity : public IHasIntegerIdMember
     {
     private:
         std::vector<IComponent *> _components;
+        size_t entity_id_;
+
+        virtual void
+        set_id(size_t) override;
 
     public:
-        size_t get_entity_id();
+        virtual size_t get_id() const override;
 
         template <typename TComp>
         bool has_component()
@@ -97,7 +102,8 @@ namespace msce
         template <typename TComp>
         void force_attach_component(TComp *comp)
         {
-
+            if (has_component<TComp>())
+                detach_component<TComp>();
             _components.push_back(comp);
         }
     };

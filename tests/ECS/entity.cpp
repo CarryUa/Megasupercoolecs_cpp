@@ -1,8 +1,26 @@
 #include <test_configs.h>
+
+#include <gtest/gtest.h>
 #include <MSCE/ECS/entity.h>
 #include <MSCE/ECS/component.h>
+#include <MSCE/Prototypes/prototype.hpp>
+#include <MSCE/Managers/entityManager.h>
+#include <MSCE/Managers/prototypeManager.h>
+#include <MSCE/Managers/componentManager.h>
 #include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/msce_macros.h>
 using namespace msce;
+
+struct TestPrototype1_ent : public msce::IPrototype
+{
+    int test_int = 15556;
+    bool test_bool = true;
+    std::string test_str = "Hello World!";
+
+public:
+    MSCE_DEFINE_PROTOTYPE(TestPrototype1_ent, test_int, test_bool, test_str)
+};
+MSCE_REGISTER_PROTOTYPE(TestPrototype1_ent, TestPrototype1_ent)
 
 TEST(EntityTests, CreationTest)
 {
@@ -12,7 +30,7 @@ TEST(EntityTests, CreationTest)
     auto ent2 = entMan->create_entity();
 
     EXPECT_NE(ent, ent2);
-    EXPECT_NE(ent->get_entity_id(), ent2->get_entity_id());
+    EXPECT_NE(ent->get_id(), ent2->get_id());
 }
 
 TEST(EntityTests, EntityOperationTest)
@@ -52,7 +70,7 @@ TEST(EntityTests, EntityOperationTest)
         auto ent3 = entMan->copy_entity(ent);
 
         EXPECT_NE(ent, ent3) << "Entity copy points to same memory address";
-        EXPECT_NE(ent->get_entity_id(), ent3->get_entity_id()) << "Copy of an entity has same ID as original";
+        EXPECT_NE(ent->get_id(), ent3->get_id()) << "Copy of an entity has same ID as original";
         ASSERT_TRUE(ent3->has_component<TransformComponent>()) << "Copy of an entity doesn't have same components";
         EXPECT_NE(ent->get_component<TransformComponent>(), ent3->get_component<TransformComponent>()) << "Entity copys component points to same address as originals component";
         EXPECT_EQ(ent->get_component<TransformComponent>()->position, ent3->get_component<TransformComponent>()->position) << "Entity copys component has different values than originals";
