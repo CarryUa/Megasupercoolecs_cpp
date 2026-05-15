@@ -11,6 +11,15 @@ static double round_to_digits(double value, int digits)
     return std::round(value * multiplier) / multiplier;
 }
 
+static double clamp(double v, double max, double min)
+{
+    if (v > max)
+        return max;
+    if (v < min)
+        return min;
+    return v;
+}
+
 template <typename VecCT>
 Vector2D<VecCT>::Vector2D(VecCT x, VecCT y)
 {
@@ -197,6 +206,24 @@ double Vector2D<VecCT>::normalized_dot(const Vector2D &other) const
     Vector2D<double> other_normalized = other.normalized();
 
     return round_to_digits(this_normalized.dot(other_normalized), 15);
+}
+template <typename VecCT>
+double msce::Vector2D<VecCT>::get_angle_between_radians(const Vector2D<VecCT> &other) const noexcept
+{
+    VecCT n_dot = this->normalized_dot(other);
+    clamp(n_dot, -1, 1);
+
+    return acos(n_dot);
+}
+template <typename VecCT>
+double msce::Vector2D<VecCT>::get_angle_between_degrees(const Vector2D<VecCT> &other) const noexcept
+{
+    return get_angle_between_radians(other) * (180 / M_PI);
+}
+template <typename VecCT>
+VecCT msce::Vector2D<VecCT>::distance_to(const Vector2D<VecCT> &other) const noexcept
+{
+    return std::abs(((*this) - other).length());
 }
 template <typename VecCT>
 template <typename NewVecCT>

@@ -1,4 +1,6 @@
 #include "graphicsSystem.h"
+#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <glad/glad.h>
 #include <iostream>
 
 using namespace msce;
@@ -10,6 +12,11 @@ void GraphicsSystem::init()
     {
         throw std::runtime_error("Couldn't initialize glfw.");
     }
+}
+
+msce::GraphicsSystem::GraphicsSystem()
+{
+    this->compMan_ = ComponentManager::instance;
 }
 
 void GraphicsSystem::select_window(size_t id)
@@ -24,6 +31,10 @@ void GraphicsSystem::select_window(size_t id)
 void GraphicsSystem::select_window(MSCEWindow *window)
 {
     window->make_curent_context();
+}
+
+void msce::GraphicsSystem::pre_rended_all_objects_on_window(MSCEWindow *window)
+{
 }
 
 MSCEWindow *GraphicsSystem::get_window(size_t id)

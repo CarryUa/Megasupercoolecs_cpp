@@ -1,4 +1,8 @@
 #ifndef MSCE_MACORS_HPP_
+/**
+ * This file defines general macros, like serialization and relection -related.
+ * For specific macros, like system, prototype etc. refer to system prototype etc. header files corespondingly.
+ */
 #define MSCE_MACORS_HPP_
 
 #include <iostream>
@@ -229,63 +233,4 @@ public:                                                                         
     }
 
 #pragma endregion
-
-#pragma region Prototypes
-
-#define MSCE_DEFINE_PROTOTYPE(Type, ...)                                            \
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__) \
-    MSCE_GENERATE_REFLECTION_METHODS_DERIVED(Type, ::msce::IPrototype, __VA_ARGS__)
-
-#define MSCE_REGISTER_PROTOTYPE(Type, Name)                        \
-    CEREAL_REGISTER_TYPE(Type)                                     \
-    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, Type) \
-    namespace msce                                                 \
-    {                                                              \
-        template <>                                                \
-        class Registration<Type>                                   \
-        {                                                          \
-        public:                                                    \
-            [[gnu::used]] Registration()                           \
-            {                                                      \
-                register_prototype<Type>(#Name);                   \
-            }                                                      \
-        };                                                         \
-        inline Registration<Type> registered_##Name;               \
-    }
-
-#pragma endregion
-
-#pragma region Systems
-#define MSCE_REGISTER_SYSTEM(Type, Name)             \
-    namespace msce                                   \
-    {                                                \
-        template <>                                  \
-        class Registration<Type>                     \
-        {                                            \
-        public:                                      \
-            [[gnu::used]] Registration()             \
-            {                                        \
-                register_system<Type>();             \
-            }                                        \
-        };                                           \
-        inline Registration<Type> registered_##Name; \
-    }
-
-#pragma endregion
-
-#pragma region Components
-#define MSCE_DEFINE_COMPONENT(Type, ...)                                                                        \
-private:                                                                                                        \
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>, __VA_ARGS__)                    \
-public:                                                                                                         \
-    /**  @brief This overload is used by cereal. All components must be instantiated using ComponentManager. */ \
-    Type() {}                                                                                                   \
-    Type(size_t id) : BaseComponent(id) {}
-
-#define MSCE_REGISTER_COMPONENT(Type) \
-    CEREAL_REGISTER_TYPE(Type)        \
-    CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::BaseComponent<Type>, Type)
-
-#pragma endregion
-
 #endif // MSCE_MACORS_HPP_

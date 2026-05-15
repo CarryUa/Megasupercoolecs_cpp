@@ -2,6 +2,24 @@
 #define _MSCE_SYSTEM_H_
 #include <MSCE/msce_macros.h>
 
+#pragma region Systems Macros
+#define MSCE_REGISTER_SYSTEM(Type, Name)             \
+    namespace msce                                   \
+    {                                                \
+        template <>                                  \
+        class Registration<Type>                     \
+        {                                            \
+        public:                                      \
+            [[gnu::used]] Registration()             \
+            {                                        \
+                register_system<Type>();             \
+            }                                        \
+        };                                           \
+        inline Registration<Type> registered_##Name; \
+    }
+
+#pragma endregion
+
 namespace msce
 {
     // Forward declaration to prevent co-dependency

@@ -5,12 +5,18 @@
 #include <MSCE/Common/vector.h>
 #include <memory>
 
+#include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/Managers/componentManager.h>
+
 using namespace std;
 
 namespace msce
 {
     class MSCEWindow
     {
+        GLuint shaderProgram_;
+        TimeSystem *tSys_;
+        ComponentManager *compMan_ = nullptr;
         unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window;
 
     public:
@@ -18,8 +24,11 @@ namespace msce
         const char *title;
         MSCEWindow(Vector2D<int> window_size_ = Vector2D<int>(500, 500), const char *title = "Window", GLFWmonitor *glfw_monitor = nullptr, GLFWwindow *glfw_share = nullptr);
         bool should_close();
+        void render();
         void swap_buffers();
         void make_curent_context();
+
+        static void on_resize(GLFWwindow *, int w, int h);
     };
 }
 

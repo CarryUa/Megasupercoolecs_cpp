@@ -2,4 +2,5 @@
 
 target_sources(${MSCE_TARGET}
                 PRIVATE MSCEWindow.cpp
-                PRIVATE color.cpp)
+                PRIVATE color.cpp
+                PRIVATE shape.cpp)
