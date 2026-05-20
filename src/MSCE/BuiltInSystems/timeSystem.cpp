@@ -1,53 +1,53 @@
 #include "timeSystem.h"
 
+#define TIME_POINT_NOW() high_resolution_clock::now()
+
 using namespace std::chrono;
 using namespace msce;
 
-double TimeSystem::get_delta_time() const
+namespace
 {
-    auto delta_time = duration_cast<nanoseconds>(
-        high_resolution_clock::now() - this->_last_frame_time);
-
-    // convert to millis and then to seconds: / (1,000 * 1,000,000)
-    return static_cast<double>(delta_time.count()) / 1000000000.0;
+    const high_resolution_clock::time_point PROGRAM_START_TIME_POINT = TIME_POINT_NOW();
 }
 
-high_resolution_clock::time_point TimeSystem::get_last_frame_time() const
+void msce::TimeSystem::set_all_units_from_nanos(unsigned long nanos)
 {
-    return this->_last_frame_time;
+    this->nanos_since_start_ = nanos;
+    this->millis_since_start_ = static_cast<double>(nanos) / 1.0E6;
+    this->seconds_since_start_ = static_cast<double>(nanos) / 1.0E9;
 }
 
-high_resolution_clock::time_point TimeSystem::get_start_time() const
+void msce::TimeSystem::init()
 {
-    return this->_start_time;
+    this->set_all_units_from_nanos(duration_cast<nanoseconds>(TIME_POINT_NOW() - PROGRAM_START_TIME_POINT).count());
 }
 
-double TimeSystem::get_total_millis() const
+void msce::TimeSystem::update(double delta_time)
 {
-    return get_total_nanos() / 1000000.0;
+    auto prev_total_sec = this->seconds_since_start_;
+
+    this->set_all_units_from_nanos(duration_cast<nanoseconds>(TIME_POINT_NOW() - PROGRAM_START_TIME_POINT).count());
+    this->delta_seconds_ = this->seconds_since_start_ - prev_total_sec;
 }
 
-unsigned long TimeSystem::get_total_nanos() const
+double msce::TimeSystem::get_delta_seconds() const
 {
-    return _nanos_since_start;
+    return this->delta_seconds_;
 }
 
-double TimeSystem::get_total_seconds() const
+double msce::TimeSystem::get_total_seconds() const
 {
-    return static_cast<double>(this->get_total_millis()) / 1000.0;
+    return this->seconds_since_start_;
 }
 
-void TimeSystem::init()
+double msce::TimeSystem::get_total_millis() const
 {
-    this->_start_time = high_resolution_clock::now();
-    this->_last_frame_time = high_resolution_clock::now();
-    this->_nanos_since_start = 0;
+    return this->millis_since_start_;
 }
 
-void TimeSystem::update(double delta_time)
+unsigned long msce::TimeSystem::get_total_nanos() const
 {
-    this->_last_frame_time = high_resolution_clock::now();
-    this->_nanos_since_start = duration_cast<nanoseconds>(
-                                   high_resolution_clock::now() - this->_start_time)
-                                   .count();
+    return this->nanos_since_start_;
 }
+
+#undef TIME_POINT_NOW

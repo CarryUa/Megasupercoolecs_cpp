@@ -9,7 +9,7 @@ namespace msce
     class TransformComponent : public BaseComponent<TransformComponent>
     {
     public:
-        vec2d position = vec2d(-1, 0);
+        vec2d position = vec2d(0, 0);
         vec2d scale = vec2d(1.0, 1.0);
         vec2d rotation = vec2d(0, 0);
 

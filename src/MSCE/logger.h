@@ -12,7 +12,6 @@ namespace msce
     {
     private:
         std::string owner_name;
-        static std::size_t millis_at_start;
         inline static std::ofstream log_file = std::ofstream(std::filesystem::temp_directory_path() / "msce_log.txt");
 
         void append_to_log_file(const std::string_view &message) const noexcept;

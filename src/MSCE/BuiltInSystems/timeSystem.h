@@ -7,24 +7,34 @@ namespace msce
     class TimeSystem : public System
     {
     private:
-        /// @brief chrono::time_point of program start.
-        std::chrono::high_resolution_clock::time_point _start_time;
-        /// @brief chrono::time_point of last frame.
-        std::chrono::high_resolution_clock::time_point _last_frame_time;
-        /// @brief Nanoseconds since start of the program.
-        unsigned long _nanos_since_start;
+        /// @brief Nanoseconds since start of program.
+        unsigned long nanos_since_start_ = 0;
+        /// @brief Nanoseconds since start of program.
+        double millis_since_start_ = 0;
+        /// @brief Nanoseconds since start of program.
+        double seconds_since_start_ = 0;
+
+        /// @brief Amount of seconds that have passed since last frame.
+        double delta_seconds_ = 0;
+
+        /// @brief Consistently sets all time units from nanoseconds.
+        void set_all_units_from_nanos(unsigned long nanos);
 
     public:
         void init() override;
-        void update(double delta_time) override;
+        void update(double delta_seconds) override;
 
-        double get_delta_time() const;
+        /// @brief Returns SECONDS that have passed since last frame. (Delta T)
+        double get_delta_seconds() const;
+
+        /// @brief Returns SECONDS that have passed since program start. (runtime)
         double get_total_seconds() const;
-        double get_total_millis() const;
-        unsigned long get_total_nanos() const;
 
-        std::chrono::high_resolution_clock::time_point get_start_time() const;
-        std::chrono::high_resolution_clock::time_point get_last_frame_time() const;
+        /// @brief Returns MILLISECONDS that have passed since program start. (runtime)
+        double get_total_millis() const;
+
+        /// @brief Returns NANOSECONDS that have passed since program start. (runtime)
+        unsigned long get_total_nanos() const;
     };
 }
 MSCE_REGISTER_SYSTEM(msce::TimeSystem, TimeSystem)

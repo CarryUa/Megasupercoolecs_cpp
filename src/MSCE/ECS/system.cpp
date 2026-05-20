@@ -14,6 +14,6 @@ void System::init()
 {
 }
 
-void System::update(double delta_t)
+void System::update(double delta_seconds)
 {
 }

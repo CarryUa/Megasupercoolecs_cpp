@@ -1,6 +1,7 @@
 #include "MSCEWindow.h"
 #include <MSCE/BuiltInComponents/transformComponent.hpp>
 #include <MSCE/Managers/systemManager.h>
+#include <MSCE/Graphics/color.h>
 #include <iostream>
 #include <memory>
 using namespace std;
@@ -14,10 +15,11 @@ const string vertexShaderSource = "#version 330 core\n"
                                   "}\0";
 
 const string fragmentShaderSource = "#version 330 core\n"
+                                    "uniform vec4 color;\n"
                                     "out vec4 FragColor;\n"
                                     "void main()\n"
                                     "{\n"
-                                    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n" // Orange color
+                                    "   FragColor = (color / 255);\n"
                                     "}\n\0";
 
 static void transform_vertecies(float *dest, const VertexList &in_vert, Vertex center, TransformComponent *comp, MSCEWindow &window)
@@ -136,19 +138,18 @@ bool MSCEWindow::should_close()
 
 void msce::MSCEWindow::render()
 {
-    static float x = 0, y = 1;
 
-    x = -tanf(tSys_->get_delta_time() / 2);
-    y = sinf(tSys_->get_delta_time() * 2);
     this->make_curent_context();
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0, 0, 0, 1);
 
     auto transforms = compMan_->get_all_components_of_type<TransformComponent>();
-    // 1. Define the vertices for a triangle
-
     for (auto t : transforms)
     {
+        Color fg(vec3uc((sin(tSys_->get_total_seconds()) / 2 + 1) * 255,
+                        (sin(tSys_->get_total_seconds() + M_PI / 1.5) / 2 + 1) * 255,
+                        (sin(tSys_->get_total_seconds() - M_PI / 1.5) / 2 + 1) * 255));
+
         VertexList vertices_vec = t->shape.get()->get_vertecies();
         size_t buffer_s = vertices_vec.size() * 3;
         auto vertices = make_unique<float[]>(buffer_s);
@@ -176,6 +177,9 @@ void msce::MSCEWindow::render()
 
         glUseProgram(shaderProgram_);
         glBindVertexArray(VAO);
+        auto color_uniform = glGetUniformLocation(shaderProgram_, "color");
+        glUniform4f(color_uniform, fg.r(), fg.g(), fg.b(), fg.a());
+
         glDrawArrays(GL_TRIANGLE_FAN, 0, buffer_s / 3);
     }
 }

@@ -2,8 +2,12 @@
 #include <chrono>
 
 using namespace msce;
+using namespace std::chrono;
 
-std::size_t Logger::millis_at_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+namespace
+{
+    const auto start_time_point = high_resolution_clock::now();
+}
 
 // std::ofstream Logger::log_file = ;
 
@@ -15,16 +19,14 @@ void Logger::append_to_log_file(const std::string_view &message) const noexcept
         return;
     }
 
-    std::size_t cur_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+    auto cur_time_point = high_resolution_clock::now();
 
-    log_file << "[" << (double)(cur_t - millis_at_start) / 1000 << "s] | " << message.data() << "\n";
+    log_file << "[" << static_cast<double>(duration_cast<milliseconds>(cur_time_point - start_time_point).count()) / 1000 << "s] | "
+             << message << std::endl;
 }
 
 msce::Logger::Logger(const std::string &owner_name)
 {
-    if (this->millis_at_start == 0)
-        this->millis_at_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-
     this->owner_name = owner_name;
 }
 Logger::~Logger()

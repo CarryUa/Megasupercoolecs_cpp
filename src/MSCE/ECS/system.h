@@ -42,7 +42,9 @@ namespace msce
 
         /// @brief Ran each frame of the program.
         /// @param delta_t Time since last frame in seconds.
-        virtual void update(double delta_t);
+        virtual void update(double delta_seconds);
+
+        virtual ~System() = default;
     };
 }
 MSCE_REGISTER_SYSTEM(msce::System, System)

@@ -16,6 +16,9 @@ namespace msce
         Vector2D(VecCT x = 0, VecCT y = 0);
         Vector2D(const Vector2D &Other);
 
+        static Vector2D<double> create_unit_from_radians(double);
+        static Vector2D<double> create_unit_from_degrees(double);
+
         // Scalar operations
         Vector2D &operator+=(const VecCT &scalar);
         Vector2D operator+(const VecCT &scalar) const;
@@ -37,6 +40,7 @@ namespace msce
         /// @param other The second vector.
         /// @return The dot(aka scalar) product of given type.
         double dot(const Vector2D &other) const;
+        double cross(const Vector2D &other) const;
 
         /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were normalized
         /// @param other The second vector.
@@ -146,7 +150,7 @@ namespace msce
     using vec2ui = Vector2D<unsigned int>;
     using vec2f = Vector2D<float>;
     using vec2c = Vector2D<char>;
-    using vec2uc = Vector2D<unsigned>;
+    using vec2uc = Vector2D<unsigned char>;
     using vec2d = Vector2D<double>;
     using vec2i64 = Vector2D<long>;
     using vec2ui64 = Vector2D<unsigned long>;
@@ -157,7 +161,7 @@ namespace msce
     using vec3ui = Vector3D<unsigned int>;
     using vec3f = Vector3D<float>;
     using vec3c = Vector3D<char>;
-    using vec3uc = Vector3D<unsigned>;
+    using vec3uc = Vector3D<unsigned char>;
     using vec3d = Vector3D<double>;
     using vec3i64 = Vector3D<long>;
     using vec3ui64 = Vector3D<unsigned long>;

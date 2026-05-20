@@ -61,10 +61,14 @@ namespace msce
     class Triangle : public BaseShape2D
     {
     private:
-        double a_ = 100, b_ = 100, c_ = 100;
+        vec2d a_ = vec2d(0, 0), b_ = vec2d(300, 0), c_ = vec2d(150, 300);
 
     public:
         Triangle();
+
+        static Triangle create_sss(double a, double b, double c);
+        static Triangle create_sas(double a, double degrees, double b);
+        static Triangle create_asa(double deg1, double side, double deg2);
 
         virtual VertexList get_vertecies() const override;
         virtual double get_perimetr() const override;
@@ -96,6 +100,7 @@ namespace msce
 
     public:
         Rectangle();
+        Rectangle(double a, double b);
 
         virtual VertexList get_vertecies() const override;
         virtual double get_perimetr() const override;
@@ -112,11 +117,18 @@ namespace msce
         double r_ = 300;
 
     public:
+        Circle();
+        Circle(double r);
         virtual VertexList get_vertecies() const override;
         virtual double get_perimetr() const override;
         virtual double get_area() const override;
         virtual double get_w() const override;
         virtual double get_h() const override;
+
+        void radius(double);
+        double radius() const noexcept;
+
+        MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(BaseShape2D, r_)
     };
 
 }

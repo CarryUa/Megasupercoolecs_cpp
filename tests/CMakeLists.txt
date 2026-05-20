@@ -10,6 +10,7 @@ if(BUILD_TESTING)
                 reflection.cpp
                 Common/vector.cpp
                 Graphics/color.cpp
+                Graphics/shape.cpp
                 ECS/system.cpp
                 ECS/component.cpp
                 ECS/entity.cpp

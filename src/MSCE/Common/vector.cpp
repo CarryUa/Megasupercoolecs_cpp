@@ -34,6 +34,19 @@ Vector2D<VecCT>::Vector2D(const Vector2D &other)
     this->y = other.y;
 }
 
+template <typename VecCT>
+Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_radians(double a)
+{
+    return Vector2D(cos(a), sin(a));
+}
+
+template <typename VecCT>
+Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_degrees(double a)
+{
+    constexpr double pi_180th = M_PI / 180.0;
+    return Vector2D::create_unit_from_radians(a * pi_180th);
+}
+
 #pragma region Scalar Operations
 
 template <typename VecCT>
@@ -187,6 +200,12 @@ double Vector2D<VecCT>::dot(const Vector2D &other) const
 {
     return static_cast<double>(this->x) * static_cast<double>(other.x) +
            static_cast<double>(this->y) * static_cast<double>(other.y);
+}
+
+template <typename VecCT>
+double msce::Vector2D<VecCT>::cross(const Vector2D &other) const
+{
+    return this->x * other.y - this->y * other.x;
 }
 
 template <typename VecCT>
