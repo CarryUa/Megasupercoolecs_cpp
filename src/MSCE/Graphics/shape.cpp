@@ -172,6 +172,27 @@ double msce::Rectangle::get_h() const
     return b_;
 }
 
+double msce::Rectangle::a() const noexcept
+{
+    return this->a_;
+}
+
+void msce::Rectangle::a(double a) noexcept
+{
+    this->a_ = a;
+}
+
+double msce::Rectangle::b() const noexcept
+{
+    return this->b_;
+}
+
+void msce::Rectangle::b(double b) noexcept
+{
+
+    this->b_ = b;
+}
+
 msce::BaseShape2D::BaseShape2D()
 {
 }

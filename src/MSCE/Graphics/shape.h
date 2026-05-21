@@ -107,6 +107,11 @@ namespace msce
         virtual double get_area() const override;
         virtual double get_w() const override;
         virtual double get_h() const override;
+        double a() const noexcept;
+        void a(double) noexcept;
+
+        double b() const noexcept;
+        void b(double) noexcept;
 
         MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(BaseShape2D, a_, b_)
     };
