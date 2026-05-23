@@ -2,7 +2,6 @@
 #define _MSCE_COMPONENT_H_
 #include <iostream>
 #include <MSCE/msce_macros.h>
-#include <MSCE/Common/iHasIdMember.h>
 
 #pragma region Components Macros
 #define MSCE_DEFINE_COMPONENT(Type, ...)                                                                        \
@@ -21,18 +20,16 @@ public:                                                                         
 
 namespace msce
 {
-    class IComponent : public IHasIntegerIdMember
+    class IComponent
     {
     protected:
         friend class ComponentManager;
         size_t id_;
-        virtual void set_id(size_t id) override { id_ = id; }
 
     public:
         /// @brief This overload is used by cereal.All components must be instantiated using ComponentManager
         IComponent() {}
         IComponent(size_t id) { this->id_ = id; }
-        virtual size_t get_id() const override { return id_; }
 
         virtual ~IComponent() = default;
         virtual IComponent *clone() = 0;

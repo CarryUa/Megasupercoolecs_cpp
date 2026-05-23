@@ -2,19 +2,12 @@
 
 #include <MSCE/Managers/entityManager.h>
 
-void msce::Entity::set_id(size_t id)
+bool msce::Entity::has_component(ComponentHandle<IComponent> component) noexcept
 {
-    this->entity_id_ = id;
-}
+    if (component == nullptr)
+        return false;
 
-size_t msce::Entity::get_id() const
-{
-    return this->entity_id_;
-}
-
-bool msce::Entity::has_component(IComponent *component)
-{
-    for (auto *comp : _components)
+    for (auto &comp : _components)
     {
         if (comp == component)
             return true;

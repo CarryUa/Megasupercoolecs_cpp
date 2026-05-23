@@ -9,6 +9,7 @@ if(BUILD_TESTING)
                 prototypes.cpp
                 reflection.cpp
                 Common/vector.cpp
+                Common/smartPointerLists.cpp
                 Graphics/color.cpp
                 Graphics/shape.cpp
                 ECS/system.cpp

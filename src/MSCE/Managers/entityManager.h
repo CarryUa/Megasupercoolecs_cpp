@@ -5,11 +5,12 @@
 #include <memory>
 
 #include <MSCE/ECS/entity.h>
-#include <MSCE/Common/smartPointerList.h>
+#include <MSCE/Common/smartUniquePointerList.hpp>
 #include <MSCE/Common/Interfaces/Singleton.hpp>
 
 namespace msce
 {
+    using EntityHandle = SmartHandle<SmartUniquePointerList<Entity>, Entity>;
     class EntityManager : public Singleton<EntityManager>
     {
     private:
@@ -18,17 +19,17 @@ namespace msce
     public:
         /// @brief Creates new entity.
         /// @return Pointer to newly created entity.
-        Entity *create_entity();
+        EntityHandle create_entity();
 
         /// @brief Copies an entity and all it's components.
         /// @return Pointer to newly created entity.
-        Entity *copy_entity(Entity *other);
+        EntityHandle copy_entity(EntityHandle other);
 
-        bool destroy_entity(Entity *other);
+        bool destroy_entity(EntityHandle other);
 
         /// @brief Finds entity class by id.
         /// @return Pointer to an entity with given id or nullptr.
-        Entity *get_entity(size_t id);
+        EntityHandle get_entity(uint32_t id);
     };
 }
 

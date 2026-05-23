@@ -37,7 +37,7 @@ Vector2D<VecCT>::Vector2D(const Vector2D &other)
 template <typename VecCT>
 Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_radians(double a)
 {
-    return Vector2D(cos(a), sin(a));
+    return Vector2D<double>(cos(a), sin(a));
 }
 
 template <typename VecCT>
@@ -244,14 +244,6 @@ VecCT msce::Vector2D<VecCT>::distance_to(const Vector2D<VecCT> &other) const noe
 {
     return std::abs(((*this) - other).length());
 }
-template <typename VecCT>
-template <typename NewVecCT>
-Vector2D<VecCT>::operator Vector2D<NewVecCT>() const
-{
-    return Vector2D<NewVecCT>(
-        static_cast<NewVecCT>(this->x),
-        static_cast<NewVecCT>(this->y));
-}
 
 #pragma endregion
 #pragma endregion // Vector2D
@@ -448,16 +440,6 @@ bool msce::Vector3D<VecCT>::operator==(const Vector3D<VecCT> &other) const
     return this->x == other.x &&
            this->y == other.y &&
            this->z == other.z;
-}
-
-template <typename VecCT>
-template <typename NewVecCT>
-Vector3D<VecCT>::operator Vector3D<NewVecCT>() const
-{
-    return Vector3D<NewVecCT>(
-        static_cast<NewVecCT>(this->x),
-        static_cast<NewVecCT>(this->y),
-        static_cast<NewVecCT>(this->z));
 }
 
 #pragma endregion

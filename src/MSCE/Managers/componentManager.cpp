@@ -8,11 +8,6 @@ msce::ComponentManager::ComponentManager()
 {
 }
 
-void msce::ComponentManager::destroy_component(IComponent *comp)
-{
-    this->destroy_component(comp->id_);
-}
-
 void msce::ComponentManager::destroy_component(size_t id)
 {
     this->components_.remove(id);

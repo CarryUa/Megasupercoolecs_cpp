@@ -30,7 +30,7 @@ TEST(EntityTests, CreationTest)
     auto ent2 = entMan->create_entity();
 
     EXPECT_NE(ent, ent2);
-    EXPECT_NE(ent->get_id(), ent2->get_id());
+    EXPECT_NE(ent.get_index(), ent2.get_index());
 }
 
 TEST(EntityTests, EntityOperationTest)
@@ -70,7 +70,7 @@ TEST(EntityTests, EntityOperationTest)
         auto ent3 = entMan->copy_entity(ent);
 
         EXPECT_NE(ent, ent3) << "Entity copy points to same memory address";
-        EXPECT_NE(ent->get_id(), ent3->get_id()) << "Copy of an entity has same ID as original";
+        EXPECT_NE(ent.get_index(), ent3.get_index()) << "Copy of an entity has same ID as original";
         ASSERT_TRUE(ent3->has_component<TransformComponent>()) << "Copy of an entity doesn't have same components";
         EXPECT_NE(ent->get_component<TransformComponent>(), ent3->get_component<TransformComponent>()) << "Entity copys component points to same address as originals component";
         EXPECT_EQ(ent->get_component<TransformComponent>()->position, ent3->get_component<TransformComponent>()->position) << "Entity copys component has different values than originals";

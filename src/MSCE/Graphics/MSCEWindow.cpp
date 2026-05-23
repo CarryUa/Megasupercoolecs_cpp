@@ -153,7 +153,7 @@ void msce::MSCEWindow::render()
         VertexList vertices_vec = t->shape.get()->get_vertecies();
         size_t buffer_s = vertices_vec.size() * 3;
         auto vertices = make_unique<float[]>(buffer_s);
-        transform_vertecies(vertices.get(), vertices_vec, t->position, t, (*this));
+        transform_vertecies(vertices.get(), vertices_vec, t->position, t.get(), (*this));
 
         unsigned int VBO, VAO;
         // Generate 1 VAO and 1 VBO

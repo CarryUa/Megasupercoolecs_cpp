@@ -146,6 +146,25 @@ namespace msce
         MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y, z)
     };
 
+    template <typename VecCT>
+    template <typename NewVecCT>
+    inline Vector2D<VecCT>::operator Vector2D<NewVecCT>() const
+    {
+        return Vector2D<NewVecCT>(
+            static_cast<NewVecCT>(this->x),
+            static_cast<NewVecCT>(this->y));
+    }
+
+    template <typename VecCT>
+    template <typename NewVecCT>
+    inline Vector3D<VecCT>::operator Vector3D<NewVecCT>() const
+    {
+        return Vector3D<NewVecCT>(
+            static_cast<NewVecCT>(this->x),
+            static_cast<NewVecCT>(this->y),
+            static_cast<NewVecCT>(this->z));
+    }
+
     using vec2i = Vector2D<int>;
     using vec2ui = Vector2D<unsigned int>;
     using vec2f = Vector2D<float>;
@@ -168,5 +187,4 @@ namespace msce
     using vec3l = Vector3D<long>;
     using vec3ul = Vector3D<unsigned long>;
 }
-
 #endif // _MSCE_VECTORS_H
