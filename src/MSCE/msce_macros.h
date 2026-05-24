@@ -14,6 +14,8 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/common.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/unordered_set.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/xml.hpp>
@@ -27,8 +29,6 @@ namespace msce
     template <typename T>
     struct Registration;
 
-    template <typename TProto>
-    [[gnu::used]] void register_prototype(const std::string &name);
     template <typename TSys>
     [[gnu::used]] void register_system();
 

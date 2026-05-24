@@ -71,10 +71,10 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
 TEST(PrototypeTests, PrototypeRegistryTest)
 {
     auto protoMan = PrototypeManager::instance;
-    EXPECT_GE(PrototypeManager::get_registered_prototypes().enumerate_registry().size(), 1);
+    EXPECT_GE(protoMan->registered_prototypes_ref_.enumerate_registry().size(), 1);
 
-    EXPECT_EQ(PrototypeManager::get_registered_factories().enumerate_registry().size(),
-              PrototypeManager::get_registered_prototypes().enumerate_registry().size());
+    EXPECT_EQ(protoMan->registered_factories_ref_.enumerate_registry().size(),
+              protoMan->registered_prototypes_ref_.enumerate_registry().size());
 }
 
 TEST(PrototypeTests, PrototypeByIdCreationTest)

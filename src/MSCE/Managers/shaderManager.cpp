@@ -18,16 +18,6 @@ namespace
     }
 }
 
-void msce::BaseShader::set_id(size_t id) noexcept
-{
-    this->smart_storage_id_ = id;
-}
-
-size_t msce::BaseShader::get_id() const noexcept
-{
-    return this->smart_storage_id_;
-}
-
 bool msce::BaseShader::recompile() noexcept
 {
     if (this->shader_handle_ != 0)
@@ -52,6 +42,8 @@ bool msce::BaseShader::recompile() noexcept
     const char *source_buffer = content.c_str();
     glShaderSource(this->shader_handle_, content.size(), &(source_buffer), NULL);
     glCompileShader(this->shader_handle_);
+
+    return true;
 }
 
 void msce::BaseShader::decompile() noexcept
@@ -60,7 +52,7 @@ void msce::BaseShader::decompile() noexcept
         return;
 }
 
-msce::BaseShader::BaseShader(ShaderPrototype *prototype)
+msce::BaseShader::BaseShader(ShaderPrototype *prototype) noexcept
 {
     this->prototype_ = prototype;
 }

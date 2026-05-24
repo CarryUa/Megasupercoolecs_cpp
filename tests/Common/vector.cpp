@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <MSCE/logger.h>
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 
 #include <cmath>
 

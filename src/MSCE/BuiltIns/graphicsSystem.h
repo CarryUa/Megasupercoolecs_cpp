@@ -3,7 +3,7 @@
 #include <MSCE/Managers/componentManager.h>
 #include <MSCE/Graphics/MSCEWindow.h>
 #include <MSCE/ECS/system.h>
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 #include <vector>
 #include <memory>
 class GLFWmonitor;

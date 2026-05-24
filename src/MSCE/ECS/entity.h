@@ -2,7 +2,7 @@
 #define MSCE_ENTITY_H_
 #include <vector>
 #include <MSCE/ECS/component.h>
-#include <MSCE/Common/handle.hpp>
+#include <MSCE/Types/Collections/handle.hpp>
 
 namespace msce
 {

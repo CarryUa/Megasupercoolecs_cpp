@@ -1,5 +1,5 @@
 #include "graphicsSystem.h"
-#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/BuiltIns/transformComponent.hpp>
 #include <glad/glad.h>
 #include <iostream>
 

@@ -1,5 +1,5 @@
 #include "MSCEWindow.h"
-#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/BuiltIns/transformComponent.hpp>
 #include <MSCE/Managers/systemManager.h>
 #include <MSCE/Graphics/color.h>
 #include <iostream>

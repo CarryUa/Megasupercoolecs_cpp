@@ -10,13 +10,16 @@
 #include <MSCE/ECS/entity.h>
 #include <MSCE/ECS/system.h>
 
-#include <MSCE/Common/vector.h>
-#include <MSCE/Common/Interfaces/Singleton.hpp>
+#include <MSCE/Types/vector.h>
+#include <MSCE/Types/singleton.hpp>
+#include <MSCE/Types/Collections/handle.hpp>
+#include <MSCE/Types/Collections/registry.hpp>
+#include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 
-#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/BuiltIns/transformComponent.hpp>
 
-#include <MSCE/BuiltInSystems/graphicsSystem.h>
-#include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/BuiltIns/graphicsSystem.h>
+#include <MSCE/BuiltIns/timeSystem.h>
 
 #include <MSCE/Managers/componentManager.h>
 #include <MSCE/Managers/entityManager.h>

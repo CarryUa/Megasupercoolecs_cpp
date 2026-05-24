@@ -7,7 +7,7 @@
 #include <MSCE/Managers/entityManager.h>
 #include <MSCE/Managers/prototypeManager.h>
 #include <MSCE/Managers/componentManager.h>
-#include <MSCE/BuiltInComponents/transformComponent.hpp>
+#include <MSCE/BuiltIns/transformComponent.hpp>
 #include <MSCE/msce_macros.h>
 using namespace msce;
 

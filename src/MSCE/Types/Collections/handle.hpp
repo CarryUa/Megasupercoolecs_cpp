@@ -1,5 +1,6 @@
 #ifndef MSCE_SmartHandle_HPP_
 #define MSCE_SmartHandle_HPP_
+#include <cstdint>
 
 namespace msce
 {

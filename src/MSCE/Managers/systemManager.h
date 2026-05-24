@@ -1,8 +1,8 @@
 #ifndef _MSCE_SYSTEM_MANAGER_H_
 #define _MSCE_SYSTEM_MANAGER_H_
-#include <MSCE/Common/Interfaces/Singleton.hpp>
+#include <MSCE/Types/singleton.hpp>
 #include <MSCE/logger.h>
-#include <MSCE/Common/registry.hpp>
+#include <MSCE/Types/Collections/registry.hpp>
 #include <vector>
 #include <map>
 #include <memory>
@@ -10,7 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <MSCE/ECS/system.h>
-#include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/BuiltIns/timeSystem.h>
 
 namespace msce
 {

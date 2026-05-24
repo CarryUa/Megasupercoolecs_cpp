@@ -2,9 +2,9 @@
 #define _MSCE_COMPONENT_MANAGER_H_
 #include <vector>
 #include <memory>
-#include <MSCE/Common/smartUniquePointerList.hpp>
-#include <MSCE/Common/handle.hpp>
-#include <MSCE/Common/Interfaces/Singleton.hpp>
+#include <MSCE/Types/Collections/smartUniquePointerList.hpp>
+#include <MSCE/Types/Collections/handle.hpp>
+#include <MSCE/Types/singleton.hpp>
 #include <MSCE/ECS/component.h>
 #include <MSCE/logger.h>
 

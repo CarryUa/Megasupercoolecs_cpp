@@ -15,13 +15,20 @@ namespace msce
         std::unordered_map<TIdentifyer, TRegistered> registry;
 
     public:
+        Registry()
+        {
+            static Logger logger("Registry");
+            logger.log_debug("New registry was created");
+        }
+
         void register_entry(TIdentifyer id, const TRegistered &entry)
         {
+            static Logger logger("Registry");
             if (is_registered(id))
             {
+                logger.log_warning("Detected double registry of a prototype! Ignoring...");
                 return;
             }
-
             registry.emplace(id, entry);
         }
 

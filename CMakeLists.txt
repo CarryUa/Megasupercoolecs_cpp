@@ -40,10 +40,8 @@ add_library(${MSCE_TARGET} SHARED dummy.cpp)
 
 # Subdirs
 add_subdirectory(src/MSCE)
-add_subdirectory(src/MSCE/BuiltInComponents)
-add_subdirectory(src/MSCE/BuiltInSystems)
-add_subdirectory(src/MSCE/Common)
-add_subdirectory(src/MSCE/Common/Interfaces)
+add_subdirectory(src/MSCE/BuiltIns)
+add_subdirectory(src/MSCE/Types)
 add_subdirectory(src/MSCE/ECS)
 add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)

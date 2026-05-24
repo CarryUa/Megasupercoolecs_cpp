@@ -2,7 +2,7 @@
 #define MSCE_COLOR_H_
 #include <string>
 
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 
 namespace msce
 {

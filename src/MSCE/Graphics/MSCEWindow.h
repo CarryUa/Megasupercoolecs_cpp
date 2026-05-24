@@ -2,10 +2,10 @@
 #define _MSCE_WINDOW_H_
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 #include <memory>
 
-#include <MSCE/BuiltInSystems/timeSystem.h>
+#include <MSCE/BuiltIns/timeSystem.h>
 #include <MSCE/Managers/componentManager.h>
 
 using namespace std;

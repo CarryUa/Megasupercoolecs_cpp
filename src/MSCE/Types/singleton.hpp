@@ -8,7 +8,7 @@ namespace msce
     class Singleton
     {
     public:
-        static Derrived *instance;
+        inline static Derrived *instance = nullptr;
         Singleton()
         {
             if (instance != nullptr)
@@ -23,9 +23,6 @@ namespace msce
             instance = static_cast<Derrived *>(this);
         }
     };
-
-    template <typename T>
-    T *Singleton<T>::instance = nullptr;
 }
 
 #endif // MSCE_SINGLETON_HPP_

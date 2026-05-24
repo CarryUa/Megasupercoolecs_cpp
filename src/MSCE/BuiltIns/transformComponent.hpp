@@ -2,7 +2,7 @@
 #define _MSCE_TRANSFORM_COMPONENT_H_
 #include <MSCE/ECS/component.h>
 #include <MSCE/Graphics/shape.h>
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 
 namespace msce
 {

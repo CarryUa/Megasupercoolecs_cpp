@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
 
-#include <MSCE/Common/smartUniquePointerList.hpp>
+#include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 
 using namespace msce;
 using namespace std;

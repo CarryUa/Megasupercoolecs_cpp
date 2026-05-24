@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include <MSCE/Common/handle.hpp>
+#include <MSCE/Types/Collections/handle.hpp>
 
 #define LocalHandle SmartHandle<SmartUniquePointerList<TPointedTo>, TPointedTo>
 
@@ -13,10 +13,10 @@ namespace msce
      * @brief Extends std::vector functionality to sparingly use and reuse std::unique_ptr.
      * Use this when you need to be able to delete items.
      *
-     * @note This is "owning" list. Since items implement IHasIntegerIdMember, and typically have only one id, they can be stored in one SmartPointerList
+     * @note This is "owning" list.
      * @note Almost Always try to use iterators. They do not return nullptrs.
      *
-     * @tparam TPointedTo must implement IHasIntegerIdMember.
+     * @tparam TPointedTo the type of objects stored.
      */
     template <class TPointedTo>
     struct SmartUniquePointerList

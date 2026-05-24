@@ -11,16 +11,10 @@
 
 using namespace std;
 
-msce::Registry<std::string, std::reference_wrapper<const std::type_info>> &msce::PrototypeManager::get_registered_prototypes()
+msce::PrototypeManager::PrototypeManager()
+    : registered_factories_ref_(get_g_registered_prototype_factories()),
+      registered_prototypes_ref_(get_g_registered_prototypes())
 {
-    static msce::Registry<std::string, std::reference_wrapper<const std::type_info>> instance;
-    return instance;
-}
-
-msce::Registry<std::string, std::function<std::unique_ptr<msce::IPrototype>()>> &msce::PrototypeManager::get_registered_factories()
-{
-    static msce::Registry<std::string, std::function<std::unique_ptr<msce::IPrototype>()>> instance;
-    return instance;
 }
 
 void msce::PrototypeManager::deserialize_prototype(const string &path)
@@ -113,7 +107,7 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
 
 msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
 {
-    if (!get_registered_factories().is_registered(type))
+    if (!registered_factories_ref_.is_registered(type))
     {
         logger_.log_error("Error: Prototype with type '{}' wasn't ever registered!", type);
         return nullptr;
@@ -124,7 +118,7 @@ msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::strin
         return nullptr;
     }
 
-    this->_prototypes[id] = get_registered_factories().get_entry(type)();
+    this->_prototypes[id] = registered_factories_ref_.get_entry(type)();
     _prototypes[id]->id = id;
 
     return this->_prototypes[id].get();
@@ -135,7 +129,7 @@ bool msce::PrototypeManager::prototype_id_exists(const std::string &id) const no
 }
 bool msce::PrototypeManager::prototype_type_registered(const std::string &type) const noexcept
 {
-    return get_registered_prototypes().is_registered(type) && get_registered_factories().is_registered(type);
+    return registered_prototypes_ref_.is_registered(type) && registered_prototypes_ref_.is_registered(type);
 }
 bool msce::PrototypeManager::delete_prototype(const std::string &id) noexcept
 {

@@ -4,7 +4,7 @@
 #define MSCE_CIRCLE_VERTICES_COUNT 32
 
 #include <MSCE/msce_macros.h>
-#include <MSCE/Common/vector.h>
+#include <MSCE/Types/vector.h>
 #include <vector>
 namespace msce
 {

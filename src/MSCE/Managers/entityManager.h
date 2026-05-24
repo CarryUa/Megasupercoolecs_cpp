@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <MSCE/ECS/entity.h>
-#include <MSCE/Common/smartUniquePointerList.hpp>
-#include <MSCE/Common/Interfaces/Singleton.hpp>
+#include <MSCE/Types/Collections/smartUniquePointerList.hpp>
+#include <MSCE/Types/singleton.hpp>
 
 namespace msce
 {
