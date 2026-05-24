@@ -11,13 +11,23 @@
 namespace msce
 {
 
+    /**
+     *  @brief Manages registration and invocation(firing) of events.
+     */
     class EventManager : public Singleton<EventManager>
     {
     private:
+        /**
+         * @brief Stores individual event subscriptions.
+         * @note Essentially a subscription is simply a pair of event type and callback function.
+         */
         std::unordered_multimap<std::type_index, std::function<void(BaseEvent &)>>
             subscriptions_;
 
     public:
+        /**
+         * Subscribes
+         */
         template <typename TEv>
         void subscribe(std::function<void(TEv &)> callback);
 

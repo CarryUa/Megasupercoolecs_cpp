@@ -14,23 +14,23 @@ namespace msce
     enum class TransformMethod : unsigned char
     {
         /// @brief move all vertecies on the X axis.
-        translate_x,
+        TRANSLATE_X,
         /// @brief move all vertecies on the Y axis.
-        translate_y,
+        TRANSLATE_Y,
         /// @brief move all vertecies on all axises by equal distance.
-        translate_xy,
+        TRANSLATE_XY,
         /// @brief set X component of scale.
-        scale_x,
+        SCALE_X,
         /// @brief set Y component of scale.
-        scale_y,
+        SCALE_Y,
         /// @brief set bouth components of scale.
-        scale_xy,
+        SCALE_XY,
         /// @brief rotate object on X axis. IN DEGREES
-        rotate_x,
+        ROTATE_X,
         /// @brief rotate object on Y axis. IN DEGREES
-        rotate_y,
+        ROTATE_Y,
         /// @brief rotate object on all axises by equal value. IN DEGREES
-        rotate_xy,
+        ROTATE_XY,
     };
 
     class IShape2D

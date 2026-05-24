@@ -4,6 +4,9 @@
 
 namespace msce
 {
+    /**
+     * Base type for all events. It exists purely for storage purpuses.
+     */
     class BaseEvent
     {
     };

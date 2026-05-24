@@ -39,7 +39,7 @@ TEST(PrototypeTests, PrototypeSerializationTest)
     EXPECT_EQ(tp1_serialized->test_str, tp1_deserialized->test_str);
 }
 
-TEST(PrototypeTests, PrototypeEnumerationTest)
+TEST(PrototypeTests, PrototypeFileConsistencyTest)
 {
     auto protoMan = PrototypeManager::instance;
     const std::string cereal_file_path = "/tmp/test_prototype.cereal";
@@ -49,15 +49,9 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
     {
         tp->id = "test_prototype_" + std::to_string(i);
         protoMan->serialize_prototype(cereal_file_path + std::to_string(i), tp);
-    }
-
-    for (size_t i = 1; i < TEST_ITERATIONS; i++)
-    {
         protoMan->deserialize_prototype(cereal_file_path + std::to_string(i));
-    }
-
-    for (size_t i = 0; i < TEST_ITERATIONS; i++)
         std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str());
+    }
 
     const auto prototypes = protoMan->enumerate_prototypes();
     EXPECT_EQ(prototypes.size(), TEST_ITERATIONS);
@@ -71,10 +65,10 @@ TEST(PrototypeTests, PrototypeEnumerationTest)
 TEST(PrototypeTests, PrototypeRegistryTest)
 {
     auto protoMan = PrototypeManager::instance;
-    EXPECT_GE(protoMan->registered_prototypes_ref_.enumerate_registry().size(), 1);
+    EXPECT_GE(protoMan->registered_prototypes_ref.enumerate_registry().size(), 1);
 
-    EXPECT_EQ(protoMan->registered_factories_ref_.enumerate_registry().size(),
-              protoMan->registered_prototypes_ref_.enumerate_registry().size());
+    EXPECT_EQ(protoMan->registered_factories_ref.enumerate_registry().size(),
+              protoMan->registered_prototypes_ref.enumerate_registry().size());
 }
 
 TEST(PrototypeTests, PrototypeByIdCreationTest)

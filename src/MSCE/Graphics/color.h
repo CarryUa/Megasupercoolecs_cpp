@@ -8,16 +8,16 @@ namespace msce
 {
     enum class ColorType : unsigned char
     {
-        invalid = 0x00,
-        rgb = 0x01,
-        rgba = 0x02,
-        grayscale = 0x03,
-        grayscale_plus_alpha = 0x04,
+        INVALID = 0x00,
+        RGB = 0x01,
+        RGBA = 0x02,
+        GRAYSCALE = 0x03,
+        GRAYSCALE_PLUS_ALPHA = 0x04,
 
         /// @brief Alias to ColorType::rgb
-        truecolor = ColorType::rgb,
+        TRUECOLOR = ColorType::RGB,
         /// @brief Alias to ColorType::rgba
-        truecolor_plus_alpha = ColorType::rgba,
+        TRUECOLOR_PLUS_ALPHA = ColorType::RGBA,
     };
     struct Color
     {

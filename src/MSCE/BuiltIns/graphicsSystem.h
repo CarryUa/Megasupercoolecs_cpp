@@ -15,11 +15,11 @@ namespace msce
     class GraphicsSystem : public System
     {
     private:
-        GLuint vertexSh_;
-        GLuint fragSh_;
+        GLuint vertex_sh_;
+        GLuint frag_sh_;
         GLuint program_;
-        std::vector<std::unique_ptr<MSCEWindow>> _windows;
-        ComponentManager *compMan_ = nullptr;
+        std::vector<std::unique_ptr<MSCEWindow>> windows_;
+        ComponentManager *comp_man_ = nullptr;
 
     public:
         GraphicsSystem();

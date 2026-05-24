@@ -16,7 +16,7 @@ void GraphicsSystem::init()
 
 msce::GraphicsSystem::GraphicsSystem()
 {
-    this->compMan_ = ComponentManager::instance;
+    this->comp_man_ = ComponentManager::instance;
 }
 
 void GraphicsSystem::select_window(size_t id)
@@ -39,18 +39,18 @@ void msce::GraphicsSystem::pre_rended_all_objects_on_window(MSCEWindow *window)
 
 MSCEWindow *GraphicsSystem::get_window(size_t id)
 {
-    if (this->_windows.size() <= id)
+    if (this->windows_.size() <= id)
     {
-        cerr << "Can't find window at (" << id << "), thera are only " << this->_windows.size() << " windows availible" << endl;
+        cerr << "Can't find window at (" << id << "), thera are only " << this->windows_.size() << " windows availible" << endl;
         return nullptr;
     }
 
-    return this->_windows[id].get();
+    return this->windows_[id].get();
 }
 
 MSCEWindow *GraphicsSystem::create_window(Vector2D<int> window_size, const char *title, GLFWmonitor *glfw_monitor, GLFWwindow *glfw_share)
 {
-    this->_windows.push_back(make_unique<MSCEWindow>(window_size, title, glfw_monitor, glfw_share));
+    this->windows_.push_back(make_unique<MSCEWindow>(window_size, title, glfw_monitor, glfw_share));
 
-    return this->_windows.back().get();
+    return this->windows_.back().get();
 }

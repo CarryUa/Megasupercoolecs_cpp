@@ -14,14 +14,14 @@ namespace msce
     class PrototypeManager : public Singleton<PrototypeManager>
     {
     private:
-        std::unordered_map<std::string, std::unique_ptr<IPrototype>> _prototypes;
-        inline static Logger logger_ = Logger("PrototypeManager");
+        std::unordered_map<std::string, std::unique_ptr<IPrototype>> prototypes_;
+        inline static Logger logger = Logger("PrototypeManager");
 
     public:
         PrototypeManager();
 
-        Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &registered_factories_ref_;
-        Registry<std::string, std::reference_wrapper<const std::type_info>> &registered_prototypes_ref_;
+        Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &registered_factories_ref;
+        Registry<std::string, std::reference_wrapper<const std::type_info>> &registered_prototypes_ref;
         /// @brief Tries do deserialize cereal file and create a prototype based on it.
         /// @param path The path to cereal file.
         void deserialize_prototype(const std::string &path);
@@ -85,15 +85,15 @@ namespace msce
     template <typename TProto>
     TProto *PrototypeManager::get_prototype(const std::string &id)
     {
-        if (!this->_prototypes.contains(id))
+        if (!this->prototypes_.contains(id))
         {
-            logger_.log_warning("[PROTO]: Prototype with id '{}' doesn't exist", id);
+            logger.log_warning("[PROTO]: Prototype with id '{}' doesn't exist", id);
             return nullptr;
         }
-        TProto *p = dynamic_cast<TProto *>(this->_prototypes[id].get());
+        TProto *p = dynamic_cast<TProto *>(this->prototypes_[id].get());
         if (p == nullptr)
         {
-            logger_.log_warning("[PROTO]: Prototype with id '{}' doesn't match type provided: {}", id, typeid(TProto).name());
+            logger.log_warning("[PROTO]: Prototype with id '{}' doesn't match type provided: {}", id, typeid(TProto).name());
             return nullptr;
         }
 
@@ -104,7 +104,7 @@ namespace msce
     std::unordered_set<TProto *> PrototypeManager::enumerate_prototypes()
     {
         std::unordered_set<TProto *> result = std::unordered_set<TProto *>();
-        for (const auto &[_, p] : this->_prototypes)
+        for (const auto &[_, p] : this->prototypes_)
         {
             TProto *cast_p = dynamic_cast<TProto *>(p.get());
             if (cast_p == nullptr)
@@ -119,24 +119,24 @@ namespace msce
     template <typename TProto>
     TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
     {
-        if (!registered_factories_ref_.is_registered(type))
+        if (!registered_factories_ref.is_registered(type))
         {
-            logger_.log_error("Prototype with type '{} ' wasn't ever registered!", type);
+            logger.log_error("Prototype with type '{} ' wasn't ever registered!", type);
             return nullptr;
         }
-        if (this->_prototypes.contains(id))
+        if (this->prototypes_.contains(id))
         {
-            logger_.log_error("Prototype with id '{}' already exist!", id);
+            logger.log_error("Prototype with id '{}' already exist!", id);
             return nullptr;
         }
 
-        this->_prototypes[id] = registered_factories_ref_.get_entry(type)();
-        this->_prototypes[id]->id = id;
+        this->prototypes_[id] = registered_factories_ref.get_entry(type)();
+        this->prototypes_[id]->id = id;
 
-        auto ptr = dynamic_cast<TProto *>(this->_prototypes[id].get());
+        auto ptr = dynamic_cast<TProto *>(this->prototypes_[id].get());
         if (ptr == nullptr)
         {
-            logger_.log_error("Prototype with type '{}' cant exist!", type);
+            logger.log_error("Prototype with type '{}' cant exist!", type);
             return nullptr;
         }
 

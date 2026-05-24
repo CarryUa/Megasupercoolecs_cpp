@@ -14,7 +14,7 @@ namespace msce
         template <typename TComp>
         using ComponentHandle = SmartHandle<SmartUniquePointerList<IComponent>, TComp>;
 
-        std::vector<ComponentHandle<IComponent>> _components;
+        std::vector<ComponentHandle<IComponent>> components_;
         size_t entity_id_;
 
     public:
@@ -46,7 +46,7 @@ namespace msce
     template <typename TComp>
     inline bool Entity::has_component() const noexcept
     {
-        for (auto comp : _components)
+        for (auto comp : components_)
         {
             if (dynamic_cast<TComp *>(comp.get()) != nullptr)
                 return true;
@@ -56,7 +56,7 @@ namespace msce
     template <typename TComp>
     inline SmartHandle<SmartUniquePointerList<IComponent>, TComp> Entity::get_component() const noexcept
     {
-        for (auto &comp : _components)
+        for (auto &comp : components_)
         {
             TComp *result = dynamic_cast<TComp *>(comp.get());
             if (result != nullptr)
@@ -69,7 +69,7 @@ namespace msce
     inline std::vector<SmartHandle<SmartUniquePointerList<IComponent>, TComp>> Entity::get_components() const noexcept
     {
         std::vector<ComponentHandle<TComp>> result;
-        for (auto &comp : _components)
+        for (auto &comp : components_)
         {
             TComp *casted_comp = dynamic_cast<TComp *>(comp.get());
             if (casted_comp != nullptr)
@@ -84,7 +84,7 @@ namespace msce
     {
         if (!has_component<TComp>())
         {
-            _components.push_back(static_cast<ComponentHandle<IComponent>>(comp));
+            components_.push_back(static_cast<ComponentHandle<IComponent>>(comp));
         }
     }
     template <typename TComp>
@@ -92,17 +92,17 @@ namespace msce
     {
         if (has_component<TComp>())
             detach_component<TComp>();
-        _components.push_back(comp);
+        components_.push_back(comp);
     }
     template <typename TComp>
     inline void Entity::detach_component() noexcept
     {
-        for (size_t i = 0; i < _components.size(); ++i)
+        for (size_t i = 0; i < components_.size(); ++i)
         {
-            if (dynamic_cast<TComp *>(_components[i].get()) == nullptr)
+            if (dynamic_cast<TComp *>(components_[i].get()) == nullptr)
                 continue;
 
-            _components.erase(_components.begin() + i);
+            components_.erase(components_.begin() + i);
             return;
         }
     }

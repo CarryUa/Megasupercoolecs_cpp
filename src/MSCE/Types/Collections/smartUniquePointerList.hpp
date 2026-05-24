@@ -36,28 +36,28 @@ namespace msce
         void update_min_dead_index();
 
     public:
-        struct iterator
+        struct Iterator
         {
         private:
             const SmartUniquePointerList &collection_ref_;
             uint32_t index_;
 
         public:
-            iterator(const SmartUniquePointerList &collection_ref, uint32_t index);
+            Iterator(const SmartUniquePointerList &collection_ref, uint32_t index);
 
             LocalHandle operator*() const noexcept;
-            iterator &operator++();
-            bool operator!=(const iterator &other) const;
+            Iterator &operator++();
+            bool operator!=(const Iterator &other) const;
         };
 
-        iterator begin() const
+        Iterator begin() const
         {
-            return iterator(*this, 0);
+            return Iterator(*this, 0);
         }
 
-        iterator end() const
+        Iterator end() const
         {
-            return iterator(*this, this->size());
+            return Iterator(*this, this->size());
         }
 
         SmartUniquePointerList();
@@ -215,8 +215,8 @@ namespace msce
     inline std::vector<SmartHandle<SmartUniquePointerList<TPointedTo>, T>> SmartUniquePointerList<TPointedTo>::get_all_items_of_type() const noexcept
     {
         std::vector<SmartHandle<SmartUniquePointerList<TPointedTo>, T>> result;
-        iterator end = this->end();
-        iterator cur = this->begin();
+        Iterator end = this->end();
+        Iterator cur = this->begin();
         for (; cur != end; ++cur)
         {
             LocalHandle handle = *(cur);
@@ -229,24 +229,24 @@ namespace msce
         return result;
     }
     template <class TPointedTo>
-    inline SmartUniquePointerList<TPointedTo>::iterator::iterator(const SmartUniquePointerList &collection_ref, uint32_t index)
+    inline SmartUniquePointerList<TPointedTo>::Iterator::Iterator(const SmartUniquePointerList &collection_ref, uint32_t index)
         : collection_ref_(collection_ref), index_(index)
     {
         while (collection_ref_[index_] == nullptr && index_ < collection_ref_.size())
             index_++;
     }
     template <class TPointedTo>
-    inline SmartHandle<SmartUniquePointerList<TPointedTo>, TPointedTo> SmartUniquePointerList<TPointedTo>::iterator::operator*() const noexcept
+    inline SmartHandle<SmartUniquePointerList<TPointedTo>, TPointedTo> SmartUniquePointerList<TPointedTo>::Iterator::operator*() const noexcept
     {
         return collection_ref_[index_];
     }
     template <class TPointedTo>
-    inline bool SmartUniquePointerList<TPointedTo>::iterator::operator!=(const iterator &other) const
+    inline bool SmartUniquePointerList<TPointedTo>::Iterator::operator!=(const Iterator &other) const
     {
         return this->index_ != other.index_;
     }
     template <class TPointedTo>
-    inline SmartUniquePointerList<TPointedTo>::iterator &SmartUniquePointerList<TPointedTo>::iterator::operator++()
+    inline SmartUniquePointerList<TPointedTo>::Iterator &SmartUniquePointerList<TPointedTo>::Iterator::operator++()
     {
         do
         {

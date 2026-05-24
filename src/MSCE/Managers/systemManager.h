@@ -21,9 +21,9 @@ namespace msce
     class SystemManager : public Singleton<SystemManager>
     {
     private:
-        inline static Logger logger_ = Logger("SystemManager");
+        inline static Logger logger = Logger("SystemManager");
         static Registry<std::type_index, std::function<std::unique_ptr<System>()>> &get_system_registry();
-        TimeSystem *_time_sys;
+        TimeSystem *time_sys_;
 
     public:
         /// @brief Creates all previously registered systems.
@@ -31,7 +31,7 @@ namespace msce
         SystemManager();
 
         /// @brief List of all existing system instances.
-        std::vector<std::unique_ptr<System>> AllSystems;
+        std::vector<std::unique_ptr<System>> all_systems;
 
         /// @brief Facade function for Registry::register_entry. Registers system by its type_index.
         /// @tparam TSys The type of system being registered.
@@ -40,7 +40,7 @@ namespace msce
         {
             if (get_system_registry().is_registered(typeid(TSys)))
             {
-                logger_.log_warning("Double registration of {} detected!", typeid(TSys).name());
+                logger.log_warning("Double registration of {} detected!", typeid(TSys).name());
                 return;
             }
             get_system_registry().register_entry(typeid(TSys),
@@ -48,7 +48,7 @@ namespace msce
                                                  {
                                                      return std::unique_ptr<System>(std::make_unique<TSys>().release());
                                                  });
-            logger_.log_info("Registered system of type: {}", typeid(TSys).name());
+            logger.log_info("Registered system of type: {}", typeid(TSys).name());
         }
 
         /// @brief Initializes all system using System.Init();
@@ -63,7 +63,7 @@ namespace msce
         template <typename TSys>
         TSys *get_system()
         {
-            for (auto &sys : this->AllSystems)
+            for (auto &sys : this->all_systems)
             {
                 TSys *return_sys = dynamic_cast<TSys *>(sys.get());
                 if (return_sys == nullptr)

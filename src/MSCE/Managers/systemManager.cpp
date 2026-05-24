@@ -14,20 +14,20 @@ SystemManager::SystemManager()
 {
     for (const auto &[type, constructor] : SystemManager::get_system_registry().enumerate_registry())
     {
-        this->AllSystems.push_back(constructor());
-        this->AllSystems.back().get()->p_sys_man = this;
+        this->all_systems.push_back(constructor());
+        this->all_systems.back().get()->p_sys_man = this;
     }
 
-    this->_time_sys = this->get_system<TimeSystem>();
+    this->time_sys_ = this->get_system<TimeSystem>();
 }
 
 void SystemManager::init_all_systems()
 {
-    for (const auto &system : this->AllSystems)
+    for (const auto &system : this->all_systems)
     {
         system->pre_init();
     }
-    for (const auto &system : this->AllSystems)
+    for (const auto &system : this->all_systems)
     {
         system->init();
     }
@@ -35,9 +35,9 @@ void SystemManager::init_all_systems()
 
 void SystemManager::update_all_systems()
 {
-    for (auto &system : this->AllSystems)
+    for (auto &system : this->all_systems)
     {
         if (system->active)
-            system->update(this->_time_sys->get_delta_seconds());
+            system->update(this->time_sys_->get_delta_seconds());
     }
 }

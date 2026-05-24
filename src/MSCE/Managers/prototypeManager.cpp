@@ -12,8 +12,8 @@
 using namespace std;
 
 msce::PrototypeManager::PrototypeManager()
-    : registered_factories_ref_(get_g_registered_prototype_factories()),
-      registered_prototypes_ref_(get_g_registered_prototypes())
+    : registered_factories_ref(get_g_registered_prototype_factories()),
+      registered_prototypes_ref(get_g_registered_prototypes())
 {
 }
 
@@ -22,7 +22,7 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
     ifstream file(path);
     if (!file)
     {
-        logger_.log_error("Couldn't open prototype file at '{}'", path);
+        logger.log_error("Couldn't open prototype file at '{}'", path);
         return;
     }
 
@@ -39,11 +39,11 @@ void msce::PrototypeManager::deserialize_prototype(const string &path)
         ar(proto);
 #endif
 
-        this->_prototypes[proto->id] = std::move(proto);
+        this->prototypes_[proto->id] = std::move(proto);
     }
     catch (const exception &e)
     {
-        logger_.log_error("Couldn't deserialize prototype at '{}': ", e.what());
+        logger.log_error("Couldn't deserialize prototype at '{}': ", e.what());
     }
     catch (...)
     {
@@ -57,7 +57,7 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
     ofstream file(path);
     if (!file)
     {
-        logger_.log_error("Couldn't create prototype cereal file at '{}'", path);
+        logger.log_error("Couldn't create prototype cereal file at '{}'", path);
         return;
     }
 
@@ -74,7 +74,7 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
     }
     catch (const exception &e)
     {
-        logger_.log_error("Couldn't serialize '{}' into file at '{}': {}", prototype->id, path, e.what());
+        logger.log_error("Couldn't serialize '{}' into file at '{}': {}", prototype->id, path, e.what());
     }
     catch (...)
     {
@@ -85,19 +85,19 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
 
 msce::IPrototype *msce::PrototypeManager::get_prototype(const std::string &id)
 {
-    if (!this->_prototypes.contains(id))
+    if (!this->prototypes_.contains(id))
     {
-        logger_.log_error("Prototype '{}' doesn't exist.", id);
+        logger.log_error("Prototype '{}' doesn't exist.", id);
         return nullptr;
     }
 
-    return this->_prototypes[id].get();
+    return this->prototypes_[id].get();
 }
 
 unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
 {
     unordered_set<IPrototype *> result = unordered_set<IPrototype *>();
-    for (const auto &[_, p] : this->_prototypes)
+    for (const auto &[_, p] : this->prototypes_)
     {
         result.insert(p.get());
     }
@@ -107,36 +107,36 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
 
 msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
 {
-    if (!registered_factories_ref_.is_registered(type))
+    if (!registered_factories_ref.is_registered(type))
     {
-        logger_.log_error("Error: Prototype with type '{}' wasn't ever registered!", type);
+        logger.log_error("Error: Prototype with type '{}' wasn't ever registered!", type);
         return nullptr;
     }
-    if (this->_prototypes.contains(id))
+    if (this->prototypes_.contains(id))
     {
-        logger_.log_error("Error: Prototype with id '{}' already exist!", id);
+        logger.log_error("Error: Prototype with id '{}' already exist!", id);
         return nullptr;
     }
 
-    this->_prototypes[id] = registered_factories_ref_.get_entry(type)();
-    _prototypes[id]->id = id;
+    this->prototypes_[id] = registered_factories_ref.get_entry(type)();
+    prototypes_[id]->id = id;
 
-    return this->_prototypes[id].get();
+    return this->prototypes_[id].get();
 }
 bool msce::PrototypeManager::prototype_id_exists(const std::string &id) const noexcept
 {
-    return this->_prototypes.contains(id);
+    return this->prototypes_.contains(id);
 }
 bool msce::PrototypeManager::prototype_type_registered(const std::string &type) const noexcept
 {
-    return registered_prototypes_ref_.is_registered(type) && registered_prototypes_ref_.is_registered(type);
+    return registered_prototypes_ref.is_registered(type) && registered_prototypes_ref.is_registered(type);
 }
 bool msce::PrototypeManager::delete_prototype(const std::string &id) noexcept
 {
     if (!prototype_id_exists(id))
         return false;
 
-    this->_prototypes.erase(id);
+    this->prototypes_.erase(id);
     return true;
 }
 bool msce::PrototypeManager::delete_prototype(IPrototype *proto) noexcept

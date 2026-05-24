@@ -14,10 +14,10 @@ namespace msce
 {
     class MSCEWindow
     {
-        GLuint shaderProgram_;
-        TimeSystem *tSys_;
-        ComponentManager *compMan_ = nullptr;
-        unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window;
+        GLuint shader_program_;
+        TimeSystem *t_sys_;
+        ComponentManager *comp_man_ = nullptr;
+        unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window_;
 
     public:
         Vector2D<int> window_size;

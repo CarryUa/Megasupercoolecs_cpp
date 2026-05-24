@@ -12,7 +12,7 @@ namespace msce
     class Registry
     {
     protected:
-        std::unordered_map<TIdentifyer, TRegistered> registry;
+        std::unordered_map<TIdentifyer, TRegistered> registry_;
 
     public:
         Registry()
@@ -29,7 +29,7 @@ namespace msce
                 logger.log_warning("Detected double registry of a prototype! Ignoring...");
                 return;
             }
-            registry.emplace(id, entry);
+            registry_.emplace(id, entry);
         }
 
         /// @exception std::out_of_range - Entry with given id is missing;
@@ -37,14 +37,14 @@ namespace msce
         /// @return Entry with provided id.
         TRegistered &get_entry(TIdentifyer id)
         {
-            return registry.at(id);
+            return registry_.at(id);
         }
 
         /// @param entry The entry to be checked.
         /// @return True if entry exists.
         inline bool is_registered(const TRegistered &entry)
         {
-            for (const auto &[_, e] : registry)
+            for (const auto &[_, e] : registry_)
             {
                 if (e == entry)
                     return true;
@@ -56,11 +56,11 @@ namespace msce
         /// @return True if entry with provided id exists.
         inline bool is_registered(TIdentifyer id)
         {
-            return registry.contains(id);
+            return registry_.contains(id);
         }
 
         /// @return A copy of registry map.
-        std::unordered_map<TIdentifyer, TRegistered> enumerate_registry() { return this->registry; }
+        std::unordered_map<TIdentifyer, TRegistered> enumerate_registry() { return this->registry_; }
     };
 }
 

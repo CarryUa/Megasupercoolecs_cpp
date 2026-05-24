@@ -27,7 +27,7 @@ void Logger::append_to_log_file(const std::string_view &message) const noexcept
 
 msce::Logger::Logger(const std::string &owner_name)
 {
-    this->owner_name = owner_name;
+    this->owner_name_ = owner_name;
 }
 Logger::~Logger()
 {
