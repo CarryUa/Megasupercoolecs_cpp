@@ -8,6 +8,7 @@ if(BUILD_TESTING)
                 main.cpp
                 prototypes.cpp
                 reflection.cpp
+                events.cpp
                 Common/vector.cpp
                 Common/smartPointerLists.cpp
                 Graphics/color.cpp

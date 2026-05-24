@@ -5,6 +5,7 @@
 #include <MSCE/Managers/componentManager.h>
 #include <MSCE/Managers/entityManager.h>
 #include <MSCE/Managers/prototypeManager.h>
+#include <MSCE/Managers/eventManager.h>
 
 #include <chrono>
 
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
     static ComponentManager compMan;
     static EntityManager entMan;
     static PrototypeManager protoMan;
+    static EventManager evMan;
 
     log.log_info("Starting tests");
     sysMan.init_all_systems();

@@ -6,4 +6,5 @@ target_sources(${MSCE_TARGET}
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/componentManager.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/entityManager.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/prototypeManager.cpp
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/eventManager.cpp
                 )

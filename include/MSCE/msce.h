@@ -25,6 +25,7 @@
 #include <MSCE/Managers/entityManager.h>
 #include <MSCE/Managers/prototypeManager.h>
 #include <MSCE/Managers/systemManager.h>
+#include <MSCE/Managers/eventManager.h>
 
 #include <MSCE/Prototypes/prototype.hpp>
 #include <MSCE/Prototypes/entityPrototype.hpp>

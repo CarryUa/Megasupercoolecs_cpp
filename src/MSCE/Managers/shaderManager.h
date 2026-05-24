@@ -6,6 +6,7 @@
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Prototypes/shaderPrototype.hpp>
 
+// TODO: Finish this later
 namespace msce
 {
     class ShaderManager;
