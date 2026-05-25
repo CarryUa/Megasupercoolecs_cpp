@@ -50,7 +50,7 @@ TEST(PrototypeTests, PrototypeFileConsistencyTest)
         tp->id = "test_prototype_" + std::to_string(i);
         protoMan->serialize_prototype(cereal_file_path + std::to_string(i), tp);
         protoMan->deserialize_prototype(cereal_file_path + std::to_string(i));
-        std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str());
+        ASSERT_TRUE(std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str()));
     }
 
     const auto prototypes = protoMan->enumerate_prototypes();

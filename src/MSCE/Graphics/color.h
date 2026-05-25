@@ -6,28 +6,18 @@
 
 namespace msce
 {
-    enum class ColorType : unsigned char
-    {
-        INVALID = 0x00,
-        RGB = 0x01,
-        RGBA = 0x02,
-        GRAYSCALE = 0x03,
-        GRAYSCALE_PLUS_ALPHA = 0x04,
-
-        /// @brief Alias to ColorType::rgb
-        TRUECOLOR = ColorType::RGB,
-        /// @brief Alias to ColorType::rgba
-        TRUECOLOR_PLUS_ALPHA = ColorType::RGBA,
-    };
+    /**
+     * @brief Class representation of color.
+     */
     struct Color
     {
     private:
-        /// @brief The buffer containing actual values
+        /// @brief Individual channel byte.
         unsigned char r_, g_, b_, a_;
 
     public:
         /// @brief Constructs the color from hex code.
-        /// @param hex
+        /// @param hex Try and guess -_-
         Color(const std::string &hex, unsigned char a = 255);
 
         /// @brief Constructs the color from rgb vector and alpha variable.
@@ -74,8 +64,11 @@ namespace msce
         /// @param value The hex representation.
         void hex(const std::string &value) noexcept;
 
+        /// @brief Compares this color to hex provided.
         bool operator==(const std::string &hex) const noexcept;
+        /// @brief Compares this color to rgb vector provided.
         bool operator==(const Vector3D<unsigned char> vec) const noexcept;
+        /// @brief Compares this color to another color.
         bool operator==(const Color &other) const noexcept;
     };
 }

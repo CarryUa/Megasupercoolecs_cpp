@@ -54,17 +54,24 @@ namespace msce
 
 namespace msce
 {
+    /**
+     * @brief Interface and base class of all prototypes.
+     */
     class IPrototype
     {
     public:
+        /// @brief The if of this prototype.
         std::string id = "Invalid default prototype!";
 
+        /// @brief Do I really need to document this?
         virtual ~IPrototype() = default;
 
     public:
         friend class ::cereal::access;
+        /// @brief cereal stuff.
         template <class Archive>
         void save(Archive &ar) const { ar(::cereal::make_nvp("id", id)); }
+        /// @brief cereal stuff.
         template <class Archive>
         void load(Archive &ar) { ar(::cereal::make_nvp("id", id)); }
         MSCE_GENERATE_REFLECTION_METHODS(IPrototype, id)

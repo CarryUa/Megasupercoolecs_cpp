@@ -4,11 +4,19 @@
 
 namespace msce
 {
+    /**
+     * @brief Automaticaly manages the singleton pattern.
+     * @throws Throws std::runtime_error if second instance of singleton object is created.
+     * @tparam Derrived Type of derrived object. (AKA object using this)
+     */
     template <typename Derrived>
     class Singleton
     {
     public:
+        /// @brief Instance of singleton object.
         inline static Derrived *instance = nullptr;
+        /// @brief Singleton constructor. Manages the whole thing, trust me bro :)
+        /// @throws std::runtime_error if second instance is created.
         Singleton()
         {
             if (instance != nullptr)

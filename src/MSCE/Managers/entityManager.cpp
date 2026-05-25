@@ -29,5 +29,8 @@ msce::EntityHandle msce::EntityManager::copy_entity(EntityHandle other)
 }
 bool msce::EntityManager::destroy_entity(EntityHandle other)
 {
+    for (auto &comp : other.get()->components_)
+        ComponentManager::instance->destroy_component(comp);
+
     return this->entities_.remove(other);
 }

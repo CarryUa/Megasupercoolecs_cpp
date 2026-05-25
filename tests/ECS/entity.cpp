@@ -11,6 +11,11 @@
 #include <MSCE/msce_macros.h>
 using namespace msce;
 
+namespace
+{
+    Logger logger("EntityTests");
+}
+
 struct TestPrototype1_ent : public msce::IPrototype
 {
     int test_int = 15556;
@@ -37,45 +42,41 @@ TEST(EntityTests, EntityOperationTest)
 {
     for (size_t i = 0; i < TEST_ITERATIONS; ++i)
     {
-        double rand_x = rand() / 2;
-        double rand_y = rand() / 2;
+        auto t1 = ComponentManager::instance->create_component<TransformComponent>();
+        auto t2 = ComponentManager::instance->create_component<TransformComponent>();
+        auto e1 = EntityManager::instance->create_entity();
+        auto e2 = EntityManager::instance->create_entity();
 
-        double rand_x2 = rand() / 2;
-        double rand_y2 = rand() / 2;
+        e1->attach_component(t1);
+        ASSERT_TRUE(e1->has_component(t1)) << "Component attachment failed";
+        ASSERT_EQ(EntityManager::instance->get_entity(e1.get_index()), e1);
 
-        auto entMan = EntityManager::instance;
-        auto compMan = ComponentManager::instance;
+        e2->attach_component(t2);
+        ASSERT_TRUE(e2->has_component(t2)) << "Component attachment failed";
+        ASSERT_EQ(EntityManager::instance->get_entity(e2.get_index()), e2);
 
-        auto ent = entMan->create_entity();
-        auto ent2 = entMan->create_entity();
+        auto e3 = EntityManager::instance->copy_entity(e1);
+        ASSERT_EQ(EntityManager::instance->get_entity(e3.get_index()), e3);
+        auto t3 = ComponentManager::instance->create_component<TransformComponent>();
 
-        auto transform = compMan->create_component<TransformComponent>();
-        transform->position = Vector2D(rand_x, rand_y);
+        EXPECT_EQ(e1->get_component<TransformComponent>(), t1);
+        EXPECT_EQ(e2->get_component<TransformComponent>(), t2);
 
-        auto transform2 = compMan->create_component<TransformComponent>();
-        transform2->position = Vector2D(rand_x2, rand_y2);
+        e3->force_attach_component(t3);
+        EXPECT_FALSE(e3->has_component(t1));
+        EXPECT_TRUE(e3->has_component<TransformComponent>());
+        EXPECT_NE(e3->get_component<TransformComponent>(), t1);
 
-        ent->attach_component(transform);
-        ent2->attach_component(transform2);
+        EntityManager::instance->destroy_entity(e1);
+        EXPECT_EQ(e1.get(), nullptr);
+        EXPECT_EQ(t1.get(), nullptr);
 
-        ASSERT_TRUE(ent->has_component<TransformComponent>()) << "Failed to add a component to an entity";
-        ASSERT_TRUE(ent2->has_component<TransformComponent>()) << "Failed to add a component to an entity";
+        EntityManager::instance->destroy_entity(e2);
+        EXPECT_EQ(e2.get(), nullptr);
+        EXPECT_EQ(t2.get(), nullptr);
 
-        EXPECT_EQ(ent->get_component<TransformComponent>(), transform) << "Component address stored in entity is different from managers";
-        EXPECT_EQ(ent2->get_component<TransformComponent>(), transform2) << "Component address stored in entity is different from managers";
-
-        EXPECT_EQ(ent->get_component<TransformComponent>()->position, Vector2D(rand_x, rand_y)) << "Values of component stored in an entity and in manager are different";
-        EXPECT_EQ(ent2->get_component<TransformComponent>()->position, Vector2D(rand_x2, rand_y2)) << "Values of component stored in an entity and in manager are different";
-
-        auto ent3 = entMan->copy_entity(ent);
-
-        EXPECT_NE(ent, ent3) << "Entity copy points to same memory address";
-        EXPECT_NE(ent.get_index(), ent3.get_index()) << "Copy of an entity has same ID as original";
-        ASSERT_TRUE(ent3->has_component<TransformComponent>()) << "Copy of an entity doesn't have same components";
-        EXPECT_NE(ent->get_component<TransformComponent>(), ent3->get_component<TransformComponent>()) << "Entity copys component points to same address as originals component";
-        EXPECT_EQ(ent->get_component<TransformComponent>()->position, ent3->get_component<TransformComponent>()->position) << "Entity copys component has different values than originals";
-
-        ent->detach_component<TransformComponent>();
-        EXPECT_FALSE(ent->has_component<TransformComponent>());
+        EntityManager::instance->destroy_entity(e3);
+        EXPECT_EQ(e3.get(), nullptr);
+        EXPECT_EQ(t3.get(), nullptr);
     }
 }

@@ -7,10 +7,8 @@
 #define MSCE_DEFINE_COMPONENT(Type, ...)                                                                        \
 private:                                                                                                        \
     MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>, __VA_ARGS__)                    \
-public:                                                                                                         \
     /**  @brief This overload is used by cereal. All components must be instantiated using ComponentManager. */ \
-    Type() {}                                                                                                   \
-    Type(size_t id) : BaseComponent(id) {}
+    Type() {}
 
 #define MSCE_REGISTER_COMPONENT(Type) \
     CEREAL_REGISTER_TYPE(Type)        \
@@ -20,40 +18,53 @@ public:                                                                         
 
 namespace msce
 {
+    class ComponentManager;
+    /**
+     * @brief Component interface used for storage.
+     */
     class IComponent
     {
     protected:
         friend class ComponentManager;
-        size_t id_;
 
-    public:
         /// @brief This overload is used by cereal.All components must be instantiated using ComponentManager
         IComponent() {}
-        IComponent(size_t id) { this->id_ = id; }
 
+    public:
         virtual ~IComponent() = default;
         virtual IComponent *clone() = 0;
 
         friend class ::cereal::access;
+        /**  @brief Cereal's save function. Refer to their docs for more info.*/
         template <class Archive>
         void save(Archive &ar) const {}
         template <class Archive>
-        void load(Archive &ar) {}
+        /**  @brief Cereal's load function. Refer to their docs for more info.*/
+        void load(Archive &ar)
+        {
+        }
     };
 
+    /**
+     * @brief Base type for all components.
+     */
     template <typename TComp>
     class BaseComponent : public IComponent
     {
-    public:
-        /// @brief This overload is used by cereal. All components must be instantiated using ComponentManager.
-        BaseComponent() {}
-        BaseComponent(size_t id) : IComponent(id) {}
-        /// @brief This method is used by ComponentManager, dont relly on it for cloning components
-        /// @return
-        IComponent *clone() override
+    protected:
+        friend class ComponentManager;
+
+        /**
+         * @returns A pointer to the copy.
+         */
+        IComponent *clone() override final
         {
             return new TComp(static_cast<const TComp &>(*this));
         }
+        /// @brief This overload is used by cereal. All components must be instantiated using ComponentManager.
+        BaseComponent() {}
+
+    public:
     };
 }
 

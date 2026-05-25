@@ -11,49 +11,77 @@
 
 namespace msce
 {
+    /**
+     * @brief Manages prototypes (de)serialization and manupulation. Always use it to interact with prototypes.
+     */
     class PrototypeManager : public Singleton<PrototypeManager>
     {
     private:
+        /**
+         * @brief Storage for active prototypes.
+         */
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> prototypes_;
         inline static Logger logger = Logger("PrototypeManager");
 
     public:
         PrototypeManager();
 
+        /**
+         * @brief Reference to staticaly-registered prototype factories.
+         */
         Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &registered_factories_ref;
+        /**
+         * @brief Reference to staticaly-registered prototype types.
+         */
         Registry<std::string, std::reference_wrapper<const std::type_info>> &registered_prototypes_ref;
-        /// @brief Tries do deserialize cereal file and create a prototype based on it.
-        /// @param path The path to cereal file.
+
+        /**
+         * @brief Uses cereal to desetialize prototype file into actiall prototype, and stores it in @ref msce::PrototypeManager::prototypes_;
+         * @param path Path to serialized file.
+         */
         void deserialize_prototype(const std::string &path);
 
-        /// @brief Tries do serialize a prototype.
-        /// @param path The path to cereal file to be created.
-        /// @param prototype The prototype uptr that needs to be serialized.
+        /**
+         * @brief Serializes runtime prototype object into a file. TRUNCATES THE FILE.
+         * @param path Path to file to serialize into.
+         * @param prototype The prototype reference to be serialized.
+         * @warning This will truncate the file at path.
+         */
         void serialize_prototype(const std::string &path, const std::unique_ptr<IPrototype> &prototype);
 
-        /// @brief Returns the prototype with provided id.
-        /// @param id The id of the prototype
-        /// @return A pointer to the prototype or nullptr
+        /**
+         * @brief Gets the prototype with given id.
+         * @param id The id of prototype to get.
+         * @return Pointer to the prototype or nullptr.
+         */
         IPrototype *get_prototype(const std::string &id);
 
-        /// @brief Returns the prototype with provided id, if it can be cast to the provided type.
-        /// @tparam TProto Prototype type to be returned.
-        /// @param id The id of the prototype
-        /// @return A pointer to the prototype or nullptr
+        /**
+         * @brief Gets the prototype with given id and of type TProto.
+         * @param id The if of prototype to get.
+         * @return Pointer to the prototype of nullptr.
+         */
         template <typename TProto>
         TProto *get_prototype(const std::string &id);
 
-        /// @return Returns an unordered set of all prototypes pointers.
+        /**
+         * @return std::unordered_set of pointers to all prototypes.
+         */
         std::unordered_set<IPrototype *> enumerate_prototypes();
 
-        /// @return Returns an unordered set of pointers to all TProto* castable prototypes.
+        /**
+         * @tparam TProto Type of prototypes to be returned.
+         * @returns std::unordered_set of pointers to prototypes of type TProto.
+         */
         template <typename TProto>
         std::unordered_set<TProto *> enumerate_prototypes();
 
-        /// @brief Creates registered prototype by its typename string at runtime.
-        /// @param type The type of the prototype, that it was registered with.
-        /// @param id Id that will be asigned to the prototype.
-        /// @return Pointer to newly-created prototype or nullptr.
+        /**
+         * @brief Creates prototype by its name if registered.
+         * @param type The prototype typename it was registered with.
+         * @param id The id of the prototype.
+         * @return Pointer to instantiated prototype or nullptr.
+         */
         IPrototype *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
 
         /// @brief Creates registered prototype by its type-name string at runtime.
@@ -64,26 +92,39 @@ namespace msce
         template <typename TProto>
         TProto *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
 
-        /// @param id Try and guess.
-        /// @return True if prototype with given ID exists, and false otherwise.
+        /**
+         * @param id Try and guess -_-
+         * @retval true if exists.
+         * @retval false if not.
+         */
         bool prototype_id_exists(const std::string &id) const noexcept;
 
-        /// @param type Try and guess.
-        /// @return True if prototype with given type was registered in bouth regestries, and false otherwise.
+        /**
+         * @param type Try and guess -_-
+         * @retval true if type is registered.
+         * @retval false if not.
+         */
         bool prototype_type_registered(const std::string &type) const noexcept;
 
-        /// @param id Try and guess.
-        /// @return True if prototype was successfully deleted, and false otherwise.
+        /**
+         * @brief Deletes the instance of prototype with given id.
+         * @param id Try and guess -_-
+         * @retval true if prototype was deleted.
+         * @retval false if not.
+         */
         bool delete_prototype(const std::string &id) noexcept;
 
-        /// @brief This variant also sets proto argument to nullptr if deleted successfully.
-        /// @param proto Pointer to the prototype to be deleted.
-        /// @return True if prototype was successfully deleted, and false otherwise.
+        /**
+         * @brief Deletes the instance of given prototype.
+         * @param proto Pointer to the prototype instance to be deleted.
+         * @retval true if prototype was deleted.
+         * @retval false if not.
+         */
         bool delete_prototype(IPrototype *proto) noexcept;
     };
 
     template <typename TProto>
-    TProto *PrototypeManager::get_prototype(const std::string &id)
+    inline TProto *PrototypeManager::get_prototype(const std::string &id)
     {
         if (!this->prototypes_.contains(id))
         {
@@ -101,7 +142,7 @@ namespace msce
     }
 
     template <typename TProto>
-    std::unordered_set<TProto *> PrototypeManager::enumerate_prototypes()
+    inline std::unordered_set<TProto *> PrototypeManager::enumerate_prototypes()
     {
         std::unordered_set<TProto *> result = std::unordered_set<TProto *>();
         for (const auto &[_, p] : this->prototypes_)
@@ -117,7 +158,7 @@ namespace msce
     };
 
     template <typename TProto>
-    TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
+    inline TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
     {
         if (!registered_factories_ref.is_registered(type))
         {

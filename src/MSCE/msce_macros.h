@@ -200,11 +200,12 @@ static constexpr const std::type_info &get_member_type(U T::*)
 /// @param ... Names of members that need to be serialized.
 #define MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(...)                                                        \
     friend class ::cereal::access;                                                                         \
-    template <class Archive>                                                                               \
+    template <class Archive> /**  @brief Cereal's save function. Refer to their docs for more info.*/      \
     void save(Archive &ar) const                                                                           \
     {                                                                                                      \
         ar(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))); \
     }                                                                                                      \
+    /**  @brief Cereal's load function. Refer to their docs for more info.*/                               \
     template <class Archive>                                                                               \
     void load(Archive &ar)                                                                                 \
     {                                                                                                      \
@@ -219,12 +220,14 @@ static constexpr const std::type_info &get_member_type(U T::*)
 #define MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(ParentClass, ...)                                   \
 public:                                                                                                    \
     friend class ::cereal::access;                                                                         \
+    /**  @brief Cereal's save function. Refer to their docs for more info.*/                               \
     template <class Archive>                                                                               \
     void save(Archive &ar) const                                                                           \
     {                                                                                                      \
         ar(cereal::base_class<ParentClass>(this),                                                          \
            BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))); \
     }                                                                                                      \
+    /**  @brief Cereal's load function. Refer to their docs for more info.*/                               \
     template <class Archive>                                                                               \
     void load(Archive &ar)                                                                                 \
     {                                                                                                      \

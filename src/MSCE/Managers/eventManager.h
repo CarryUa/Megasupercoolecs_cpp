@@ -26,11 +26,18 @@ namespace msce
 
     public:
         /**
-         * Subscribes
+         * @brief Subsctibes callback to an event of type TEv.
+         * @tparam TEv type of event
+         * @note Note that regardless of event instance, callback subscribes to event @b type. The event instance is used as args passed into callback parameter.
          */
         template <typename TEv>
         void subscribe(std::function<void(TEv &)> callback);
 
+        /**
+         * @brief Fires the event of type TEv, and passes event as parameter for callbacks.
+         * @tparam TEv type of event to be fired.
+         * @param event TEv instance passed as parameter for callbacks.
+         */
         template <typename TEv>
         void fire(TEv &event);
     };
