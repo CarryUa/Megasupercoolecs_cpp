@@ -1,5 +1,6 @@
 #include "shaderManager.h"
 #include <MSCE/logger.h>
+#include <MSCE/Managers/eventManager.h>
 
 namespace
 {
@@ -54,10 +55,26 @@ void msce::BaseShader::decompile() noexcept
 
 msce::BaseShader::BaseShader(ShaderPrototype *prototype) noexcept
 {
+    MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(RenderStartEvent, this->on_render_start);
+    MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(PreRenderStartEvent, this->on_pre_render_start);
+
     this->prototype_ = prototype;
+    for (auto &[name, value] : prototype_->attribs)
+    {
+        this->set_field_any(name, value);
+    }
 }
 
 GLuint msce::BaseShader::get_shader_handle() const noexcept
 {
     return this->shader_handle_;
+}
+
+void msce::BaseShader::on_pre_render_start(PreRenderStartEvent &ev)
+{
+}
+
+void msce::BaseShader::on_render_start(RenderStartEvent &ev)
+{
+    logger.log_debug("Render event triggered for window {}", ev.target_window.title);
 }

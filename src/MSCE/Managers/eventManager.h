@@ -10,6 +10,11 @@
 
 namespace msce
 {
+#define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback) \
+    EventManager::instance->subscribe<Event>(Callback)
+
+#define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback) \
+    EventManager::instance->subscribe<Event>([this](Event &ev) { Callback(ev); })
 
     /**
      *  @brief Manages registration and invocation(firing) of events.

@@ -5,6 +5,7 @@
 
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Prototypes/shaderPrototype.hpp>
+#include <MSCE/Events/glEvents.h>
 
 // TODO: Finish this later
 namespace msce
@@ -12,8 +13,10 @@ namespace msce
     class ShaderManager;
 
     /**
-     * Base class of all shaders.
-     * @warning This class does not have any attribute/uniform manipulation methods. It is derived class responsibility to define and implement those.
+     * @brief Base class of all shaders.
+     * @related msce::ShaderManager
+     * @related msce::ShaderPrototype
+     * @note This auto-subscribes to gl-related events, like @ref msce::RenderStartEvent.
      */
     class BaseShader
     {
@@ -26,9 +29,18 @@ namespace msce
         bool recompile() noexcept;
         void decompile() noexcept;
 
+        MSCE_GENERATE_REFLECTION_METHODS(BaseShader, smart_storage_id_, shader_handle_, prototype_)
+
     public:
         BaseShader(ShaderPrototype *prototype) noexcept;
         GLuint get_shader_handle() const noexcept;
+
+        virtual void on_pre_render_start(PreRenderStartEvent &ev);
+        virtual void on_render_start(RenderStartEvent &ev);
+    };
+
+    class ShaderProgram
+    {
     };
 
     class ShaderManager : public Singleton<ShaderManager>

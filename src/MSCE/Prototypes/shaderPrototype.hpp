@@ -1,6 +1,7 @@
 #ifndef MSCE_SHADER_PROTOTYPE_H_
 #define MSCE_SHADER_PROTOTYPE_H_
 #include <MSCE/Prototypes/prototype.hpp>
+#include <MSCE/Types/vector.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
@@ -34,12 +35,15 @@ namespace msce
         FloatVec3 = GL_FLOAT_VEC3,
 
     };
+
+    using GLAny = std::variant<char, unsigned char, int, unsigned int, float, double, vec2i, vec2ui, vec2f>;
+
     struct ShaderPrototype : public IPrototype
     {
         ShaderType type = ShaderType::Invalid;
         std::string source_path = "";
-        std::unordered_map<std::string, GLType> attribs = {};
-        std::unordered_map<std::string, GLType> uniforms = {};
+        std::unordered_map<std::string, GLAny> attribs = {};
+        std::unordered_map<std::string, GLAny> uniforms = {};
         MSCE_DEFINE_PROTOTYPE(ShaderPrototype, type, source_path, attribs, uniforms)
     };
 }
