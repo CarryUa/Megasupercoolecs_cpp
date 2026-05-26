@@ -4,15 +4,10 @@
 using namespace std;
 using namespace msce;
 
-Registry<std::type_index, std::function<std::unique_ptr<System>()>> &msce::SystemManager::get_system_registry()
+SystemManager::SystemManager() : system_registry_ref_(get_g_system_registry())
 {
-    static auto instance = Registry<std::type_index, std::function<std::unique_ptr<System>()>>();
-    return instance;
-}
-
-SystemManager::SystemManager()
-{
-    for (const auto &[type, constructor] : SystemManager::get_system_registry().enumerate_registry())
+    logger.log_info("Initializing self...");
+    for (const auto &[type, constructor] : this->system_registry_ref_.enumerate_registry())
     {
         this->all_systems.push_back(constructor());
         this->all_systems.back().get()->p_sys_man = this;
@@ -20,7 +15,6 @@ SystemManager::SystemManager()
 
     this->time_sys_ = this->get_system<TimeSystem>();
 }
-
 void SystemManager::init_all_systems()
 {
     for (const auto &system : this->all_systems)

@@ -22,7 +22,7 @@ namespace msce
     {
     private:
         inline static Logger logger = Logger("SystemManager");
-        static Registry<std::type_index, std::function<std::unique_ptr<System>()>> &get_system_registry();
+        Registry<std::type_index, std::function<std::unique_ptr<System>()>> &system_registry_ref_;
         TimeSystem *time_sys_;
 
     public:
@@ -32,24 +32,6 @@ namespace msce
 
         /// @brief List of all existing system instances.
         std::vector<std::unique_ptr<System>> all_systems;
-
-        /// @brief Facade function for Registry::register_entry. Registers system by its type_index.
-        /// @tparam TSys The type of system being registered.
-        template <typename TSys>
-        static void register_system()
-        {
-            if (get_system_registry().is_registered(typeid(TSys)))
-            {
-                logger.log_warning("Double registration of {} detected!", typeid(TSys).name());
-                return;
-            }
-            get_system_registry().register_entry(typeid(TSys),
-                                                 []() -> std::unique_ptr<System>
-                                                 {
-                                                     return std::unique_ptr<System>(std::make_unique<TSys>().release());
-                                                 });
-            logger.log_info("Registered system of type: {}", typeid(TSys).name());
-        }
 
         /// @brief Initializes all system using System.Init();
         void init_all_systems();
@@ -74,11 +56,6 @@ namespace msce
             return nullptr;
         }
     };
-    template <typename TSys>
-    inline void register_system()
-    {
-        SystemManager::register_system<TSys>();
-    }
 }
 
 #endif //_MSCE_SYSTEM_MANAGER_H_
