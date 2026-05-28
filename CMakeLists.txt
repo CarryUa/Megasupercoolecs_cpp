@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.28.0)
 project(Megasupercoolecs VERSION 0.1.0 LANGUAGES CXX)
 
+set(DOXYGEN_EXECUTABLE "" FORCE)
 set(CMAKE_COMPILER_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
 
 if(NOT MSCE_SKIP_TESTS)
@@ -46,6 +47,8 @@ add_subdirectory(src/MSCE/ECS)
 add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)
 add_subdirectory(src/MSCE/Prototypes)
+add_subdirectory(src/MSCE/ABI)
+
 
 add_subdirectory(tests)
 

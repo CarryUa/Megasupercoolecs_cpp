@@ -7,14 +7,20 @@ int main(int argc, char **argv)
 {
     srand(time(NULL));
     static auto g_logger = Logger("GLOBAL");
-    g_logger.log_info("STARTING...");
-    g_logger.log_info("Initializing SystemManager...");
     static auto g_sys_man = SystemManager();
     g_sys_man.init_all_systems();
-    g_logger.log_info("Initializing ComponentManager...");
     static auto g_comp_man = ComponentManager();
-    g_logger.log_info("Initializing PrototypeManager...");
     static auto g_proto_man = PrototypeManager();
+    static auto g_enum_man = EnumManager();
+
+    Enum shader_type = g_enum_man.create_enum("ShaderType", "VERTEX_SHADER");
+    g_logger.log_info("Created enum '{}' with value {}({})", shader_type.get_name(), shader_type.get_enumerator_name(), shader_type.get_value<int64_t>());
+
+    auto shader = PrototypeManager::instance->create_new_prototype_instance<ShaderPrototype>("ShaderPrototype", "new_shader_proto");
+    // shader->attribs.emplace("TestIntAttrib", 100);
+    // shader->uniforms.emplace("TestFloatUniform", 10.012311f);
+    shader->type = shader_type.get_value<ShaderType>();
+    g_proto_man.serialize_prototype("/tmp/test_shader_proto.msceproto", shader->id);
 
     auto graphic_sys = g_sys_man.get_system<GraphicsSystem>();
     auto time_sys = g_sys_man.get_system<TimeSystem>();

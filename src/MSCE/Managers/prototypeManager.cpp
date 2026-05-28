@@ -71,6 +71,7 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
         cereal::BinaryOutputArchive ar(file);
         ar(prototype);
 #endif
+        logger.log_info("Successfully serialized prototype into '{}'", path);
     }
     catch (const exception &e)
     {

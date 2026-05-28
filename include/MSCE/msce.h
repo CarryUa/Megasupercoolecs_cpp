@@ -10,6 +10,7 @@
 #include <MSCE/ECS/entity.h>
 #include <MSCE/ECS/system.h>
 
+#include <MSCE/Types/enum.hpp>
 #include <MSCE/Types/vector.h>
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Types/Collections/handle.hpp>
@@ -26,8 +27,10 @@
 #include <MSCE/Managers/prototypeManager.h>
 #include <MSCE/Managers/systemManager.h>
 #include <MSCE/Managers/eventManager.h>
+#include <MSCE/Managers/enumManager.h>
 
 #include <MSCE/Prototypes/prototype.hpp>
 #include <MSCE/Prototypes/entityPrototype.hpp>
+#include <MSCE/Prototypes/shaderPrototype.hpp>
 
 #endif
