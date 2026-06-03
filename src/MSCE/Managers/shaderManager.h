@@ -20,6 +20,9 @@ namespace msce
      */
     class BaseShader
     {
+    private:
+        inline static Logger logger = Logger("BaseShader");
+
     protected:
         friend class ShaderManager;
 
@@ -46,10 +49,12 @@ namespace msce
     class ShaderManager : public Singleton<ShaderManager>
     {
     private:
+        inline static Logger logger = Logger("ShaderManager");
         /// @brief The map of shaders and their users(programs) count
         std::unordered_set<std::unique_ptr<BaseShader>, unsigned int> shaders_;
 
     public:
+        ShaderManager();
     };
 }
 

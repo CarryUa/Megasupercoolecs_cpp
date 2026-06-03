@@ -4,6 +4,11 @@
 #include <MSCE/ECS/component.h>
 #include <MSCE/Managers/componentManager.h>
 
+msce::EntityManager::EntityManager()
+{
+    logger.log_info("Initializing manager...");
+}
+
 msce::EntityHandle msce::EntityManager::create_entity()
 {
 

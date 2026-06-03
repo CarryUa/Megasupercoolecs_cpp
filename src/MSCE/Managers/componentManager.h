@@ -25,6 +25,7 @@ namespace msce
     private:
         /// @brief Component storage
         SmartUniquePointerList<IComponent> components_;
+        inline static Logger logger = Logger("ComponentManager");
 
     public:
         ComponentManager();

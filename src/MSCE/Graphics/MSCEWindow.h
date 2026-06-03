@@ -18,6 +18,7 @@ namespace msce
         TimeSystem *t_sys_;
         ComponentManager *comp_man_ = nullptr;
         unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window_;
+        unsigned int vbo_, vao_;
 
     public:
         Vector2D<int> window_size;

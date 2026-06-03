@@ -1,5 +1,6 @@
 #ifndef MSCE_EVENT_MANAGER_H_
 #define MSCE_EVENT_MANAGER_H_
+#include <MSCE/logger.h>
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Events/event.h>
@@ -22,6 +23,8 @@ namespace msce
     class EventManager : public Singleton<EventManager>
     {
     private:
+        inline static Logger logger = Logger("EventManager");
+
         /**
          * @brief Stores individual event subscriptions.
          * @note Essentially a subscription is simply a pair of event type and callback function.
@@ -30,6 +33,8 @@ namespace msce
             subscriptions_;
 
     public:
+        EventManager();
+
         /**
          * @brief Subsctibes callback to an event of type TEv.
          * @tparam TEv type of event

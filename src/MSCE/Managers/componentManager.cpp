@@ -6,6 +6,7 @@ using namespace msce;
 
 msce::ComponentManager::ComponentManager()
 {
+    logger.log_info("Initializing manager...");
 }
 
 void msce::ComponentManager::destroy_component(size_t id)

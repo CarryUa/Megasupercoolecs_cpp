@@ -39,7 +39,7 @@ namespace msce
          * @brief Uses cereal to desetialize prototype file into actiall prototype, and stores it in @ref msce::PrototypeManager::prototypes_;
          * @param path Path to serialized file.
          */
-        void deserialize_prototype(const std::string &path);
+        IPrototype *deserialize_prototype(const std::string &path);
 
         /**
          * @brief Serializes runtime prototype object into a file. TRUNCATES THE FILE.
@@ -47,7 +47,7 @@ namespace msce
          * @param prototype The prototype reference to be serialized.
          * @warning This will truncate the file at path.
          */
-        void serialize_prototype(const std::string &path, const std::unique_ptr<IPrototype> &prototype);
+        void serialize_prototype(const std::string &path, const std::string &id);
 
         /**
          * @brief Gets the prototype with given id.
@@ -82,7 +82,7 @@ namespace msce
          * @param id The id of the prototype.
          * @return Pointer to instantiated prototype or nullptr.
          */
-        IPrototype *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
+        IPrototype *create_new_prototype_instance(const std::string &type, const std::string &id) noexcept;
 
         /// @brief Creates registered prototype by its type-name string at runtime.
         /// @tparam TProto Type that prototype will be cast to.
@@ -90,7 +90,7 @@ namespace msce
         /// @param id Id that will be asigned to the prototype.
         /// @return Pointer to newly-created prototype or nullptr.
         template <typename TProto>
-        TProto *instantiate_prototype(const std::string &type, const std::string &id) noexcept;
+        TProto *create_new_prototype_instance(const std::string &type, const std::string &new_id) noexcept;
 
         /**
          * @param id Try and guess -_-
@@ -158,23 +158,23 @@ namespace msce
     };
 
     template <typename TProto>
-    inline TProto *PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
+    inline TProto *PrototypeManager::create_new_prototype_instance(const std::string &type, const std::string &new_id) noexcept
     {
         if (!registered_factories_ref.is_registered(type))
         {
             logger.log_error("Prototype with type '{} ' wasn't ever registered!", type);
             return nullptr;
         }
-        if (this->prototypes_.contains(id))
+        if (this->prototypes_.contains(new_id))
         {
-            logger.log_error("Prototype with id '{}' already exist!", id);
+            logger.log_error("Prototype with id '{}' already exist!", new_id);
             return nullptr;
         }
 
-        this->prototypes_[id] = registered_factories_ref.get_entry(type)();
-        this->prototypes_[id]->id = id;
+        this->prototypes_[new_id] = registered_factories_ref.get_entry(type)();
+        this->prototypes_[new_id]->id = new_id;
 
-        auto ptr = dynamic_cast<TProto *>(this->prototypes_[id].get());
+        auto ptr = dynamic_cast<TProto *>(this->prototypes_[new_id].get());
         if (ptr == nullptr)
         {
             logger.log_error("Prototype with type '{}' cant exist!", type);

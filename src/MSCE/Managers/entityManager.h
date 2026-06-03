@@ -23,8 +23,11 @@ namespace msce
     private:
         /// @brief Entity storage.
         SmartUniquePointerList<Entity> entities_;
+        inline static Logger logger = Logger("EntityManager");
 
     public:
+        EntityManager();
+
         /**
          * @brief Creates an empty entity.
          * @return @ref msce::EntityHandle of created entity.

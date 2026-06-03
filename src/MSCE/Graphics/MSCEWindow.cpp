@@ -19,7 +19,7 @@ const string fragment_shader_source = "#version 330 core\n"
                                       "out vec4 FragColor;\n"
                                       "void main()\n"
                                       "{\n"
-                                      "   FragColor = (color / 255);\n"
+                                      "   FragColor = color;\n"
                                       "}\n\0";
 
 static void transform_vertecies(float *dest, const VertexList &in_vert, Vertex center, TransformComponent *comp, MSCEWindow &window)
@@ -62,6 +62,7 @@ MSCEWindow::MSCEWindow(Vector2D<int> window_size_, const char *title, GLFWmonito
     }
 
     glfwMakeContextCurrent(p_window_.get());
+    vao_ = vbo_ = 0;
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -118,6 +119,9 @@ MSCEWindow::MSCEWindow(Vector2D<int> window_size_, const char *title, GLFWmonito
     glDeleteShader(frag_sh);
 
     glfwSetFramebufferSizeCallback(this->p_window_.get(), this->on_resize);
+
+    glGenVertexArrays(1, &vao_);
+    glGenBuffers(1, &vbo_);
 }
 
 void msce::MSCEWindow::on_resize(GLFWwindow *window, int w, int h)
@@ -138,33 +142,32 @@ bool MSCEWindow::should_close()
 
 void msce::MSCEWindow::render()
 {
-
     this->make_curent_context();
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0, 0, 0, 1);
 
     auto transforms = comp_man_->get_all_components_of_type<TransformComponent>();
+    double time = t_sys_->get_total_seconds();
+    double sin_t_norm_r = (sin(time) + 1) / 2;
+    double sin_t_norm_g = (sin(time + M_PI / 1.5) + 1) / 2;
+    double sin_t_norm_b = (sin(time - M_PI / 1.5) + 1) / 2;
     for (auto t : transforms)
     {
-        Color fg(vec3uc((sin(t_sys_->get_total_seconds()) / 2 + 1) * 255,
-                        (sin(t_sys_->get_total_seconds() + M_PI / 1.5) / 2 + 1) * 255,
-                        (sin(t_sys_->get_total_seconds() - M_PI / 1.5) / 2 + 1) * 255));
+        Logger logger("Window");
+        Color fg(vec3uc(static_cast<unsigned char>(sin_t_norm_r * 255),
+                        static_cast<unsigned char>(sin_t_norm_g * 255),
+                        static_cast<unsigned char>(sin_t_norm_b * 255)));
 
         VertexList vertices_vec = t->shape.get()->get_vertecies();
         size_t buffer_s = vertices_vec.size() * 3;
         auto vertices = make_unique<float[]>(buffer_s);
         transform_vertecies(vertices.get(), vertices_vec, t->position, t.get(), (*this));
 
-        unsigned int vbo, vao;
-        // Generate 1 VAO and 1 VBO
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-
         // Bind the VAO first
-        glBindVertexArray(vao);
+        glBindVertexArray(vao_);
 
         // Bind VBO and buffer the vertex data
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
         glBufferData(GL_ARRAY_BUFFER, buffer_s * sizeof(float), vertices.get(), GL_STATIC_DRAW);
 
         // Configure vertex attribute pointers (position at layout location 0)
@@ -176,9 +179,9 @@ void msce::MSCEWindow::render()
         glBindVertexArray(0);
 
         glUseProgram(shader_program_);
-        glBindVertexArray(vao);
+        glBindVertexArray(vao_);
         auto color_uniform = glGetUniformLocation(shader_program_, "color");
-        glUniform4f(color_uniform, fg.r(), fg.g(), fg.b(), fg.a());
+        glUniform4f(color_uniform, (static_cast<float>(fg.r()) / 255.0), (static_cast<float>(fg.g()) / 255.0), (static_cast<float>(fg.b()) / 255.0), (static_cast<float>(fg.a()) / 255.0));
 
         glDrawArrays(GL_TRIANGLE_FAN, 0, buffer_s / 3);
     }

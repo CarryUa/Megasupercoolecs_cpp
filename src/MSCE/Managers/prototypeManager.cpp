@@ -1,12 +1,13 @@
 #include "prototypeManager.h"
 #include <fstream>
 #include <functional>
-#ifdef DEBUG
+
+#if defined(RELEASE)
+#include <cereal/archives/binary.hpp>
+#else
 #include <cereal/archives/json.hpp>
 #endif
-#ifdef RELEASE
-#include <cereal/archives/binary.hpp>
-#endif
+
 #include <cereal/types/memory.hpp>
 
 using namespace std;
@@ -15,45 +16,55 @@ msce::PrototypeManager::PrototypeManager()
     : registered_factories_ref(get_g_registered_prototype_factories()),
       registered_prototypes_ref(get_g_registered_prototypes())
 {
+    logger.log_info("Initializing manager...");
 }
 
-void msce::PrototypeManager::deserialize_prototype(const string &path)
+msce::IPrototype *msce::PrototypeManager::deserialize_prototype(const string &path)
 {
     ifstream file(path);
     if (!file)
     {
         logger.log_error("Couldn't open prototype file at '{}'", path);
-        return;
+        return nullptr;
     }
 
     try
     {
         std::unique_ptr<msce::IPrototype> proto;
 
-#ifdef DEBUG
+#if defined(RELEASE)
+        cereal::BinaryInputArchive ar(file);
+        ar(proto);
+#else
         cereal::JSONInputArchive ar(file);
         ar(proto);
 #endif
-#ifdef RELEASE
-        cereal::BinaryInputArchive ar(file);
-        ar(proto);
-#endif
-
+        auto ptr = proto.get();
         this->prototypes_[proto->id] = std::move(proto);
+        return ptr;
     }
     catch (const exception &e)
     {
         logger.log_error("Couldn't deserialize prototype at '{}': ", e.what());
+        return nullptr;
     }
     catch (...)
     {
         file.close();
-        return;
+        return nullptr;
     }
+
+    return nullptr;
 }
 
-void msce::PrototypeManager::serialize_prototype(const std::string &path, const unique_ptr<IPrototype> &prototype)
+void msce::PrototypeManager::serialize_prototype(const std::string &path, const std::string &id)
 {
+    if (!prototype_id_exists(id))
+    {
+        logger.log_error("Tried serializing non-manager-created prototype. Use create_new_prototype_instance() to create prototypes.");
+        return;
+    }
+
     ofstream file(path);
     if (!file)
     {
@@ -63,19 +74,19 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
 
     try
     {
-#ifdef DEBUG
-        cereal::JSONOutputArchive ar(file);
-        ar(prototype);
-#endif
-#ifdef RELEASE
+        auto &uptr_ref = this->prototypes_[id];
+
+#if defined(RELEASE)
         cereal::BinaryOutputArchive ar(file);
-        ar(prototype);
+        ar(uptr_ref);
+#else
+        cereal::JSONOutputArchive ar(file);
+        ar(uptr_ref);
 #endif
-        logger.log_info("Successfully serialized prototype into '{}'", path);
     }
     catch (const exception &e)
     {
-        logger.log_error("Couldn't serialize '{}' into file at '{}': {}", prototype->id, path, e.what());
+        logger.log_error("Couldn't serialize '{}' into file at '{}': {}", id, path, e.what());
     }
     catch (...)
     {
@@ -106,7 +117,7 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
     return result;
 }
 
-msce::IPrototype *msce::PrototypeManager::instantiate_prototype(const std::string &type, const std::string &id) noexcept
+msce::IPrototype *msce::PrototypeManager::create_new_prototype_instance(const std::string &type, const std::string &id) noexcept
 {
     if (!registered_factories_ref.is_registered(type))
     {

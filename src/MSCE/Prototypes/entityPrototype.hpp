@@ -10,9 +10,9 @@ namespace msce
     {
         /// @brief List of components for serialization.
         std::vector<std::shared_ptr<IComponent>> components;
-        MSCE_DEFINE_PROTOTYPE(EntityPrototype, components)
+        // MSCE_DEFINE_PROTOTYPE(EntityPrototype, components)
     };
 }
-MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype)
+// MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype)
 
 #endif // MSCE_ENTITY_PROTOTYPE_HPP_
