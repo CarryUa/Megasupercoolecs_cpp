@@ -28,6 +28,7 @@
 #include <MSCE/Managers/systemManager.h>
 #include <MSCE/Managers/eventManager.h>
 #include <MSCE/Managers/enumManager.h>
+#include <MSCE/Managers/shaderManager.h>
 
 #include <MSCE/Prototypes/prototype.hpp>
 #include <MSCE/Prototypes/entityPrototype.hpp>

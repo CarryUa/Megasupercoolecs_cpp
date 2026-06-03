@@ -13,15 +13,6 @@ int main(int argc, char **argv)
     static auto g_proto_man = PrototypeManager();
     static auto g_enum_man = EnumManager();
 
-    Enum shader_type = g_enum_man.create_enum("ShaderType", "VERTEX_SHADER");
-    g_logger.log_info("Created enum '{}' with value {}({})", shader_type.get_name(), shader_type.get_enumerator_name(), shader_type.get_value<int64_t>());
-
-    auto shader = PrototypeManager::instance->create_new_prototype_instance<ShaderPrototype>("ShaderPrototype", "new_shader_proto");
-    // shader->attribs.emplace("TestIntAttrib", 100);
-    // shader->uniforms.emplace("TestFloatUniform", 10.012311f);
-    shader->type = shader_type.get_value<ShaderType>();
-    g_proto_man.serialize_prototype("/tmp/test_shader_proto.msceproto", shader->id);
-
     auto graphic_sys = g_sys_man.get_system<GraphicsSystem>();
     auto time_sys = g_sys_man.get_system<TimeSystem>();
 
@@ -35,27 +26,34 @@ int main(int argc, char **argv)
     t3->shape = std::make_shared<Rectangle>(100, 200);
 
     int frame = 0;
-    unsigned long next_fps_time = 0;
+    double next_fps_time = 0.5;
 
+    g_logger.log_debug("Starting main loop...");
     while (!root_window->should_close())
     {
         frame++;
-        if (time_sys->get_total_seconds() + 1 > next_fps_time)
+        if (time_sys->get_total_millis() > next_fps_time)
         {
-            g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame, time_sys->get_total_seconds());
+            g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame * 3, time_sys->get_total_seconds());
             frame = 0;
-            next_fps_time++;
+            next_fps_time += 333;
         }
+        g_logger.log_debug("Updating systems...");
         g_sys_man.update_all_systems();
 
+        g_logger.log_debug("Applying transformations...");
         t->position.x = sin(time_sys->get_total_seconds());
         t2->position.y = sin(time_sys->get_total_seconds());
         t3->scale.x = sin(time_sys->get_total_seconds());
         t3->scale.y = sin(time_sys->get_total_seconds());
 
+        g_logger.log_debug("Setting context...");
         root_window->make_curent_context();
+        g_logger.log_debug("Polling events...");
         glfwPollEvents();
+        g_logger.log_debug("Rendering...");
         root_window->render();
+        g_logger.log_debug("Swapping...");
         root_window->swap_buffers();
     }
 

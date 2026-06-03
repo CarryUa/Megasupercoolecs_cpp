@@ -1,6 +1,8 @@
 #ifndef MSCE_SHADER_PROTOTYPE_H_
 #define MSCE_SHADER_PROTOTYPE_H_
+#include <MSCE/msce_macros.h>
 #include <MSCE/Prototypes/prototype.hpp>
+#include <MSCE/Types/enum.hpp>
 #include <MSCE/Types/vector.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,44 +12,25 @@ namespace msce
 {
     enum class ShaderType
     {
-        Invalid = 0,
-        VertexShader = GL_VERTEX_SHADER,
-        FragmentShader = GL_FRAGMENT_SHADER,
-
+        INVALID = 0,
+        VERTEX_SHADER = GL_VERTEX_SHADER,
+        FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
     };
-    enum class GLType
-    {
-        Short = GL_SHORT,
-        UShort = GL_UNSIGNED_SHORT,
-        Byte = GL_BYTE,
-        UByte = GL_UNSIGNED_BYTE,
-        Int = GL_INT,
-        UInt = GL_UNSIGNED_INT,
-        Float = GL_FLOAT,
-        Double = GL_DOUBLE,
-        IntVec2 = GL_INT_VEC2,
-        UIntVec2 = GL_UNSIGNED_INT_VEC2,
-        BoolVec2 = GL_BOOL_VEC2,
-        FloatVec2 = GL_FLOAT_VEC2,
-        IntVec3 = GL_INT_VEC3,
-        UIntVec3 = GL_UNSIGNED_INT_VEC3,
-        BoolVec3 = GL_BOOL_VEC3,
-        FloatVec3 = GL_FLOAT_VEC3,
-
-    };
+    MSCE_REGISTER_ENUM(ShaderType, INVALID, VERTEX_SHADER, FRAGMENT_SHADER)
 
     using GLAny = std::variant<char, unsigned char, int, unsigned int, float, double, vec2i, vec2ui, vec2f>;
 
     struct ShaderPrototype : public IPrototype
     {
-        ShaderType type = ShaderType::Invalid;
+        ShaderType type = ShaderType::INVALID;
         std::string source_path = "";
-        std::unordered_map<std::string, GLAny> attribs = {};
-        std::unordered_map<std::string, GLAny> uniforms = {};
-        MSCE_DEFINE_PROTOTYPE(ShaderPrototype, type, source_path, attribs, uniforms)
+
+    public:
+        MSCE_DEFINE_PROTOTYPE(ShaderPrototype, type, source_path)
     };
 }
 
+// MSCE_REGISTER_ENUM(msce::ShaderType, ShaderType, INVALID, VERTEX_SHADER, FRAGMENT_SHADER)
 MSCE_REGISTER_PROTOTYPE(msce::ShaderPrototype, ShaderPrototype)
 
 #endif // MSCE_SHADER_PROTOTYPE_H_

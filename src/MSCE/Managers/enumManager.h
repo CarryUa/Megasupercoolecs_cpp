@@ -17,6 +17,7 @@ namespace msce
         inline static Logger logger = Logger("EnumManager");
         /// @brief Reference to global enum factories registry. @ref msce::get_g_enum_factories_registry().
         Registry<std::string, std::function<Enum()>> &registered_enum_factories_ref_;
+        std::vector<std::reference_wrapper<const std::type_info>> &registered_enum_types_ref_;
 
     public:
         /// @brief Default constructor.
@@ -34,6 +35,16 @@ namespace msce
          * @param value Value enumerator name.
          */
         Enum create_enum(const std::string &enum_name, int64_t value);
+
+        /**
+         * @returns true if enum with given name was registered, and false otherwise.
+         */
+        bool enum_exists(const std::string &enum_name) const;
+
+        /**
+         * @returns true if enum with given type_info was registered, and false otherwise.
+         */
+        bool is_type_enum(const std::type_info &t) const;
     };
 }
 

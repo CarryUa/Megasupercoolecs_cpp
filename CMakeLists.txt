@@ -48,6 +48,7 @@ add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)
 add_subdirectory(src/MSCE/Prototypes)
 add_subdirectory(src/MSCE/ABI)
+add_subdirectory(src/MSCE/Reflection)
 
 
 add_subdirectory(tests)

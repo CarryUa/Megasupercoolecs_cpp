@@ -42,6 +42,17 @@ static constexpr const std::type_info &get_member_type(U T::*)
     return typeid(U);
 }
 
+namespace msce::macro_helpers
+{
+    inline std::string format_file_and_line_helper(const std::string &file, const std::string &line)
+    {
+        return file + ":" + line;
+    }
+}
+#define MSCE_FILE_TRACK_HELPER(file, line) ::msce::macro_helpers::format_file_and_line_helper(file, #line)
+#define MSCE_FILE_TRACK_WRAPPER(file, line) MSCE_FILE_TRACK_HELPER(file, line)
+#define MSCE_FILE_TRACK_STR() MSCE_FILE_TRACK_WRAPPER(__FILE__, __LINE__)
+
 #define GET_FIELD_NAME_TYPE_PAIR_HELPER(r, data, x) \
     std::pair(std::string_view(#x), std::reference_wrapper<const std::type_info>(get_member_type(&data::x)))
 

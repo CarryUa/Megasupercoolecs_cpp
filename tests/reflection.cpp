@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
+#include <test_configs.h>
 #include <MSCE/msce_macros.h>
+#include <MSCE/Reflection/reflection.h>
 
 struct TestTypeWithReflection
 {
@@ -7,136 +9,186 @@ struct TestTypeWithReflection
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_GENERATE_REFLECTION_METHODS(TestTypeWithReflection, test_int, test_bool, test_str)
+    static const ::msce::Type &type_info;
 };
-struct TestTypeWithReflectionDerived : public TestTypeWithReflection
+MSCE_INITIALIZE_REFLECTED_OBJECT(::TestTypeWithReflection, test_int, test_bool, test_str)
+
+TEST(ReflectionTests, IntegralsTest)
 {
-    int derived_test_int = 22222;
-    bool derived_test_bool = false;
-    std::string derived_test_str = "Bye Bye, Earth!";
+    const auto &t_char = msce::get_reflection_of_type<char>();
+    const auto &t_uchar = msce::get_reflection_of_type<unsigned char>();
+    const auto &t_short = msce::get_reflection_of_type<short>();
+    const auto &t_ushort = msce::get_reflection_of_type<unsigned short>();
+    const auto &t_int = msce::get_reflection_of_type<int>();
+    const auto &t_uint = msce::get_reflection_of_type<unsigned int>();
+    const auto &t_long = msce::get_reflection_of_type<long>();
+    const auto &t_ulong = msce::get_reflection_of_type<unsigned long>();
 
-    MSCE_GENERATE_REFLECTION_METHODS_DERIVED(TestTypeWithReflectionDerived, TestTypeWithReflection, derived_test_int, derived_test_bool, derived_test_str)
-};
+    EXPECT_TRUE(t_char.is_numeric());
+    EXPECT_TRUE(t_char.is_integer());
+    EXPECT_FALSE(t_char.is_unsigned());
+    EXPECT_FALSE(t_char.is_class());
+    EXPECT_FALSE(t_char.is_pointer());
+    EXPECT_FALSE(t_char.is_reference());
+    EXPECT_FALSE(t_char.is_array());
+    EXPECT_FALSE(t_char.is_enum());
+    EXPECT_FALSE(t_char.is_function());
+    EXPECT_FALSE(t_char.is_void());
 
-#define STRINGIFY(x) #x
+    EXPECT_TRUE(t_uchar.is_numeric());
+    EXPECT_TRUE(t_uchar.is_integer());
+    EXPECT_TRUE(t_uchar.is_unsigned());
+    EXPECT_FALSE(t_uchar.is_class());
+    EXPECT_FALSE(t_uchar.is_pointer());
+    EXPECT_FALSE(t_uchar.is_reference());
+    EXPECT_FALSE(t_uchar.is_array());
+    EXPECT_FALSE(t_uchar.is_enum());
+    EXPECT_FALSE(t_uchar.is_function());
+    EXPECT_FALSE(t_uchar.is_void());
 
-TEST(ReflectionTests, BasicMethodsTest)
+    EXPECT_TRUE(t_short.is_numeric());
+    EXPECT_TRUE(t_short.is_integer());
+    EXPECT_FALSE(t_short.is_unsigned());
+    EXPECT_FALSE(t_short.is_class());
+    EXPECT_FALSE(t_short.is_pointer());
+    EXPECT_FALSE(t_short.is_reference());
+    EXPECT_FALSE(t_short.is_array());
+    EXPECT_FALSE(t_short.is_enum());
+    EXPECT_FALSE(t_short.is_function());
+    EXPECT_FALSE(t_short.is_void());
+
+    EXPECT_TRUE(t_ushort.is_numeric());
+    EXPECT_TRUE(t_ushort.is_integer());
+    EXPECT_TRUE(t_ushort.is_unsigned());
+    EXPECT_FALSE(t_ushort.is_class());
+    EXPECT_FALSE(t_ushort.is_pointer());
+    EXPECT_FALSE(t_ushort.is_reference());
+    EXPECT_FALSE(t_ushort.is_array());
+    EXPECT_FALSE(t_ushort.is_enum());
+    EXPECT_FALSE(t_ushort.is_function());
+    EXPECT_FALSE(t_ushort.is_void());
+
+    EXPECT_TRUE(t_int.is_numeric());
+    EXPECT_TRUE(t_int.is_integer());
+    EXPECT_FALSE(t_int.is_unsigned());
+    EXPECT_FALSE(t_int.is_class());
+    EXPECT_FALSE(t_int.is_pointer());
+    EXPECT_FALSE(t_int.is_reference());
+    EXPECT_FALSE(t_int.is_array());
+    EXPECT_FALSE(t_int.is_enum());
+    EXPECT_FALSE(t_int.is_function());
+    EXPECT_FALSE(t_int.is_void());
+
+    EXPECT_TRUE(t_uint.is_numeric());
+    EXPECT_TRUE(t_uint.is_integer());
+    EXPECT_TRUE(t_uint.is_unsigned());
+    EXPECT_FALSE(t_uint.is_class());
+    EXPECT_FALSE(t_uint.is_pointer());
+    EXPECT_FALSE(t_uint.is_reference());
+    EXPECT_FALSE(t_uint.is_array());
+    EXPECT_FALSE(t_uint.is_enum());
+    EXPECT_FALSE(t_uint.is_function());
+    EXPECT_FALSE(t_uint.is_void());
+
+    EXPECT_TRUE(t_long.is_numeric());
+    EXPECT_TRUE(t_long.is_integer());
+    EXPECT_FALSE(t_long.is_unsigned());
+    EXPECT_FALSE(t_long.is_class());
+    EXPECT_FALSE(t_long.is_pointer());
+    EXPECT_FALSE(t_long.is_reference());
+    EXPECT_FALSE(t_long.is_array());
+    EXPECT_FALSE(t_long.is_enum());
+    EXPECT_FALSE(t_long.is_function());
+    EXPECT_FALSE(t_long.is_void());
+
+    EXPECT_TRUE(t_ulong.is_numeric());
+    EXPECT_TRUE(t_ulong.is_integer());
+    EXPECT_TRUE(t_ulong.is_unsigned());
+    EXPECT_FALSE(t_ulong.is_class());
+    EXPECT_FALSE(t_ulong.is_pointer());
+    EXPECT_FALSE(t_ulong.is_reference());
+    EXPECT_FALSE(t_ulong.is_array());
+    EXPECT_FALSE(t_ulong.is_enum());
+    EXPECT_FALSE(t_ulong.is_function());
+    EXPECT_FALSE(t_ulong.is_void());
+}
+TEST(ReflectionTests, FloatingPointTest)
 {
-    auto twr = TestTypeWithReflection();
+    const auto &t_float = msce::get_reflection_of_type<float>();
+    const auto &t_double = msce::get_reflection_of_type<double>();
+    const auto &t_ldouble = msce::get_reflection_of_type<long double>();
 
-    ASSERT_EQ(twr.get_field_name_type_pairs().size(), 3) << "Some or all fields of testing object weren't picked up by reflection.";
+    EXPECT_TRUE(t_float.is_numeric());
+    EXPECT_TRUE(t_float.is_floating_point());
+    EXPECT_FALSE(t_float.is_unsigned());
+    EXPECT_FALSE(t_float.is_class());
+    EXPECT_FALSE(t_float.is_pointer());
+    EXPECT_FALSE(t_float.is_reference());
+    EXPECT_FALSE(t_float.is_array());
+    EXPECT_FALSE(t_float.is_enum());
+    EXPECT_FALSE(t_float.is_function());
+    EXPECT_FALSE(t_float.is_void());
 
-    EXPECT_EQ(twr.get_unmangled_type_name(), STRINGIFY(TestTypeWithReflection));
+    EXPECT_TRUE(t_double.is_numeric());
+    EXPECT_TRUE(t_double.is_floating_point());
+    EXPECT_FALSE(t_double.is_unsigned());
+    EXPECT_FALSE(t_double.is_class());
+    EXPECT_FALSE(t_double.is_pointer());
+    EXPECT_FALSE(t_double.is_reference());
+    EXPECT_FALSE(t_double.is_array());
+    EXPECT_FALSE(t_double.is_enum());
+    EXPECT_FALSE(t_double.is_function());
+    EXPECT_FALSE(t_double.is_void());
 
-    EXPECT_EQ(twr.test_bool, twr.get_field<bool>("test_bool"));
-    EXPECT_EQ(twr.test_int, twr.get_field<int>("test_int"));
-    EXPECT_EQ(twr.test_str, twr.get_field<std::string>("test_str"));
-
-    bool bool_value_start = twr.test_bool;
-    int int_value_start = twr.test_int;
-    char *str_value_start = new char[twr.test_str.size()];
-    twr.test_str.copy(str_value_start, twr.test_str.size(), 0);
-
-    twr.set_field("test_bool", !twr.test_bool);
-    EXPECT_NE(bool_value_start, twr.test_bool);
-
-    twr.set_field("test_str", twr.test_str + "Hello World!");
-    EXPECT_NE(str_value_start, twr.test_str);
-
-    twr.set_field("test_int", twr.test_int + 1);
-    EXPECT_NE(int_value_start, twr.test_int);
-
-    EXPECT_EQ(twr.test_bool, std::any_cast<bool>(twr.get_field_any("test_bool")));
-    EXPECT_EQ(twr.test_int, std::any_cast<int>(twr.get_field_any("test_int")));
-    EXPECT_EQ(twr.test_str, std::any_cast<std::string>(twr.get_field_any("test_str")));
-
-    twr.set_field_any("test_bool", std::any(false));
-    EXPECT_EQ(twr.test_bool, false);
-
-    twr.set_field_any("test_int", std::any(42));
-    EXPECT_EQ(twr.test_int, 42);
-
-    twr.set_field_any("test_str", std::any(std::string("Updated String")));
-    EXPECT_EQ(twr.test_str, "Updated String");
-
-    twr.set_field_any("test_bool", std::any(true));
-    EXPECT_EQ(twr.test_bool, true);
-    EXPECT_EQ(twr.get_field<bool>("test_bool"), true);
-
-    twr.set_field_any("test_int", std::any(999));
-    EXPECT_EQ(twr.get_field<int>("test_int"), 999);
-
-    twr.set_field_any("test_str", std::any(std::string("New Value")));
-    EXPECT_EQ(twr.get_field<std::string>("test_str"), "New Value");
-
-    delete[] str_value_start;
+    EXPECT_TRUE(t_ldouble.is_numeric());
+    EXPECT_TRUE(t_ldouble.is_floating_point());
+    EXPECT_FALSE(t_ldouble.is_unsigned());
+    EXPECT_FALSE(t_ldouble.is_class());
+    EXPECT_FALSE(t_ldouble.is_pointer());
+    EXPECT_FALSE(t_ldouble.is_reference());
+    EXPECT_FALSE(t_ldouble.is_array());
+    EXPECT_FALSE(t_ldouble.is_enum());
+    EXPECT_FALSE(t_ldouble.is_function());
+    EXPECT_FALSE(t_ldouble.is_void());
 }
 
-TEST(ReflectionTests, RTTI_Test)
+TEST(ReflectionTests, CompoundTest)
 {
-    auto twrd = new TestTypeWithReflectionDerived();
-    auto downcast = dynamic_cast<TestTypeWithReflection *>(twrd);
+    TestTypeWithReflection t;
+    EXPECT_EQ(t.type_info, msce::get_reflection_of_type<TestTypeWithReflection>());
+    EXPECT_EQ(t.type_info, msce::get_reflection_of_type("::TestTypeWithReflection"));
+    EXPECT_EQ(t.type_info, msce::get_reflection_of_type(typeid(TestTypeWithReflection)));
 
-    auto base_class_fields = TestTypeWithReflection::get_field_name_type_pairs_static();
-    auto derived_class_fields = downcast->get_field_name_type_pairs();
+    EXPECT_TRUE(t.type_info.is_class());
+    EXPECT_FALSE(t.type_info.is_numeric());
+    EXPECT_FALSE(t.type_info.is_pointer());
+    EXPECT_FALSE(t.type_info.is_reference());
+    EXPECT_FALSE(t.type_info.is_array());
+    EXPECT_FALSE(t.type_info.is_enum());
+    EXPECT_FALSE(t.type_info.is_function());
+    EXPECT_FALSE(t.type_info.is_void());
 
-    EXPECT_NE(base_class_fields.size(), derived_class_fields.size()) << "RTTI-deduced derived reflection returned same amount of fields, as base class.";
-    EXPECT_EQ(twrd->get_field_name_type_pairs_static().size(), derived_class_fields.size());
-    EXPECT_EQ(downcast->get_field_name_type_pairs_static().size(), base_class_fields.size());
+    ASSERT_TRUE(t.type_info.has_member_named("test_int"));
+    ASSERT_TRUE(t.type_info.has_member_named("test_bool"));
+    ASSERT_TRUE(t.type_info.has_member_named("test_str"));
+    ASSERT_FALSE(t.type_info.has_member_named("dkgiowewehsdgsDIGUdFiusdfsdfygui"));
 
-    auto derived_fields_checklist = TestTypeWithReflectionDerived::get_field_name_type_pairs_static();
+    EXPECT_EQ(t.test_int, t.type_info.get_member_value<int>(t, "test_int"));
+    EXPECT_EQ(t.test_bool, t.type_info.get_member_value<bool>(t, "test_bool"));
+    EXPECT_EQ(t.test_str, t.type_info.get_member_value<std::string>(t, "test_str"));
 
-    for (const auto &[name, type] : derived_class_fields)
+    for (int i = 0; i < TEST_ITERATIONS; i++)
     {
-        derived_fields_checklist.erase(name);
+        int ri = rand();
+        bool rb = rand() % 2 == 0;
+        std::string rstr = std::format("{:x}", rand());
+
+        t.type_info.set_member_value(t, "test_int", ri);
+        t.type_info.set_member_value(t, "test_bool", rb);
+        t.type_info.set_member_value(t, "test_str", rstr);
+
+        EXPECT_EQ(t.test_int, ri);
+        EXPECT_EQ(t.test_bool, rb);
+        EXPECT_EQ(t.test_str, rstr);
     }
-    EXPECT_EQ(derived_fields_checklist.size(), 0) << "Some or all fields are missing in TestTypeWithReflectionDerived RTTI output.";
-
-    EXPECT_EQ(downcast->get_field<int>("test_int"), twrd->test_int);
-    EXPECT_EQ(downcast->get_field<bool>("test_bool"), twrd->test_bool);
-    EXPECT_EQ(downcast->get_field<std::string>("test_str"), twrd->test_str);
-
-    // get_field() isn't virtual.
-    // EXPECT_EQ(downcast->get_field<int>("derived_test_int"), twrd->derived_test_int);
-    // EXPECT_EQ(downcast->get_field<bool>("derived_test_bool"), twrd->derived_test_bool);
-    // EXPECT_EQ(downcast->get_field<std::string>("derived_test_str"), twrd->derived_test_str);
-
-    downcast->set_field("test_int", 99999);
-    EXPECT_EQ(twrd->test_int, 99999);
-
-    downcast->set_field("test_bool", false);
-    EXPECT_EQ(twrd->test_bool, false);
-
-    downcast->set_field("test_str", std::string("Modified base field"));
-    EXPECT_EQ(twrd->test_str, "Modified base field");
-
-    EXPECT_EQ(std::any_cast<int>(downcast->get_field_any("test_int")), twrd->test_int);
-    EXPECT_EQ(std::any_cast<bool>(downcast->get_field_any("test_bool")), twrd->test_bool);
-    EXPECT_EQ(std::any_cast<std::string>(downcast->get_field_any("test_str")), twrd->test_str);
-
-    EXPECT_EQ(std::any_cast<int>(downcast->get_field_any("derived_test_int")), twrd->derived_test_int);
-    EXPECT_EQ(std::any_cast<bool>(downcast->get_field_any("derived_test_bool")), twrd->derived_test_bool);
-    EXPECT_EQ(std::any_cast<std::string>(downcast->get_field_any("derived_test_str")), twrd->derived_test_str);
-
-    downcast->set_field_any("test_int", std::any(55555));
-    EXPECT_EQ(twrd->test_int, 55555);
-
-    downcast->set_field_any("test_bool", std::any(true));
-    EXPECT_EQ(twrd->test_bool, true);
-
-    downcast->set_field_any("test_str", std::any(std::string("Any modified base")));
-    EXPECT_EQ(twrd->test_str, "Any modified base");
-
-    downcast->set_field_any("derived_test_int", std::any(77777));
-    EXPECT_EQ(twrd->derived_test_int, 77777);
-
-    downcast->set_field_any("derived_test_bool", std::any(false));
-    EXPECT_EQ(twrd->derived_test_bool, false);
-
-    downcast->set_field_any("derived_test_str", std::any(std::string("Any modified derived")));
-    EXPECT_EQ(twrd->derived_test_str, "Any modified derived");
-
-    delete twrd;
 }
-
-#undef STRINGIFY
