@@ -68,6 +68,11 @@ namespace msce
 
     namespace internal
     {
+        /**
+         * @brief Internal function used by reflection.
+         * @tparam T The type to compute traits of.
+         * @returns Returns a bitmap of @ref msce::TypeTraitFlags of given type.
+         */
         template <typename T>
         inline uint16_t compute_type_traits()
         {
@@ -159,40 +164,95 @@ namespace msce
             static Registry<std::string, std::reference_wrapper<const Type>> reg;
             return reg;
         }
+
+        /**
+         * @brief Internal function used by reflection. Calculates the offset of member pointer passed in.
+         * @tparam TC Type of compound containint member. Dublicate it into Context tparam.
+         * @tparam TM Type of member under the pointer.
+         * @tparam Context The actual type. You need to pass it it to avoid template deduction.
+         */
+        template <ClassWithReflection Context, ClassWithReflection TC, typename TM>
+        inline uint32_t get_offset_of_member(TM TC::*m_ptr)
+        {
+            const Context *fake = reinterpret_cast<const Context *>(0x1000);
+            const TM *fake_m = &(fake->*m_ptr);
+
+            uint32_t offset = static_cast<uint32_t>(
+                reinterpret_cast<uintptr_t>(fake_m) - reinterpret_cast<uintptr_t>(fake));
+
+            static Logger l("Offset calculator");
+            l.log_debug("\nStart address: 0x{:x}\nEnd   address: 0x{:x}\noffset: {}\n\n===================\n\n", reinterpret_cast<uintptr_t>(fake), reinterpret_cast<uintptr_t>(fake_m), offset);
+
+            return offset;
+        }
     }
 
+    /**
+     * @brief Class-representation of individual reflected member.
+     */
     class MemberInfo
     {
     private:
         inline static Logger logger = Logger("Reflection(MemberInfo)");
 
-        /// @brief Reference to @ref msce::Type of this type.
+        /// @brief Reference to @ref msce::Type of this member.
         const Type &type_info_;
         /// @brief Human-readable name of this member.
         const char *name_;
-        /// @brief The offset from start of the container object, where this member is stored.
+        /// @brief The offset from start of the container object to this member.
         const uint32_t offset_;
 
     public:
         MemberInfo(const char *name, uint32_t offset, const Type &type);
 
+        /**
+         * @param object Reference to target object.
+         * @returns Value of member represented by this in given object if present.
+         * @throws std::runtime_error if given object doesn't contain this member.
+         */
         template <typename TValue, ClassWithReflection TObject>
         TValue get_value(const TObject &object) const;
+        /**
+         * @brief Sets the value of member represented by this in given object if present.
+         * @param object Reference to target object.
+         * @param value Honestly I dont know what this could be :)
+         * @throws std::runtime_error if given object doesn't contain this member.
+         */
         template <typename TValue, ClassWithReflection TObject>
         void set_value(const TObject &objecr, TValue value) const;
 
+        /**
+         * @retval Returns type-casted pointer to the member represented by this in given object if present.
+         * @retval nullptr otherwise.
+         */
         template <typename TValue, ClassWithReflection TObject>
         TValue *get_ptr(const TObject &object) const;
         template <ClassWithReflection TObject>
+        /**
+         * @retval Returns untyped(void) pointer to the member represented by this in given object if present.
+         * @retval nullptr otherwise.
+         */
         void *get_ptr(const TObject &object) const;
         bool operator==(const MemberInfo &other) const;
 
+        /**
+         * @brief Getter for this member's offset
+         */
         uint32_t get_offset() const;
 
+        /**
+         * @brief Getter for this member's name.
+         */
         constexpr const char *get_name() const;
+        /**
+         * @brief Getter for this member's stringified name
+         */
         std::string get_name_str() const;
     };
 
+    /**
+     * @brief Class-representation of reflected type.
+     */
     class Type
     {
     private:
@@ -227,20 +287,56 @@ namespace msce
         {
         }
 
+        /**
+         * @returns Constant std::type_info reference to type represented by this.
+         */
         const std::type_info &get_std_type() const;
+
+        /**
+         * @brief Getter for this member's name.
+         */
         const char *get_name() const;
+        /**
+         * @brief Getter for this member's stringified name.
+         */
         std::string get_name_str() const;
 
+        /**
+         * @retval True if this type has provided member.
+         * @retval False otherwise.
+         */
         bool has_member(const MemberInfo &member) const;
+        /**
+         * @retval True if this type has member with given name.
+         * @retval False otherwise.
+         */
         bool has_member_named(const char *name) const;
+        /**
+         * @returns Constant @ref msce::MemberInfo reference representation of member with given name.
+         * @throws std::runtime_error if member with given name does not exist in this type.
+         */
         const MemberInfo &get_member_named(const char *name) const;
+
+        /**
+         * @returns Value of member with given name in given object.
+         * @throws std::runtime_error if member with given name does not exist in given object.
+         */
         template <typename TValue, ClassWithReflection TObject>
         TValue get_member_value(const TObject &object, const char *member_name) const;
 
+        /**
+         * @brief Sets the value of member with given name in given object to provided one.
+         * @throws std::runtime_error if member with given name does not exist in given object.
+         */
         template <typename TValue, ClassWithReflection TObject>
         void set_member_value(const TObject &object, const char *member_name, TValue value) const;
 
+        /**
+         * @brief Getter for size of this object. Same as sizeof(RepresentedType).
+         */
         uint32_t get_size() const;
+
+        /* I am absolutely NOT documenting 24 self-explainatory methods. Go back to pre-school if you can't figure it out.*/
 
         bool is_numeric() const;
         bool is_integer() const;
@@ -377,7 +473,7 @@ namespace msce
     MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, __COUNTER__)
 
 #define MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(ReflectedType, MemberName) \
-    ::msce::MemberInfo(#MemberName, offsetof(ReflectedType, MemberName), ::msce::get_reflection_of_type(typeid(decltype(ReflectedType::MemberName))))
+    ::msce::MemberInfo(#MemberName, ::msce::internal::get_offset_of_member<ReflectedType>(&ReflectedType::MemberName), ::msce::get_reflection_of_type(typeid(decltype(ReflectedType::MemberName))))
 
 #define MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER(r, data, x) \
     MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(data, x)
@@ -412,15 +508,9 @@ namespace msce
 
 /**
  * @brief Initializes the type_info reference IN A CPP SOURCE FILE.
- * @note If you want to reflect parent objects, use MSCE_INITIALIZE_DERIVED_REFLECTED_OBJECT
+ * @note If you want to reflect polymorphic objects, you will have to pass all parents members into this macro, even tho they are already reflected.
  * @warning May be used ONLY in cpp source file.
  */
 #define MSCE_INITIALIZE_REFLECTED_OBJECT(ReflectedType, ...) \
     MSCE_INITIALIZE_REFLECTED_OBJECT_HELPER(ReflectedType, __COUNTER__, __VA_ARGS__)
-
-/**
- * @brief Initializes the type_info reference IN A CPP SOURCE FILE. Also adds object's parents to ther
- * @warning May be used ONLY in cpp source file.
- */
-#define MSCE_INITIALIZE_DERIVED_REFLECTED_OBJECT(ReflectedType, ParentReflectedType, ...)
 #endif // MSCE_REFLECTION_H_

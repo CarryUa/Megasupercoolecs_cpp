@@ -220,27 +220,7 @@ const msce::Type &msce::get_reflection_of_type(const std::type_info &std_type)
 }
 
 MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char)
-namespace
-{
-    ::msce::Type registered_type_101("unsigned char", sizeof(unsigned char), ::msce::internal::compute_type_traits<unsigned char>(), {}, typeid(unsigned char));
-}
-template <>
-const ::msce::Type & ::msce::get_reflection_of_type<unsigned char>() { return registered_type_101; }
-namespace msce
-{
-    template <>
-    class TypeRegistration<unsigned char>
-    {
-    public:
-        [[gnu::used]] TypeRegistration()
-        {
-            static Logger logger("StaticReflectionTypeRegistration");
-            ::msce::internal::get_g_reflection_types_registry().register_entry("unsigned char", std::cref(registered_type_101));
-            logger.log_info("Registered type '{}'", "unsigned char");
-        }
-    };
-    TypeRegistration<unsigned char> reg_101;
-}
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned char)
 MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char8_t)
 MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char16_t)
 MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char32_t)

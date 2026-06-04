@@ -10,8 +10,22 @@ struct TestTypeWithReflection
     std::string test_str = "Hello World!";
 
     static const ::msce::Type &type_info;
+    // virtual void vtable_shifts_stuff_fuck()
+    // {
+    // }
+};
+
+struct TestTypeWithReflectionDerived : public TestTypeWithReflection
+{
+    int derived_int = 0;
+    static const ::msce::Type &type_info;
+
+    virtual void vtable_shifts_stuff_fuck()
+    {
+    }
 };
 MSCE_INITIALIZE_REFLECTED_OBJECT(::TestTypeWithReflection, test_int, test_bool, test_str)
+MSCE_INITIALIZE_REFLECTED_OBJECT(::TestTypeWithReflectionDerived, test_int, test_bool, test_str, derived_int)
 
 TEST(ReflectionTests, IntegralsTest)
 {
@@ -155,6 +169,7 @@ TEST(ReflectionTests, FloatingPointTest)
 TEST(ReflectionTests, CompoundTest)
 {
     TestTypeWithReflection t;
+    TestTypeWithReflectionDerived td;
     EXPECT_EQ(t.type_info, msce::get_reflection_of_type<TestTypeWithReflection>());
     EXPECT_EQ(t.type_info, msce::get_reflection_of_type("::TestTypeWithReflection"));
     EXPECT_EQ(t.type_info, msce::get_reflection_of_type(typeid(TestTypeWithReflection)));
@@ -177,9 +192,37 @@ TEST(ReflectionTests, CompoundTest)
     EXPECT_EQ(t.test_bool, t.type_info.get_member_value<bool>(t, "test_bool"));
     EXPECT_EQ(t.test_str, t.type_info.get_member_value<std::string>(t, "test_str"));
 
+    EXPECT_EQ(td.type_info, msce::get_reflection_of_type<TestTypeWithReflectionDerived>());
+    EXPECT_EQ(td.type_info, msce::get_reflection_of_type("::TestTypeWithReflectionDerived"));
+    EXPECT_EQ(td.type_info, msce::get_reflection_of_type(typeid(TestTypeWithReflectionDerived)));
+
+    EXPECT_TRUE(td.type_info.is_class());
+    EXPECT_FALSE(td.type_info.is_numeric());
+    EXPECT_FALSE(td.type_info.is_pointer());
+    EXPECT_FALSE(td.type_info.is_reference());
+    EXPECT_FALSE(td.type_info.is_array());
+    EXPECT_FALSE(td.type_info.is_enum());
+    EXPECT_FALSE(td.type_info.is_function());
+    EXPECT_FALSE(td.type_info.is_void());
+
+    ASSERT_TRUE(td.type_info.has_member_named("test_int"));
+    ASSERT_TRUE(td.type_info.has_member_named("test_bool"));
+    ASSERT_TRUE(td.type_info.has_member_named("test_str"));
+    ASSERT_TRUE(td.type_info.has_member_named("derived_int"));
+    ASSERT_FALSE(td.type_info.has_member_named("dkgiowewehsdgsDIGUdFiusdfsdfygui"));
+
+    static msce::Logger l("Test");
+    l.log_debug("\nMemory Address of object: 0x{:x}\n----------------test_int: 0x{:x}\n---------------test_bool: 0x{:x}\n----------------test_str: 0x{:x}\n-------------derived_int: 0x{:x}\n",
+                reinterpret_cast<uintptr_t>(&td), reinterpret_cast<uintptr_t>(&td.test_int), reinterpret_cast<uintptr_t>(&td.test_bool), reinterpret_cast<uintptr_t>(&td.test_str), reinterpret_cast<uintptr_t>(&td.derived_int));
+    EXPECT_EQ(td.test_int, td.type_info.get_member_value<int>(td, "test_int"));
+    EXPECT_EQ(td.test_bool, td.type_info.get_member_value<bool>(td, "test_bool"));
+    EXPECT_EQ(td.test_str, td.type_info.get_member_value<std::string>(td, "test_str"));
+    EXPECT_EQ(td.derived_int, td.type_info.get_member_value<int>(td, "derived_int"));
+
     for (int i = 0; i < TEST_ITERATIONS; i++)
     {
         int ri = rand();
+        int ri2 = rand();
         bool rb = rand() % 2 == 0;
         std::string rstr = std::format("{:x}", rand());
 
@@ -190,5 +233,15 @@ TEST(ReflectionTests, CompoundTest)
         EXPECT_EQ(t.test_int, ri);
         EXPECT_EQ(t.test_bool, rb);
         EXPECT_EQ(t.test_str, rstr);
+
+        td.type_info.set_member_value(td, "test_int", ri);
+        td.type_info.set_member_value(td, "test_bool", rb);
+        td.type_info.set_member_value(td, "test_str", rstr);
+        td.type_info.set_member_value(td, "derived_int", ri2);
+
+        EXPECT_EQ(td.test_int, ri);
+        EXPECT_EQ(td.test_bool, rb);
+        EXPECT_EQ(td.test_str, rstr);
+        EXPECT_EQ(td.derived_int, ri2);
     }
 }

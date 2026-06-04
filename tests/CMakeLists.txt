@@ -6,6 +6,7 @@ if(BUILD_TESTING)
     # Add source files to executable
     add_executable(run_tests 
                 main.cpp
+                tree.cpp
                 prototypes.cpp
                 reflection.cpp
                 events.cpp
