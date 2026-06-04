@@ -14,7 +14,7 @@ namespace msce
     /// @brief T is class/struct with reflection.
     template <typename T>
     concept ClassWithReflection = Class<T> && requires {
-        { T::type_info } -> std::convertible_to<const Type &>;
+        { T::get_type_info() } -> std::convertible_to<const Type &>;
     };
 }
 

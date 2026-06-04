@@ -374,8 +374,8 @@ namespace msce
     template <typename TValue, ClassWithReflection TObject>
     inline TValue MemberInfo::get_value(const TObject &object) const
     {
-        if (!TObject::type_info.has_member(*this))
-            throw std::runtime_error("Tried to get value of member '" + this->get_name_str() + "' from '" + TObject::type_info.get_name_str() + "', but said object doesn't have said member.");
+        if (!TObject::get_type_info().has_member(*this))
+            throw std::runtime_error("Tried to get value of member '" + this->get_name_str() + "' from '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
 
         auto m_addr = reinterpret_cast<uintptr_t>(&object) + this->offset_;
         return *reinterpret_cast<TValue *>(m_addr);
@@ -383,13 +383,13 @@ namespace msce
     template <typename TValue, ClassWithReflection TObject>
     inline void MemberInfo::set_value(const TObject &object, TValue value) const
     {
-        if (!TObject::type_info.has_member(*this))
-            throw std::runtime_error("Tried to set value of member '" + this->get_name_str() + "' in '" + TObject::type_info.get_name_str() + "', but said object doesn't have said member.");
+        if (!TObject::get_type_info().has_member(*this))
+            throw std::runtime_error("Tried to set value of member '" + this->get_name_str() + "' in '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
 
         auto m = this->get_ptr<TValue>(object);
         if (!m)
         {
-            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::type_info.get_name_str());
+            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
             return;
         }
         *m = value;
@@ -399,7 +399,7 @@ namespace msce
     {
         if (this->type_info_.get_std_type() != typeid(TValue))
         {
-            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::type_info.get_name_str());
+            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
             return nullptr;
         }
 
@@ -409,12 +409,12 @@ namespace msce
     inline void *MemberInfo::get_ptr(const TObject &object) const
     {
 
-        if (!TObject::type_info.has_member(*this))
+        if (!TObject::get_type_info().has_member(*this))
         {
-            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::type_info.get_name_str());
+            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
             return nullptr;
         }
-        if (this->offset_ > TObject::type_info.get_size())
+        if (this->offset_ > TObject::get_type_info().get_size())
             return nullptr;
 
         auto m_addr = reinterpret_cast<uintptr_t>(&object) + this->offset_;
@@ -435,82 +435,111 @@ namespace msce
     }
 
     template <typename T>
-    const Type &get_reflection_of_type();
+    const Type &get_reflection_of_type()
+    {
+        static Logger logger("Reflection(get_reflection_of_type<T>())");
+        logger.log_error("Type '{}' wasn't ever reflected.", typeid(T).name());
+        throw std::runtime_error("get_reflection_of_type<T>() defined at '" + MSCE_FILE_TRACK_STR() + "' failed. See logs for details.");
+    }
     const Type &get_reflection_of_type(const std::string &name);
     const Type &get_reflection_of_type(const std::type_info &std_type);
 
 }
 
-#define MSCE_DEFINE_REFLECTED_OBJECT() \
-    static const ::msce::Type &type_info;
+#define MSCE_DEFINE_REFLECTED_OBJECT(ReflectedType, ...) \
+    inline static const ::msce::Type &get_type_info()    \
+    {                                                    \
+        static const ::msce::Type &t = []() {\
+                ::msce::Logger logger("StaticReflectionTypeRegistration");                                                                                                                                                                                         \
+                static ::std::array<::msce::MemberInfo, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)> lm = {BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER, ReflectedType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}; \
+               static ::msce::Type lt(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), lm, typeid(ReflectedType));                                                                                                 \
+                ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(lt));                                                                                                                                         \
+                logger.log_info("Registered type '{}'", #ReflectedType);                                                                                                                                                                                   \
+            return lt; }();       \
+        return t;                                        \
+    };
 
-#define MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, RTUID)                                                                                                  \
-    namespace                                                                                                                                                                         \
-    {                                                                                                                                                                                 \
-        ::msce::Type BOOST_PP_CAT(registered_type_, RTUID)(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), {}, typeid(ReflectedType)); \
-    }                                                                                                                                                                                 \
-    template <>                                                                                                                                                                       \
-    const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>()                                                                                                              \
-    {                                                                                                                                                                                 \
-        return BOOST_PP_CAT(registered_type_, RTUID);                                                                                                                                 \
-    }                                                                                                                                                                                 \
-    namespace msce                                                                                                                                                                    \
-    {                                                                                                                                                                                 \
-        template <>                                                                                                                                                                   \
-        class TypeRegistration<ReflectedType>                                                                                                                                         \
-        {                                                                                                                                                                             \
-        public:                                                                                                                                                                       \
-            [[gnu::used]] TypeRegistration()                                                                                                                                          \
-            {                                                                                                                                                                         \
-                static Logger logger("StaticReflectionTypeRegistration");                                                                                                             \
-                ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(BOOST_PP_CAT(registered_type_, RTUID)));                                 \
-                logger.log_info("Registered type '{}'", #ReflectedType);                                                                                                              \
-            }                                                                                                                                                                         \
-        };                                                                                                                                                                            \
-        TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);                                                                                                                    \
-    }
+#define MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, RTUID)                                                                          \
+    template <>                                                                                                                                               \
+    inline const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>()                                                                               \
+    {                                                                                                                                                         \
+        static const ::msce::Type &t = []()                                                                                                                   \
+        {                                                                                                                                                     \
+            static ::msce::Type lt(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), {}, typeid(ReflectedType)); \
+            Logger logger("StaticReflectionTypeRegistration");                                                                                                \
+            ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(lt));                                                \
+            logger.log_info("Registered type '{}'", #ReflectedType);                                                                                          \
+            return lt;                                                                                                                                        \
+        }();                                                                                                                                                  \
+        return t;                                                                                                                                             \
+    }                                                                                                                                                         \
+    namespace msce                                                                                                                                            \
+    {                                                                                                                                                         \
+        template <>                                                                                                                                           \
+        struct TypeRegistration<ReflectedType>                                                                                                                \
+        {                                                                                                                                                     \
+            [[gnu::used]] TypeRegistration()                                                                                                                  \
+            {                                                                                                                                                 \
+                get_reflection_of_type<ReflectedType>();                                                                                                      \
+            }                                                                                                                                                 \
+        };                                                                                                                                                    \
+    }                                                                                                                                                         \
+    inline static msce::TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);
+
 #define MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(ReflectedType) \
     MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, __COUNTER__)
 
 #define MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(ReflectedType, MemberName) \
-    ::msce::MemberInfo(#MemberName, ::msce::internal::get_offset_of_member<ReflectedType>(&ReflectedType::MemberName), ::msce::get_reflection_of_type(typeid(decltype(ReflectedType::MemberName))))
+    ::msce::MemberInfo(#MemberName, ::msce::internal::get_offset_of_member<ReflectedType>(&ReflectedType::MemberName), ::msce::get_reflection_of_type<decltype(ReflectedType::MemberName)>())
 
 #define MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER(r, data, x) \
     MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(data, x)
 
-#define MSCE_INITIALIZE_REFLECTED_OBJECT_HELPER(ReflectedType, RTUID, ...)                                                                                                                                                                                                                             \
-    namespace                                                                                                                                                                                                                                                                                          \
-    {                                                                                                                                                                                                                                                                                                  \
-        ::std::array<::msce::MemberInfo, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)> BOOST_PP_CAT(BOOST_PP_CAT(registered_type_, RTUID), _members) = {BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER, ReflectedType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}; \
-        ::msce::Type BOOST_PP_CAT(registered_type_, RTUID)(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), BOOST_PP_CAT(BOOST_PP_CAT(registered_type_, RTUID), _members), typeid(ReflectedType));                                                       \
-    }                                                                                                                                                                                                                                                                                                  \
-    namespace msce                                                                                                                                                                                                                                                                                     \
-    {                                                                                                                                                                                                                                                                                                  \
-        template <>                                                                                                                                                                                                                                                                                    \
-        class TypeRegistration<ReflectedType>                                                                                                                                                                                                                                                          \
-        {                                                                                                                                                                                                                                                                                              \
-        public:                                                                                                                                                                                                                                                                                        \
-            [[gnu::used]] TypeRegistration()                                                                                                                                                                                                                                                           \
-            {                                                                                                                                                                                                                                                                                          \
-                static Logger logger("StaticReflectionTypeRegistration");                                                                                                                                                                                                                              \
-                ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(BOOST_PP_CAT(registered_type_, RTUID)));                                                                                                                                                  \
-                logger.log_info("Registered type '{}'", #ReflectedType);                                                                                                                                                                                                                               \
-            }                                                                                                                                                                                                                                                                                          \
-        };                                                                                                                                                                                                                                                                                             \
-        TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);                                                                                                                                                                                                                                     \
-    }                                                                                                                                                                                                                                                                                                  \
-    const ::msce::Type &ReflectedType::type_info = BOOST_PP_CAT(registered_type_, RTUID);                                                                                                                                                                                                              \
-    template <>                                                                                                                                                                                                                                                                                        \
-    const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>()                                                                                                                                                                                                                               \
-    {                                                                                                                                                                                                                                                                                                  \
-        return ReflectedType::type_info;                                                                                                                                                                                                                                                               \
-    }
-
 /**
- * @brief Initializes the type_info reference IN A CPP SOURCE FILE.
+ * @brief Registers all required stuff for reflection.
  * @note If you want to reflect polymorphic objects, you will have to pass all parents members into this macro, even tho they are already reflected.
- * @warning May be used ONLY in cpp source file.
  */
-#define MSCE_INITIALIZE_REFLECTED_OBJECT(ReflectedType, ...) \
-    MSCE_INITIALIZE_REFLECTED_OBJECT_HELPER(ReflectedType, __COUNTER__, __VA_ARGS__)
+#define MSCE_REGISTER_REFLECTED_OBJECT_HELPER(ReflectedType, RTUID)      \
+    template <>                                                          \
+    const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>() \
+    {                                                                    \
+        return ReflectedType::get_type_info();                           \
+    }                                                                    \
+    namespace msce                                                       \
+    {                                                                    \
+        template <>                                                      \
+        struct TypeRegistration<ReflectedType>                           \
+        {                                                                \
+            [[gnu::used]] TypeRegistration()                             \
+            {                                                            \
+                get_reflection_of_type<ReflectedType>();                 \
+            }                                                            \
+        };                                                               \
+    }                                                                    \
+    inline static msce::TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);
+
+#define MSCE_REGISTER_REFLECTED_OBJECT(ReflectedType) \
+    MSCE_REGISTER_REFLECTED_OBJECT_HELPER(ReflectedType, __COUNTER__)
+
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned char)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char8_t)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char16_t)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char32_t)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(short)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned short)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(int)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned int)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long long)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long long)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(float)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(double)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(bool)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long double)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(const char *)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char *)
+MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(std::string)
+
 #endif // MSCE_REFLECTION_H_

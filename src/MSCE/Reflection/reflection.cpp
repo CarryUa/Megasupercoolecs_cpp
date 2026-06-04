@@ -206,7 +206,16 @@ std::string msce::MemberInfo::get_name_str() const
 
 const msce::Type &msce::get_reflection_of_type(const std::string &name)
 {
-    return msce::internal::get_g_reflection_types_registry().get_entry(name);
+    try
+    {
+        return msce::internal::get_g_reflection_types_registry().get_entry(name);
+    }
+    catch (std::out_of_range &e)
+    {
+        static Logger l("Reflection()");
+        l.log_error("Tried to get reflection info of type '{}', but it wasn't registered with that name. Make sure there's no mismatch between macros. (Watch out for :: key)", name);
+        throw std::runtime_error("Reflection function msce::get_reflection_of_type(const std::string&) defined at '" + MSCE_FILE_TRACK_STR() + "' failed for type " + name);
+    }
 }
 
 const msce::Type &msce::get_reflection_of_type(const std::type_info &std_type)
@@ -216,26 +225,5 @@ const msce::Type &msce::get_reflection_of_type(const std::type_info &std_type)
         if (t.get().get_std_type() == std_type)
             return t;
     }
-    throw std::runtime_error("Reflection function msce::get_reflection_of_type(const std::type_info&) failed for type '" + std::string(std_type.name()) + "' defined at '" + MSCE_FILE_TRACK_STR() + "'");
+    throw std::runtime_error("Reflection function msce::get_reflection_of_type(const std::type_info&) defined at '" + MSCE_FILE_TRACK_STR() + "' failed for type " + std::string(std_type.name()));
 }
-
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned char)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char8_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char16_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char32_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(short)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned short)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(int)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned int)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(float)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(double)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(bool)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long double)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(const char *)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char *)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(std::string)
