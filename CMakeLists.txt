@@ -4,9 +4,9 @@ project(Megasupercoolecs VERSION 0.1.0 LANGUAGES CXX)
 set(DOXYGEN_EXECUTABLE "" FORCE)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -rdynamic -DDEBUG")
-set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-g -rdynamic")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g -rdynamic")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -DDEBUG")
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-g")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g")
 
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-invalid-offsetof>)
 add_compile_options(-Wno-pointer-arith )
@@ -57,7 +57,7 @@ add_subdirectory(src/MSCE/ECS)
 add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)
 add_subdirectory(src/MSCE/Prototypes)
-add_subdirectory(src/MSCE/ABI)
+# add_subdirectory(src/MSCE/ABI)
 
 
 add_subdirectory(tests)
