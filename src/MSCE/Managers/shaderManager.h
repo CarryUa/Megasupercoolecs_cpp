@@ -32,7 +32,7 @@ namespace msce
         bool recompile() noexcept;
         void decompile() noexcept;
 
-        MSCE_GENERATE_REFLECTION_METHODS(BaseShader, smart_storage_id_, shader_handle_, prototype_)
+        MSCE_REFLECTION_DEFINE_CLASS(::msce::BaseShader)
 
     public:
         BaseShader(ShaderPrototype *prototype) noexcept;

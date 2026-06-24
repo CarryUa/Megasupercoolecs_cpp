@@ -3,6 +3,7 @@
 #include <string>
 #include <MSCE/logger.h>
 #include <MSCE/Types/Collections/registry.hpp>
+#include <MSCE/Reflection/reflection.h>
 #include <MSCE/msce_macros.h>
 
 namespace msce
@@ -22,13 +23,14 @@ namespace msce
 
 #pragma region Prototype Macros
 
-#define MSCE_DEFINE_PROTOTYPE(Type, ...)                                            \
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__) \
-    MSCE_GENERATE_REFLECTION_METHODS_DERIVED(Type, ::msce::IPrototype, __VA_ARGS__)
+#define MSCE_DEFINE_PROTOTYPE(Type, ...) \
+    MSCE_REFLECTION_DEFINE_CLASS(Type)   \
+    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__)
 
-#define MSCE_REGISTER_PROTOTYPE(Type, Name)                                                                                                    \
+#define MSCE_REGISTER_PROTOTYPE(Type, Name, ...)                                                                                               \
     CEREAL_REGISTER_TYPE(Type)                                                                                                                 \
     CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, Type)                                                                             \
+    MSCE_REFLECT_CLASS(Type, __VA_ARGS__)                                                                                                      \
     namespace msce                                                                                                                             \
     {                                                                                                                                          \
         template <>                                                                                                                            \
@@ -74,9 +76,11 @@ namespace msce
         /// @brief cereal stuff.
         template <class Archive>
         void load(Archive &ar) { ar(::cereal::make_nvp("id", id)); }
-        MSCE_GENERATE_REFLECTION_METHODS(IPrototype, id)
+        MSCE_REFLECTION_DEFINE_CLASS(::msce::IPrototype)
     };
 }
+
+MSCE_REFLECT_CLASS(::msce::IPrototype, id)
 CEREAL_REGISTER_TYPE(msce::IPrototype)
 
 #endif // MSCE_I_PROTOTYPE_H_

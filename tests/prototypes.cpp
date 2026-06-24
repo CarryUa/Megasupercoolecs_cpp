@@ -26,7 +26,7 @@ struct TestPrototype1 : public msce::IPrototype
 public:
     MSCE_DEFINE_PROTOTYPE(TestPrototype1, test_int, test_bool, test_str)
 };
-MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1)
+MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1, test_int, test_bool, test_str)
 
 TEST(PrototypeTests, PrototypeSerializationTest)
 {
@@ -61,7 +61,7 @@ TEST(PrototypeTests, PrototypeFileConsistencyTest)
         IPrototype *tp = PrototypeManager::instance->create_new_prototype_instance("TestPrototype1", "test_prototype_" + std::to_string(i));
         protoMan->serialize_prototype(cereal_file_path + std::to_string(i), tp->id);
         protoMan->deserialize_prototype(cereal_file_path + std::to_string(i));
-        ASSERT_TRUE(std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str()));
+        ASSERT_EQ(std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str()), true);
     }
 
     const auto prototypes = protoMan->enumerate_prototypes();

@@ -16,7 +16,6 @@ namespace msce
         VERTEX_SHADER = GL_VERTEX_SHADER,
         FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
     };
-    // MSCE_REGISTER_ENUM(ShaderType, INVALID, VERTEX_SHADER, FRAGMENT_SHADER)
 
     using GLAny = std::variant<char, unsigned char, int, unsigned int, float, double, vec2i, vec2ui, vec2f>;
 
@@ -30,7 +29,9 @@ namespace msce
     };
 }
 
+MSCE_REGISTER_ENUM(::msce::ShaderType, ShaderType, INVALID, VERTEX_SHADER, FRAGMENT_SHADER)
+
 // MSCE_REGISTER_ENUM(msce::ShaderType, ShaderType, INVALID, VERTEX_SHADER, FRAGMENT_SHADER)
-MSCE_REGISTER_PROTOTYPE(msce::ShaderPrototype, ShaderPrototype)
+MSCE_REGISTER_PROTOTYPE(msce::ShaderPrototype, ShaderPrototype, type, source_path)
 
 #endif // MSCE_SHADER_PROTOTYPE_H_

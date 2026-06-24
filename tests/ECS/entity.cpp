@@ -25,7 +25,7 @@ struct TestPrototype1_ent : public msce::IPrototype
 public:
     MSCE_DEFINE_PROTOTYPE(TestPrototype1_ent, test_int, test_bool, test_str)
 };
-MSCE_REGISTER_PROTOTYPE(TestPrototype1_ent, TestPrototype1_ent)
+MSCE_REGISTER_PROTOTYPE(TestPrototype1_ent, TestPrototype1_ent, test_int, test_bool, test_str)
 
 TEST(EntityTests, CreationTest)
 {

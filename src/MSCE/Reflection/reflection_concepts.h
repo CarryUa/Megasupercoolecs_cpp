@@ -6,6 +6,8 @@
 namespace msce
 {
     class Type;
+    template <typename T>
+    constexpr const Type &get_reflection_of_type();
 
     /// @brief T is class or struct.
     template <typename T>
@@ -15,6 +17,11 @@ namespace msce
     template <typename T>
     concept ClassWithReflection = Class<T> && requires {
         { T::get_type_info() } -> std::convertible_to<const Type &>;
+    };
+
+    template <typename T>
+    concept TypeWithReflection = requires {
+        { get_reflection_of_type<T>() } -> std::convertible_to<const Type &>;
     };
 }
 

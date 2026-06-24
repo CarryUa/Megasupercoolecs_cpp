@@ -3,40 +3,112 @@
 #include <MSCE/msce_macros.h>
 #include <MSCE/Reflection/reflection.h>
 
+enum class TestEnum8 : uint8_t
+{
+    TESTV1 = 255,
+    TESTV2 = 211,
+    TESTV3 = 155,
+};
+
+enum class TestEnum32 : uint32_t
+{
+    TESTV1 = 15155,
+    TESTV2 = 171245,
+    TESTV3 = 1251,
+};
+
+namespace msce::internal
+{
+    template <>
+    struct TypeRegistration<TestEnum8>
+    {
+        inline static constexpr msce::Type type = msce::Type("TestEnum8", sizeof(TestEnum8), ::msce::internal::compute_type_traits<TestEnum8>(), {}, typeid(TestEnum8));
+        inline static constexpr const msce::Type &get_type() { return type; }
+        static void register_self()
+        {
+            static const ::msce::Type &r = []()
+            { Logger logger("StaticTypeRegistration"); ::msce::internal::get_g_reflection_types_registry().register_entry("TestEnum8", ::std::cref(TypeRegistration<TestEnum8>::type)); logger.log_info("Successfully reflected type '{}'", TypeRegistration<TestEnum8>::type.get_name_str()); return TypeRegistration<TestEnum8>::type; }();
+        }
+        [[gnu::used]] TypeRegistration() { register_self(); }
+    };
+    inline static TypeRegistration<TestEnum8> refl_t_reg539;
+}
+MSCE_REFLECT_FUNDAMENTAL(TestEnum32)
+
 struct TestTypeWithReflection
 {
     int test_int = 15556;
     bool test_bool = true;
     std::string test_str = "Hello World!";
 
-    MSCE_DEFINE_REFLECTED_OBJECT(::TestTypeWithReflection, test_int, test_bool, test_str)
+    MSCE_REFLECTION_DEFINE_CLASS(::TestTypeWithReflection)
 };
 
-MSCE_REGISTER_REFLECTED_OBJECT(::TestTypeWithReflection)
+MSCE_REFLECT_CLASS(::TestTypeWithReflection, test_int, test_bool, test_str)
 
 struct TestTypeWithReflectionDerived : public TestTypeWithReflection
 {
     int derived_int = 0;
 
-    MSCE_DEFINE_REFLECTED_OBJECT(::TestTypeWithReflectionDerived, test_int, test_bool, test_str, derived_int)
+    MSCE_REFLECTION_DEFINE_CLASS(::TestTypeWithReflectionDerived)
 
     virtual void vtable_shifts_stuff_fuck()
     {
     }
 };
 
-MSCE_REGISTER_REFLECTED_OBJECT(::TestTypeWithReflectionDerived)
+MSCE_REFLECT_CLASS(::TestTypeWithReflectionDerived, test_int, test_bool, test_str, derived_int)
+
+TEST(ReflectionTests, FundamentalOperations)
+{
+
+    const auto &t_int = typeof(int);
+    int v = 0;
+    void *vp = &v;
+
+    for (int i = 0; i < TEST_ITERATIONS; i++)
+    {
+        v = rand();
+
+        EXPECT_EQ(v, t_int.get_value<int>(v));
+        EXPECT_EQ(v, t_int.get_value<int>(vp));
+
+        int r = rand();
+        t_int.set_value(v, r);
+        EXPECT_EQ(r, t_int.get_value<int>(v));
+        EXPECT_EQ(r, t_int.get_value<int>(vp));
+        EXPECT_EQ(v, t_int.get_value<int>(v));
+        EXPECT_EQ(v, t_int.get_value<int>(vp));
+
+        r = rand();
+        t_int.set_value(vp, r);
+        EXPECT_EQ(r, t_int.get_value<int>(v));
+        EXPECT_EQ(r, t_int.get_value<int>(vp));
+        EXPECT_EQ(v, t_int.get_value<int>(v));
+        EXPECT_EQ(v, t_int.get_value<int>(vp));
+
+        try
+        {
+            EXPECT_EQ(v, t_int.get_value<int64_t>(vp));
+
+            FAIL() << "Invalid reflection use cases didn't threw predicted exceptions.";
+        }
+        catch (const std::runtime_error &e)
+        {
+        }
+    }
+}
 
 TEST(ReflectionTests, IntegralsTest)
 {
-    const auto &t_char = msce::get_reflection_of_type<char>();
-    const auto &t_uchar = msce::get_reflection_of_type<unsigned char>();
-    const auto &t_short = msce::get_reflection_of_type<short>();
-    const auto &t_ushort = msce::get_reflection_of_type<unsigned short>();
-    const auto &t_int = msce::get_reflection_of_type<int>();
-    const auto &t_uint = msce::get_reflection_of_type<unsigned int>();
-    const auto &t_long = msce::get_reflection_of_type<long>();
-    const auto &t_ulong = msce::get_reflection_of_type<unsigned long>();
+    const auto &t_char = typeof(char);
+    const auto &t_uchar = typeof(unsigned char);
+    const auto &t_short = typeof(short);
+    const auto &t_ushort = typeof(unsigned short);
+    const auto &t_int = typeof(int);
+    const auto &t_uint = typeof(unsigned int);
+    const auto &t_long = typeof(long);
+    const auto &t_ulong = typeof(unsigned long);
 
     EXPECT_TRUE(t_char.is_numeric());
     EXPECT_TRUE(t_char.is_integer());
@@ -164,6 +236,48 @@ TEST(ReflectionTests, FloatingPointTest)
     EXPECT_FALSE(t_ldouble.is_enum());
     EXPECT_FALSE(t_ldouble.is_function());
     EXPECT_FALSE(t_ldouble.is_void());
+}
+
+TEST(ReflectionTests, EnumTest)
+{
+    TestEnum8 e8 = TestEnum8::TESTV1;
+    TestEnum32 e32 = TestEnum32::TESTV1;
+
+    const auto &t8 = msce::get_reflection_of_type<TestEnum8>();
+    const auto &t32 = msce::get_reflection_of_type<TestEnum32>();
+
+    EXPECT_TRUE(t8.is_enum());
+    EXPECT_FALSE(t8.is_numeric());
+    EXPECT_FALSE(t8.is_floating_point());
+    EXPECT_FALSE(t8.is_unsigned());
+    EXPECT_FALSE(t8.is_class());
+    EXPECT_FALSE(t8.is_pointer());
+    EXPECT_FALSE(t8.is_reference());
+    EXPECT_FALSE(t8.is_array());
+    EXPECT_FALSE(t8.is_function());
+    EXPECT_FALSE(t8.is_void());
+
+    EXPECT_TRUE(t32.is_enum());
+    EXPECT_FALSE(t32.is_numeric());
+    EXPECT_FALSE(t32.is_floating_point());
+    EXPECT_FALSE(t32.is_unsigned());
+    EXPECT_FALSE(t32.is_class());
+    EXPECT_FALSE(t32.is_pointer());
+    EXPECT_FALSE(t32.is_reference());
+    EXPECT_FALSE(t32.is_array());
+    EXPECT_FALSE(t32.is_function());
+    EXPECT_FALSE(t32.is_void());
+
+    for (int i = 0; i < TEST_ITERATIONS; i++)
+    {
+        EXPECT_EQ(e8, t8.get_value<TestEnum8>(e8));
+        t8.set_value(e8, TestEnum8::TESTV2);
+        EXPECT_EQ(e8, t8.get_value<TestEnum8>(e8));
+
+        EXPECT_EQ(e32, t32.get_value<TestEnum32>(e32));
+        t32.set_value(e32, TestEnum32::TESTV2);
+        EXPECT_EQ(e32, t32.get_value<TestEnum32>(e32));
+    }
 }
 
 TEST(ReflectionTests, CompoundTest)

@@ -6,9 +6,16 @@
 #include <MSCE/Graphics/MSCEWindow.h>
 #include <MSCE/Graphics/color.h>
 
+#include <MSCE/Termination/terminator.h>
+#include <MSCE/ABI/abi_macros.h>
+#include <MSCE/ABI/core_abi.h>
+
 #include <MSCE/ECS/component.h>
 #include <MSCE/ECS/entity.h>
 #include <MSCE/ECS/system.h>
+
+#include <MSCE/Reflection/reflection.h>
+#include <MSCE/Reflection/reflection_concepts.h>
 
 #include <MSCE/Types/enum.hpp>
 #include <MSCE/Types/vector.h>

@@ -2,7 +2,14 @@ cmake_minimum_required(VERSION 3.28.0)
 project(Megasupercoolecs VERSION 0.1.0 LANGUAGES CXX)
 
 set(DOXYGEN_EXECUTABLE "" FORCE)
-set(CMAKE_COMPILER_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -rdynamic -DDEBUG")
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-g -rdynamic")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g -rdynamic")
+
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-invalid-offsetof>)
+add_compile_options(-Wno-pointer-arith )
 
 if(NOT MSCE_SKIP_TESTS)
     include(CTest)
@@ -27,11 +34,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE on)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
+
 message(STATUS "CMAKE BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(DEBUG)
-endif()
+# if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# endif()
 
 
 # definitions
@@ -41,6 +48,9 @@ add_library(${MSCE_TARGET} SHARED dummy.cpp)
 
 # Subdirs
 add_subdirectory(src/MSCE)
+add_subdirectory(src/MSCE/Platform)
+add_subdirectory(src/MSCE/Termination)
+add_subdirectory(src/MSCE/Reflection)
 add_subdirectory(src/MSCE/BuiltIns)
 add_subdirectory(src/MSCE/Types)
 add_subdirectory(src/MSCE/ECS)
@@ -48,7 +58,6 @@ add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)
 add_subdirectory(src/MSCE/Prototypes)
 add_subdirectory(src/MSCE/ABI)
-add_subdirectory(src/MSCE/Reflection)
 
 
 add_subdirectory(tests)
@@ -73,7 +82,9 @@ target_link_libraries(${MSCE_TARGET}
                         glad
                         glfw
                         cereal
-                        boost_preprocessor)    
+                        boost_preprocessor
+                        dl
+                        dw)    
 
 # Include dirs
 target_include_directories(${MSCE_TARGET} PUBLIC src)

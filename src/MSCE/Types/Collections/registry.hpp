@@ -26,7 +26,7 @@ namespace msce
             static Logger logger("Registry");
             if (is_registered(id))
             {
-                logger.log_warning("Detected double registry of a prototype! Ignoring...");
+                logger.log_warning("Detected double registry! Ignoring...");
                 return;
             }
             registry_.emplace(id, entry);

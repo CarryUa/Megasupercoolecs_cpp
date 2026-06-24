@@ -8,6 +8,7 @@
 #include <MSCE/msce_macros.h>
 #include <MSCE/logger.h>
 #include <MSCE/Types/Collections/registry.hpp>
+#include <MSCE/Reflection/reflection.h>
 
 namespace msce
 {
@@ -137,6 +138,7 @@ namespace msce
             logger.log_info("Registered enum '{}'", #EnumName);                          \
         }                                                                                \
     };                                                                                   \
-    inline msce::Registration<EnumType> registered_##EnumName;
+    inline msce::Registration<EnumType> registered_##EnumName;                           \
+    MSCE_REFLECT_FUNDAMENTAL(EnumType)
 
 #endif // MSCE_ENUM_H_

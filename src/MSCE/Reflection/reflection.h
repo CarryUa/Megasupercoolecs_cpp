@@ -17,9 +17,6 @@ namespace msce
     class Type;
     class MemberInfo;
 
-    template <typename T>
-    struct TypeRegistration;
-
     /**
      * Relevant documentation can be found at @ref msce::Type::traits_
      */
@@ -62,99 +59,101 @@ namespace msce
         DEFAULT_CONSTRUCTABLE = 1 << 9,
         COPY_CONSTRUCTABLE = 1 << 10,
         MOVE_CONSTRUCTABLE = 1 << 11,
-        COPY_ASIGNABLE = 1 << 12,
-        MOVE_ASIGNABLE = 1 << 13,
+        COPY_ASSIGNABLE = 1 << 12,
+        MOVE_ASSIGNABLE = 1 << 13,
     };
 
     namespace internal
     {
+        template <typename T>
+        struct TypeRegistration
+        {
+            inline static constexpr const msce::Type &get_type()
+            {
+                static_assert(false, "Type is never registered in reflection. Try using MSCE_REFLECT_CLASS or MSCE_REFLECT_FUNDAMENTAL to fix the issue.");
+                throw std::runtime_error("Tried to get a type reflection that is not reflected at point its reflection was requested.");
+                return msce::Type(":::::::INVALID_NULL_TYPE_BLAH BLAH BLAH SCREW OFF---OAFasf", 0, {}, typeid(void));
+            }
+        };
+
         /**
          * @brief Internal function used by reflection.
          * @tparam T The type to compute traits of.
          * @returns Returns a bitmap of @ref msce::TypeTraitFlags of given type.
          */
         template <typename T>
-        inline uint16_t compute_type_traits()
+        inline constexpr uint16_t compute_type_traits()
         {
-            static Logger l("Trait checker");
-            l.log_debug("Generating traits for {}", typeid(T).name());
-
             uint16_t flags = 0;
-            if (std::is_arithmetic_v<T>)
+            if constexpr (std::is_arithmetic_v<T>)
             {
-                l.log_debug("{} is numerical", typeid(T).name());
-                if (std::is_integral_v<T>)
+                if constexpr (std::is_integral_v<T>)
                 {
                     flags |= static_cast<uint16_t>(TypeTraitFlags::INTEGRAL);
-                    l.log_debug("{} is integral", typeid(T).name());
                 }
                 else
                 {
                     flags |= static_cast<uint16_t>(TypeTraitFlags::FLOATING_POINT);
-                    l.log_debug("{} is fp", typeid(T).name());
                 }
 
-                if (!std::is_signed_v<T>)
+                if constexpr (!std::is_signed_v<T>)
                 {
                     flags |= static_cast<uint16_t>(TypeTraitFlags::UNSIGNED);
-                    l.log_debug("{} is unsigned", typeid(T).name());
                 }
             }
-            else if (std::is_class_v<T>)
+            else if constexpr (std::is_enum_v<T>)
+            {
+                flags |= static_cast<uint16_t>(TypeTraitFlags::ENUM);
+            }
+            else if constexpr (std::is_class_v<T>)
             {
                 flags |= static_cast<uint16_t>(TypeTraitFlags::CLASS);
             }
-            else if (std::is_invocable_v<T>)
+            else if constexpr (std::is_invocable_v<T>)
             {
                 flags |= static_cast<uint16_t>(TypeTraitFlags::FUNCTION);
             }
             // Important to notice here, that I explicitly exclude function and member function pointers from POINTER category.
             // They fall into FUNCTION category, since I use std::is_invocable_v to check for functions.
-            else if (std::is_pointer_v<T>)
+            else if constexpr (std::is_pointer_v<T>)
             {
                 flags |= static_cast<uint16_t>(TypeTraitFlags::POINTER);
-                if (std::is_member_object_pointer_v<T>)
+                if constexpr (std::is_member_object_pointer_v<T>)
                     flags |= static_cast<uint16_t>(TypeTraitFlags::MEMBER_OBJECT_POINTER);
             }
-            else if (std::is_reference_v<T>)
+            else if constexpr (std::is_reference_v<T>)
             {
                 flags |= static_cast<uint16_t>(TypeTraitFlags::REFERENCE);
-                if (std::is_lvalue_reference_v<T>)
+                if constexpr (std::is_lvalue_reference_v<T>)
                     flags |= static_cast<uint16_t>(TypeTraitFlags::LVALUE);
                 else
                     flags |= static_cast<uint16_t>(TypeTraitFlags::RVALUE);
             }
-            else if (std::is_array_v<T>)
+            else if constexpr (std::is_array_v<T>)
             {
                 flags |= static_cast<uint16_t>(TypeTraitFlags::ARRAY);
-                if (std::is_bounded_array_v<T>)
+                if constexpr (std::is_bounded_array_v<T>)
                     flags |= static_cast<uint16_t>(TypeTraitFlags::BOUNDED);
-            }
-            else if (std::is_enum_v<T>)
-            {
-                flags |= static_cast<uint16_t>(TypeTraitFlags::ENUM);
             }
 
             else
                 flags |= static_cast<uint16_t>(TypeTraitFlags::VOID);
 
             /* SHARED stuff */
-            if (std::is_const_v<T>)
+            if constexpr (std::is_const_v<T>)
                 flags |= static_cast<uint16_t>(TypeTraitFlags::CONST);
-            if (std::is_volatile_v<T>)
+            if constexpr (std::is_volatile_v<T>)
                 flags |= static_cast<uint16_t>(TypeTraitFlags::VOLATILE);
-            if (std::is_default_constructible_v<T>)
+            if constexpr (std::is_default_constructible_v<T>)
                 flags |= static_cast<uint16_t>(TypeTraitFlags::DEFAULT_CONSTRUCTABLE);
-            if (std::is_copy_constructible_v<T>)
+            if constexpr (std::is_copy_constructible_v<T>)
                 flags |= static_cast<uint16_t>(TypeTraitFlags::COPY_CONSTRUCTABLE);
-            if (std::is_move_constructible_v<T>)
+            if constexpr (std::is_move_constructible_v<T>)
                 flags |= static_cast<uint16_t>(TypeTraitFlags::MOVE_CONSTRUCTABLE);
-            if (std::is_move_assignable_v<T>)
-                flags |= static_cast<uint16_t>(TypeTraitFlags::MOVE_ASIGNABLE);
-            if (std::is_copy_assignable_v<T>)
-                flags |= static_cast<uint16_t>(TypeTraitFlags::COPY_ASIGNABLE);
-
-            l.log_debug("{} flags are {:b}", typeid(T).name(), flags);
+            if constexpr (std::is_move_assignable_v<T>)
+                flags |= static_cast<uint16_t>(TypeTraitFlags::MOVE_ASSIGNABLE);
+            if constexpr (std::is_copy_assignable_v<T>)
+                flags |= static_cast<uint16_t>(TypeTraitFlags::COPY_ASSIGNABLE);
 
             return flags;
         }
@@ -171,20 +170,20 @@ namespace msce
          * @tparam TM Type of member under the pointer.
          * @tparam Context The actual type. You need to pass it it to avoid template deduction.
          */
-        template <ClassWithReflection Context, ClassWithReflection TC, typename TM>
-        inline uint32_t get_offset_of_member(TM TC::*m_ptr)
-        {
-            const Context *fake = reinterpret_cast<const Context *>(0x1000);
-            const TM *fake_m = &(fake->*m_ptr);
+        // template <typename Context, typename TC, typename TM>
+        // inline constexpr uint32_t get_offset_of_member(TM TC::*m_ptr)
+        // {
+        //     static_assert(ClassWithReflection<Context>,
+        //                   "Context must satisfy the ClassWithReflection concept!");
 
-            uint32_t offset = static_cast<uint32_t>(
-                reinterpret_cast<uintptr_t>(fake_m) - reinterpret_cast<uintptr_t>(fake));
+        //     // const Context *c = nullptr;
+        //     // const TM *m = &(c->*m_ptr);
 
-            static Logger l("Offset calculator");
-            l.log_debug("\nStart address: 0x{:x}\nEnd   address: 0x{:x}\noffset: {}\n\n===================\n\n", reinterpret_cast<uintptr_t>(fake), reinterpret_cast<uintptr_t>(fake_m), offset);
+        //     return __builtin_offsetof(Context, m_ptr);
 
-            return offset;
-        }
+        //     // return static_cast<uint32_t>(
+        //     //     reinterpret_cast<const char *>(m) - reinterpret_cast<const char *>(c));
+        // }
     }
 
     /**
@@ -203,7 +202,7 @@ namespace msce
         const uint32_t offset_;
 
     public:
-        MemberInfo(const char *name, uint32_t offset, const Type &type);
+        constexpr MemberInfo(const char *name, uint32_t offset, const Type &type);
 
         /**
          * @param object Reference to target object.
@@ -219,7 +218,7 @@ namespace msce
          * @throws std::runtime_error if given object doesn't contain this member.
          */
         template <typename TValue, ClassWithReflection TObject>
-        void set_value(const TObject &objecr, TValue value) const;
+        void set_value(const TObject &object, TValue value) const;
 
         /**
          * @retval Returns type-casted pointer to the member represented by this in given object if present.
@@ -248,6 +247,8 @@ namespace msce
          * @brief Getter for this member's stringified name
          */
         std::string get_name_str() const;
+
+        const Type &get_type() const;
     };
 
     /**
@@ -263,7 +264,7 @@ namespace msce
         /// @brief Human-readable name of this type.
         const char *name_;
         /// @brief The size of this type.
-        const uint32_t size_;
+        const uint64_t size_;
         /**
          * @brief These are flags containing this type's traits. You can find flags at @ref msce::TypeTraitFlags.
          * @details This is not conventional bitmap. Bits 0 trough 2 are most significant. They define mutually-exclusive type "category", like class, numeric, enum, etc.
@@ -275,14 +276,14 @@ namespace msce
          */
         const uint16_t traits_;
         /// @brief The members of this type.
-        const std::span<MemberInfo> members_;
+        const std::span<const MemberInfo> members_;
 
     public:
-        constexpr Type(const char *name, uint32_t size, uint16_t trait_flags, std::span<MemberInfo> members, const std::type_info &std_type) : name_(name),
-                                                                                                                                               size_(size),
-                                                                                                                                               traits_(trait_flags),
-                                                                                                                                               members_(members),
-                                                                                                                                               std_type_(std_type)
+        constexpr Type(const char *name, uint64_t size, uint16_t trait_flags, std::span<const MemberInfo> members, const std::type_info &std_type) : name_(name),
+                                                                                                                                                     size_(size),
+                                                                                                                                                     traits_(trait_flags),
+                                                                                                                                                     members_(members),
+                                                                                                                                                     std_type_(std_type)
 
         {
         }
@@ -331,46 +332,77 @@ namespace msce
         template <typename TValue, ClassWithReflection TObject>
         void set_member_value(const TObject &object, const char *member_name, TValue value) const;
 
+        template <typename TValue>
+        TValue get_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target) const;
+
+        template <typename TValue>
+        TValue get_value(void *target) const;
+
+        template <typename TValue>
+        void set_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target, TValue value) const;
+
+        template <typename TValue>
+        void set_value(void *target, TValue value) const;
+
         /**
          * @brief Getter for size of this object. Same as sizeof(RepresentedType).
          */
         uint32_t get_size() const;
 
+        std::vector<std::reference_wrapper<const MemberInfo>> get_members() const;
+
         /* I am absolutely NOT documenting 24 self-explainatory methods. Go back to pre-school if you can't figure it out.*/
 
-        bool is_numeric() const;
-        bool is_integer() const;
-        bool is_floating_point() const;
-        bool is_unsigned() const;
+        constexpr bool is_numeric() const;
+        constexpr bool is_integer() const;
+        constexpr bool is_floating_point() const;
+        constexpr bool is_unsigned() const;
 
-        bool is_class() const;
+        constexpr bool is_class() const;
 
-        bool is_pointer() const;
-        bool is_member_object_pointer() const;
+        constexpr bool is_pointer() const;
+        constexpr bool is_member_object_pointer() const;
 
-        bool is_reference() const;
-        bool is_lvalue_reference() const;
-        bool is_rvalue_reference() const;
+        constexpr bool is_reference() const;
+        constexpr bool is_lvalue_reference() const;
+        constexpr bool is_rvalue_reference() const;
 
-        bool is_array() const;
-        bool is_bounded_array() const;
+        constexpr bool is_array() const;
+        constexpr bool is_bounded_array() const;
 
-        bool is_enum() const;
-        bool is_function() const;
-        bool is_void() const;
+        constexpr bool is_enum() const;
+        constexpr bool is_function() const;
+        constexpr bool is_void() const;
 
-        bool is_const() const;
-        bool is_volatile() const;
+        constexpr bool is_const() const;
+        constexpr bool is_volatile() const;
 
-        bool is_default_constructible() const;
-        bool is_copy_constructible() const;
-        bool is_move_constructible() const;
+        constexpr bool is_default_constructible() const;
+        constexpr bool is_copy_constructible() const;
+        constexpr bool is_move_constructible() const;
 
-        bool is_copy_asignable() const;
-        bool is_move_asignable() const;
+        constexpr bool is_copy_assignable() const;
+        constexpr bool is_move_assignable() const;
 
         bool operator==(const Type &other) const;
     };
+
+    template <typename T>
+    constexpr const Type &get_reflection_of_type()
+    {
+        return internal::TypeRegistration<T>::get_type();
+    }
+    const Type &get_reflection_of_type(const std::string &name);
+    const Type &get_reflection_of_type(const std::type_info &std_type);
+
+#define typeof(Type) ::msce::get_reflection_of_type<Type>()
+#define typeof_v(Variable) ::msce::get_reflection_of_type(typeid(Variable))
+#define typeof_n(Str) ::msce::get_reflection_of_type(Str)
+
+    inline constexpr msce::MemberInfo::MemberInfo(const char *name, uint32_t offset, const Type &type) : name_(name), offset_(offset), type_info_(type)
+    {
+    }
+
     template <typename TValue, ClassWithReflection TObject>
     inline TValue MemberInfo::get_value(const TObject &object) const
     {
@@ -378,6 +410,14 @@ namespace msce
             throw std::runtime_error("Tried to get value of member '" + this->get_name_str() + "' from '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
 
         auto m_addr = reinterpret_cast<uintptr_t>(&object) + this->offset_;
+
+        if constexpr (std::is_fundamental_v<TValue> || std::is_enum_v<TValue>)
+        {
+            uint64_t safe_value = 0;
+            memcpy(&safe_value, reinterpret_cast<void *>(m_addr), this->type_info_.get_size());
+            return static_cast<TValue>(safe_value);
+        }
+
         return *reinterpret_cast<TValue *>(m_addr);
     }
     template <typename TValue, ClassWithReflection TObject>
@@ -397,6 +437,13 @@ namespace msce
     template <typename TValue, ClassWithReflection TObject>
     inline TValue *MemberInfo::get_ptr(const TObject &object) const
     {
+
+        if constexpr (std::is_integral_v<TValue> || std::is_enum_v<TValue>)
+            if (this->type_info_.is_enum() && this->type_info_.get_size() == sizeof(TValue))
+            {
+                return reinterpret_cast<TValue *>(this->get_ptr(object));
+            }
+
         if (this->type_info_.get_std_type() != typeid(TValue))
         {
             logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
@@ -420,6 +467,12 @@ namespace msce
         auto m_addr = reinterpret_cast<uintptr_t>(&object) + this->offset_;
         return reinterpret_cast<void *>(m_addr);
     }
+
+    inline constexpr const char *msce::MemberInfo::get_name() const
+    {
+        return this->name_;
+    }
+
     template <typename TValue, ClassWithReflection TObject>
     inline TValue Type::get_member_value(const TObject &object, const char *member_name) const
     {
@@ -434,112 +487,360 @@ namespace msce
         m.set_value(object, value);
     }
 
-    template <typename T>
-    const Type &get_reflection_of_type()
+    template <typename TValue>
+    inline TValue Type::get_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target) const
     {
-        static Logger logger("Reflection(get_reflection_of_type<T>())");
-        logger.log_error("Type '{}' wasn't ever reflected.", typeid(T).name());
-        throw std::runtime_error("get_reflection_of_type<T>() defined at '" + MSCE_FILE_TRACK_STR() + "' failed. See logs for details.");
-    }
-    const Type &get_reflection_of_type(const std::string &name);
-    const Type &get_reflection_of_type(const std::type_info &std_type);
+        using RawTValue = std::remove_pointer_t<std::remove_reference_t<TValue>>;
+        void *v_addr = reinterpret_cast<void *>(&target);
 
+        if constexpr (std::is_pointer_v<TValue>)
+        {
+            return reinterpret_cast<TValue>(v_addr);
+        }
+        else if constexpr (std::is_reference_v<TValue>)
+        {
+            return *reinterpret_cast<RawTValue *>(v_addr);
+        }
+        else
+        {
+            if constexpr (!typeof(RawTValue).is_copy_constructible())
+            {
+                logger.log_error("Tried to get copy-of-value of type '{}', but it is not copy-constructible", this->get_name_str());
+            }
+
+            return *reinterpret_cast<RawTValue *>(v_addr);
+        }
+    }
+
+    template <typename TValue>
+    inline TValue Type::get_value(void *target) const
+    {
+        static_assert(msce::TypeWithReflection<TValue>, "TValue must be reflected.");
+        using RawT = std::remove_pointer_t<std::remove_reference_t<TValue>>;
+
+        const Type &t = msce::get_reflection_of_type<RawT>();
+        if (t != *this)
+        {
+            logger.log_error("Tried to get value of type '{}' from object of type '{}'", t.get_name(), this->get_name());
+            throw std::runtime_error("Type mismatch. See logs for details.");
+        }
+
+        if (!target)
+        {
+            if constexpr (get_reflection_of_type<TValue>().is_pointer())
+            {
+                return nullptr;
+            }
+
+            logger.log_error("Tried to get value of nullptr object of expected type '{}'", this->get_name());
+            throw std::runtime_error("Failed to get value of null object trough reflection");
+        }
+
+        TValue *v_ptr = reinterpret_cast<TValue *>(target);
+
+        if constexpr (get_reflection_of_type<TValue>().is_pointer())
+        {
+            return v_ptr;
+        }
+        else
+        {
+            if constexpr (get_reflection_of_type<TValue>().is_reference() || get_reflection_of_type<TValue>().is_copy_constructible())
+            {
+                return *v_ptr;
+            }
+
+            else
+            {
+                logger.log_error("Tried to return copy of non-copy-constructible type '{}'", this->get_name());
+                throw std::runtime_error("Invalid copy. See logs for details");
+            }
+        }
+
+        return *v_ptr;
+    }
+
+    template <typename TValue>
+    inline void Type::set_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target, TValue value) const
+    {
+        using RawTValue = std::remove_pointer_t<std::remove_reference_t<TValue>>;
+        if (get_reflection_of_type<TValue>() != *this)
+            return;
+
+        void *v_ptr = reinterpret_cast<void *>(&target);
+
+        if constexpr (get_reflection_of_type<TValue>().is_reference())
+        {
+            logger.log_error("Failed to set value of reference type '{}'. You can not reassign references after initialization.", this->get_name_str());
+            return;
+        }
+
+        if constexpr (get_reflection_of_type<TValue>().is_pointer())
+        {
+            *reinterpret_cast<TValue *>(v_ptr) = value;
+        }
+        else
+        {
+            if constexpr (get_reflection_of_type<TValue>().is_copy_assignable())
+            {
+                *reinterpret_cast<RawTValue *>(v_ptr) = value;
+            }
+        }
+    }
+
+    template <typename TValue>
+    inline void Type::set_value(void *target, TValue value) const
+    {
+        using RawType = std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<TValue>>>;
+        if constexpr (get_reflection_of_type<TValue>().is_reference())
+        {
+            logger.log_error("Tried to set reference value post-initializarion for type '{}'", this->get_name());
+            return;
+        }
+
+        if (this->is_const())
+        {
+            logger.log_error("Tried to set value of constant post-initializarion for type '{}'", this->get_name());
+            return;
+        }
+
+        if (typeid(value) != this->get_std_type())
+            return;
+
+        RawType *v_ptr = reinterpret_cast<RawType *>(target);
+
+        if constexpr (get_reflection_of_type<TValue>().is_pointer())
+        {
+            v_ptr = value;
+        }
+        else
+        {
+            if constexpr (get_reflection_of_type<TValue>().is_copy_constructible())
+            {
+                *v_ptr = value;
+                return;
+            }
+
+            logger.log_error("Tried to set value of non-copy-constructible type '{}' by copy.", this->get_name());
+        }
+    }
+
+    inline constexpr bool msce::Type::is_numeric() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::NUMERIC;
+    }
+
+    inline constexpr bool msce::Type::is_integer() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::INTEGRAL) == (uint16_t)TypeTraitFlags::INTEGRAL;
+    }
+
+    inline constexpr bool msce::Type::is_floating_point() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::FLOATING_POINT) == (uint16_t)TypeTraitFlags::FLOATING_POINT;
+    }
+
+    inline constexpr bool msce::Type::is_unsigned() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::UNSIGNED) == (uint16_t)TypeTraitFlags::UNSIGNED;
+    }
+
+    inline constexpr bool msce::Type::is_class() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::CLASS;
+    }
+
+    inline constexpr bool msce::Type::is_pointer() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::POINTER;
+    }
+
+    inline constexpr bool msce::Type::is_member_object_pointer() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::MEMBER_OBJECT_POINTER) == (uint16_t)TypeTraitFlags::MEMBER_OBJECT_POINTER;
+    }
+
+    inline constexpr bool msce::Type::is_reference() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::REFERENCE;
+    }
+
+    inline constexpr bool msce::Type::is_lvalue_reference() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::LVALUE) == (uint16_t)TypeTraitFlags::LVALUE;
+    }
+
+    inline constexpr bool msce::Type::is_rvalue_reference() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::RVALUE) == (uint16_t)TypeTraitFlags::RVALUE;
+    }
+
+    inline constexpr bool msce::Type::is_array() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::ARRAY;
+    }
+
+    inline constexpr bool msce::Type::is_bounded_array() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::BOUNDED) == (uint16_t)TypeTraitFlags::BOUNDED;
+    }
+
+    inline constexpr bool msce::Type::is_enum() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::ENUM;
+    }
+
+    inline constexpr bool msce::Type::is_function() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::FUNCTION;
+    }
+
+    inline constexpr bool msce::Type::is_void() const
+    {
+        return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::VOID;
+    }
+
+    inline constexpr bool msce::Type::is_const() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::CONST) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_volatile() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::VOLATILE) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_default_constructible() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::DEFAULT_CONSTRUCTABLE) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_copy_constructible() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::COPY_CONSTRUCTABLE) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_move_constructible() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::MOVE_CONSTRUCTABLE) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_copy_assignable() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::COPY_ASSIGNABLE) != 0;
+    }
+
+    inline constexpr bool msce::Type::is_move_assignable() const
+    {
+        return (this->traits_ & (uint16_t)TypeTraitFlags::MOVE_ASSIGNABLE) != 0;
+    }
 }
 
-#define MSCE_DEFINE_REFLECTED_OBJECT(ReflectedType, ...) \
-    inline static const ::msce::Type &get_type_info()    \
-    {                                                    \
-        static const ::msce::Type &t = []() {\
-                ::msce::Logger logger("StaticReflectionTypeRegistration");                                                                                                                                                                                         \
-                static ::std::array<::msce::MemberInfo, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)> lm = {BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER, ReflectedType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}; \
-               static ::msce::Type lt(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), lm, typeid(ReflectedType));                                                                                                 \
-                ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(lt));                                                                                                                                         \
-                logger.log_info("Registered type '{}'", #ReflectedType);                                                                                                                                                                                   \
-            return lt; }();       \
-        return t;                                        \
-    };
-
-#define MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, RTUID)                                                                          \
-    template <>                                                                                                                                               \
-    inline const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>()                                                                               \
-    {                                                                                                                                                         \
-        static const ::msce::Type &t = []()                                                                                                                   \
-        {                                                                                                                                                     \
-            static ::msce::Type lt(#ReflectedType, sizeof(ReflectedType), ::msce::internal::compute_type_traits<ReflectedType>(), {}, typeid(ReflectedType)); \
-            Logger logger("StaticReflectionTypeRegistration");                                                                                                \
-            ::msce::internal::get_g_reflection_types_registry().register_entry(#ReflectedType, std::cref(lt));                                                \
-            logger.log_info("Registered type '{}'", #ReflectedType);                                                                                          \
-            return lt;                                                                                                                                        \
-        }();                                                                                                                                                  \
-        return t;                                                                                                                                             \
-    }                                                                                                                                                         \
-    namespace msce                                                                                                                                            \
-    {                                                                                                                                                         \
-        template <>                                                                                                                                           \
-        struct TypeRegistration<ReflectedType>                                                                                                                \
-        {                                                                                                                                                     \
-            [[gnu::used]] TypeRegistration()                                                                                                                  \
-            {                                                                                                                                                 \
-                get_reflection_of_type<ReflectedType>();                                                                                                      \
-            }                                                                                                                                                 \
-        };                                                                                                                                                    \
-    }                                                                                                                                                         \
-    inline static msce::TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);
-
-#define MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(ReflectedType) \
-    MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS_HELPER(ReflectedType, __COUNTER__)
-
-#define MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(ReflectedType, MemberName) \
-    ::msce::MemberInfo(#MemberName, ::msce::internal::get_offset_of_member<ReflectedType>(&ReflectedType::MemberName), ::msce::get_reflection_of_type<decltype(ReflectedType::MemberName)>())
-
-#define MSCE_MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_WRAPPER(r, data, x) \
-    MSCE_INITIALIZE_REFLECTED_OBJECT_MEMBER_HELPER(data, x)
-
 /**
- * @brief Registers all required stuff for reflection.
- * @note If you want to reflect polymorphic objects, you will have to pass all parents members into this macro, even tho they are already reflected.
+ * @brief Simply generates static get_type_info() method ad adds internal functions as friends. You don't HAVE to define it, but it's highly advised.
+ * @brief You do need to add it to reflect non-public members tho.
  */
-#define MSCE_REGISTER_REFLECTED_OBJECT_HELPER(ReflectedType, RTUID)      \
-    template <>                                                          \
-    const ::msce::Type & ::msce::get_reflection_of_type<ReflectedType>() \
-    {                                                                    \
-        return ReflectedType::get_type_info();                           \
-    }                                                                    \
-    namespace msce                                                       \
-    {                                                                    \
-        template <>                                                      \
-        struct TypeRegistration<ReflectedType>                           \
-        {                                                                \
-            [[gnu::used]] TypeRegistration()                             \
-            {                                                            \
-                get_reflection_of_type<ReflectedType>();                 \
-            }                                                            \
-        };                                                               \
-    }                                                                    \
-    inline static msce::TypeRegistration<ReflectedType> BOOST_PP_CAT(reg_, RTUID);
+#define MSCE_REFLECTION_DEFINE_CLASS(TypeName)                                    \
+    template <typename T>                                                         \
+    friend constexpr const ::msce::Type &get_reflection_of_type();                \
+    inline static const ::msce::Type &get_type_info()                             \
+    {                                                                             \
+        static const ::msce::Type &t = ::msce::get_reflection_of_type(#TypeName); \
+        return t;                                                                 \
+    }
 
-#define MSCE_REGISTER_REFLECTED_OBJECT(ReflectedType) \
-    MSCE_REGISTER_REFLECTED_OBJECT_HELPER(ReflectedType, __COUNTER__)
+#define MSCE_FUNDAMENTAL_HELPER(TypeName, UID)                                                                      \
+    namespace msce::internal                                                                                        \
+    {                                                                                                               \
+        template <>                                                                                                 \
+        struct TypeRegistration<TypeName>                                                                           \
+        {                                                                                                           \
+            inline static constexpr msce::Type type = msce::Type(#TypeName,                                         \
+                                                                 sizeof(TypeName),                                  \
+                                                                 ::msce::internal::compute_type_traits<TypeName>(), \
+                                                                 {},                                                \
+                                                                 typeid(TypeName));                                 \
+            inline static constexpr const msce::Type &get_type()                                                    \
+            {                                                                                                       \
+                return type;                                                                                        \
+            }                                                                                                       \
+            static void register_self()                                                                             \
+            {                                                                                                       \
+                static const ::msce::Type &r = []() {                 Logger logger("StaticTypeRegistration");                                                                                        \
+                ::msce::internal::get_g_reflection_types_registry().register_entry(#TypeName, ::std::cref(TypeRegistration<TypeName>::type)); \
+                logger.log_info("Successfully reflected type '{}'", TypeRegistration<TypeName>::type.get_name_str());                          \
+                    return TypeRegistration<TypeName>::type; }();                                                          \
+            }                                                                                                       \
+            [[gnu::used]] TypeRegistration()                                                                        \
+            {                                                                                                       \
+                register_self();                                                                                    \
+            }                                                                                                       \
+        };                                                                                                          \
+        inline static TypeRegistration<TypeName> BOOST_PP_CAT(refl_t_reg, UID);                                     \
+    }
 
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned char)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char8_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char16_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char32_t)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(short)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned short)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(int)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned int)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(unsigned long long)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(float)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(double)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(bool)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(long double)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(const char *)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(char *)
-MSCE_DEFINE_AND_INSTANTIATE_REFLECTED_NON_CLASS(std::string)
+#define MSCE_REFLECT_CLASS_MEMBER_IMPL(ClassName, MemberName) \
+    ::msce::MemberInfo(#MemberName, __builtin_offsetof(ClassName, MemberName), ::msce::get_reflection_of_type<decltype(ClassName::MemberName)>())
+#define MSCE_REFLECT_CLASS_MEMBER_WRP(r, data, x) \
+    MSCE_REFLECT_CLASS_MEMBER_IMPL(data, x)
+
+#define MSCE_REFLECT_CLASS_HELPER(ClassName, UID, ...)                                                                                       \
+    namespace msce::internal                                                                                                                 \
+    {                                                                                                                                        \
+        template <>                                                                                                                          \
+        struct TypeRegistration<ClassName>                                                                                                   \
+        {                                                                                                                                    \
+            inline static constexpr std::array<const ::msce::MemberInfo, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)> members = {                    \
+                BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(MSCE_REFLECT_CLASS_MEMBER_WRP, ClassName, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))}; \
+            inline static constexpr msce::Type type = msce::Type(#ClassName,                                                                 \
+                                                                 sizeof(ClassName),                                                          \
+                                                                 ::msce::internal::compute_type_traits<ClassName>(),                         \
+                                                                 std::span(members),                                                         \
+                                                                 typeid(ClassName));                                                         \
+            inline static constexpr const msce::Type &get_type()                                                                             \
+            {                                                                                                                                \
+                return type;                                                                                                                 \
+            }                                                                                                                                \
+            static void register_self()                                                                                                      \
+            {                                                                                                                                \
+                static const ::msce::Type &r = []() {                 Logger logger("StaticTypeRegistration");                                                                                        \
+                ::msce::internal::get_g_reflection_types_registry().register_entry(#ClassName, ::std::cref(TypeRegistration<ClassName>::type)); \
+                logger.log_info("Successfully reflected type '{}'", TypeRegistration<ClassName>::type.get_name_str());                          \
+                    return TypeRegistration<ClassName>::type; }();                                                                                   \
+            }                                                                                                                                \
+            [[gnu::used]] TypeRegistration()                                                                                                 \
+            {                                                                                                                                \
+                register_self();                                                                                                             \
+            }                                                                                                                                \
+        };                                                                                                                                   \
+        inline static TypeRegistration<ClassName> BOOST_PP_CAT(refl_t_reg, UID);                                                             \
+    }
+
+#define MSCE_REFLECT_CLASS(ClassName, ...) MSCE_REFLECT_CLASS_HELPER(ClassName, __COUNTER__, __VA_ARGS__)
+
+#define MSCE_REFLECT_FUNDAMENTAL(TypeName) \
+    MSCE_FUNDAMENTAL_HELPER(TypeName, __COUNTER__)
+
+MSCE_REFLECT_FUNDAMENTAL(void)
+MSCE_REFLECT_FUNDAMENTAL(void *)
+MSCE_REFLECT_FUNDAMENTAL(bool)
+MSCE_REFLECT_FUNDAMENTAL(char)
+MSCE_REFLECT_FUNDAMENTAL(unsigned char)
+MSCE_REFLECT_FUNDAMENTAL(char8_t)
+MSCE_REFLECT_FUNDAMENTAL(char16_t)
+MSCE_REFLECT_FUNDAMENTAL(char32_t)
+MSCE_REFLECT_FUNDAMENTAL(short)
+MSCE_REFLECT_FUNDAMENTAL(unsigned short)
+MSCE_REFLECT_FUNDAMENTAL(int)
+MSCE_REFLECT_FUNDAMENTAL(unsigned int)
+MSCE_REFLECT_FUNDAMENTAL(long)
+MSCE_REFLECT_FUNDAMENTAL(unsigned long)
+MSCE_REFLECT_FUNDAMENTAL(long long)
+MSCE_REFLECT_FUNDAMENTAL(unsigned long long)
+MSCE_REFLECT_FUNDAMENTAL(float)
+MSCE_REFLECT_FUNDAMENTAL(double)
+MSCE_REFLECT_FUNDAMENTAL(long double)
+MSCE_REFLECT_FUNDAMENTAL(const char *)
+MSCE_REFLECT_FUNDAMENTAL(char *)
+MSCE_REFLECT_FUNDAMENTAL(std::string)
 
 #endif // MSCE_REFLECTION_H_

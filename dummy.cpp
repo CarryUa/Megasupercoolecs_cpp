@@ -5,8 +5,11 @@ using namespace msce;
 
 int main(int argc, char **argv)
 {
+    std::set_terminate(msce::internal::handle_terminate);
+
     srand(time(NULL));
     static auto g_logger = Logger("GLOBAL");
+    g_logger.log_debug("Initializing all...");
     static auto g_sys_man = SystemManager();
     g_sys_man.init_all_systems();
     static auto g_comp_man = ComponentManager();
@@ -38,22 +41,16 @@ int main(int argc, char **argv)
             frame = 0;
             next_fps_time += 333;
         }
-        g_logger.log_debug("Updating systems...");
         g_sys_man.update_all_systems();
 
-        g_logger.log_debug("Applying transformations...");
         t->position.x = sin(time_sys->get_total_seconds());
         t2->position.y = sin(time_sys->get_total_seconds());
         t3->scale.x = sin(time_sys->get_total_seconds());
         t3->scale.y = sin(time_sys->get_total_seconds());
 
-        g_logger.log_debug("Setting context...");
         root_window->make_curent_context();
-        g_logger.log_debug("Polling events...");
         glfwPollEvents();
-        g_logger.log_debug("Rendering...");
         root_window->render();
-        g_logger.log_debug("Swapping...");
         root_window->swap_buffers();
     }
 
