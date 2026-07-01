@@ -7,7 +7,10 @@ msce::EnumManager::EnumManager() : registered_enum_factories_ref_(get_g_enum_fac
 msce::Enum msce::EnumManager::create_enum(const std::string &enum_name, int64_t value)
 {
     if (!this->registered_enum_factories_ref_.is_registered(enum_name))
+    {
         logger.log_error("Tried to create enum with unregistered name '{}'. Check for typos!", enum_name);
+        throw std::runtime_error("Failed to create enum.");
+    }
 
     auto e = this->registered_enum_factories_ref_.get_entry(enum_name)();
     e.set(value);

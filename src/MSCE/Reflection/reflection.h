@@ -72,7 +72,6 @@ namespace msce
             {
                 static_assert(false, "Type is never registered in reflection. Try using MSCE_REFLECT_CLASS or MSCE_REFLECT_FUNDAMENTAL to fix the issue.");
                 throw std::runtime_error("Tried to get a type reflection that is not reflected at point its reflection was requested.");
-                return msce::Type(":::::::INVALID_NULL_TYPE_BLAH BLAH BLAH SCREW OFF---OAFasf", 0, {}, typeid(void));
             }
         };
 
@@ -211,6 +210,9 @@ namespace msce
          */
         template <typename TValue, ClassWithReflection TObject>
         TValue get_value(const TObject &object) const;
+
+        template <typename TValue = void>
+        TValue get_value(const void *object, const Type &o_type) const;
         /**
          * @brief Sets the value of member represented by this in given object if present.
          * @param object Reference to target object.
@@ -220,18 +222,26 @@ namespace msce
         template <typename TValue, ClassWithReflection TObject>
         void set_value(const TObject &object, TValue value) const;
 
+        template <typename TValue = void>
+        void set_value(const void *object, TValue value, const Type &o_type) const;
+
         /**
          * @retval Returns type-casted pointer to the member represented by this in given object if present.
          * @retval nullptr otherwise.
          */
         template <typename TValue, ClassWithReflection TObject>
         TValue *get_ptr(const TObject &object) const;
+
+        template <typename TValue = void>
+        TValue *get_ptr(const void *object, const Type &o_type) const;
+
         template <ClassWithReflection TObject>
         /**
          * @retval Returns untyped(void) pointer to the member represented by this in given object if present.
          * @retval nullptr otherwise.
          */
         void *get_ptr(const TObject &object) const;
+
         bool operator==(const MemberInfo &other) const;
 
         /**
@@ -325,6 +335,9 @@ namespace msce
         template <typename TValue, ClassWithReflection TObject>
         TValue get_member_value(const TObject &object, const char *member_name) const;
 
+        template <typename TValue>
+        TValue get_member_value(const void *object, const char *member_name) const;
+
         /**
          * @brief Sets the value of member with given name in given object to provided one.
          * @throws std::runtime_error if member with given name does not exist in given object.
@@ -333,10 +346,13 @@ namespace msce
         void set_member_value(const TObject &object, const char *member_name, TValue value) const;
 
         template <typename TValue>
+        void set_member_value(const void *object, const char *member_name, const Type &o_type, TValue value) const;
+
+        template <typename TValue>
         TValue get_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target) const;
 
         template <typename TValue>
-        TValue get_value(void *target) const;
+        TValue get_value(const void *target) const;
 
         template <typename TValue>
         void set_value(std::remove_pointer_t<std::remove_reference_t<TValue>> &target, TValue value) const;
@@ -406,16 +422,63 @@ namespace msce
     template <typename TValue, ClassWithReflection TObject>
     inline TValue MemberInfo::get_value(const TObject &object) const
     {
-        if (!TObject::get_type_info().has_member(*this))
-            throw std::runtime_error("Tried to get value of member '" + this->get_name_str() + "' from '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
-
-        auto m_addr = reinterpret_cast<uintptr_t>(&object) + this->offset_;
-
-        if constexpr (std::is_fundamental_v<TValue> || std::is_enum_v<TValue>)
+        return this->get_value<TValue>(reinterpret_cast<const void *>(&object), typeof(TObject));
+    }
+    template <typename TValue>
+    inline TValue MemberInfo::get_value(const void *object, const Type &o_type) const
+    {
+        if (!object)
         {
-            uint64_t safe_value = 0;
-            memcpy(&safe_value, reinterpret_cast<void *>(m_addr), this->type_info_.get_size());
-            return static_cast<TValue>(safe_value);
+            logger.log_error("Tried to get value of null object.");
+            throw std::runtime_error("Invalid reflection operation.");
+        }
+        if (!o_type.has_member((*this)))
+        {
+            logger.log_error("Tried to get value of '{}' in '{}', but it has no such member.", this->get_name(), o_type.get_name());
+            throw std::runtime_error("Invalid reflection operation.");
+        }
+
+        auto m_addr = reinterpret_cast<uintptr_t>(this->get_ptr(object, o_type));
+
+        if constexpr (typeof(TValue).is_integer())
+        {
+            if (this->get_type().is_enum())
+            {
+                switch (this->get_type().get_size())
+                {
+                case 1:
+                {
+                    if (this->get_type().is_unsigned())
+                        return *reinterpret_cast<uint8_t *>(m_addr);
+                    else
+                        return *reinterpret_cast<int8_t *>(m_addr);
+                }
+                case 2:
+                {
+                    if (this->get_type().is_unsigned())
+                        return *reinterpret_cast<uint16_t *>(m_addr);
+                    else
+                        return *reinterpret_cast<int16_t *>(m_addr);
+                }
+                case 4:
+                {
+
+                    if (this->get_type().is_unsigned())
+                        return *reinterpret_cast<uint32_t *>(m_addr);
+                    else
+                        return *reinterpret_cast<int32_t *>(m_addr);
+                }
+                case 8:
+                {
+                    if (this->get_type().is_unsigned())
+                        return *reinterpret_cast<uint64_t *>(m_addr);
+                    else
+                        return *reinterpret_cast<int64_t *>(m_addr);
+                }
+                }
+                logger.log_warning("Invalid integer size '{}'. Returning default...", this->get_type().get_size());
+                return TValue();
+            }
         }
 
         return *reinterpret_cast<TValue *>(m_addr);
@@ -423,16 +486,79 @@ namespace msce
     template <typename TValue, ClassWithReflection TObject>
     inline void MemberInfo::set_value(const TObject &object, TValue value) const
     {
-        if (!TObject::get_type_info().has_member(*this))
-            throw std::runtime_error("Tried to set value of member '" + this->get_name_str() + "' in '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
+        this->set_value(reinterpret_cast<const void *>(&object), value, typeof(TObject));
 
-        auto m = this->get_ptr<TValue>(object);
-        if (!m)
+        // if (!TObject::get_type_info().has_member(*this))
+        //     throw std::runtime_error("Tried to set value of member '" + this->get_name_str() + "' in '" + TObject::get_type_info().get_name_str() + "', but said object doesn't have said member.");
+
+        // auto m = this->get_ptr<TValue>(object);
+        // if (!m)
+        // {
+        //     logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
+        //     return;
+        // }
+        // *m = value;
+    }
+    template <typename TValue>
+    inline void MemberInfo::set_value(const void *object, TValue value, const Type &o_type) const
+    {
+        if (!o_type.has_member(*this))
+            throw std::runtime_error(std::format("Tried to set value of member '{}' in '{}', but said object doesn't have said member.", this->get_name(), o_type.get_name()));
+
+        if constexpr (typeof(TValue).is_integer())
         {
-            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name_str(), TObject::get_type_info().get_name_str());
-            return;
+            if (this->get_type().is_enum())
+            {
+                void *addr = this->get_ptr(object, o_type);
+                switch (this->get_type().get_size())
+                {
+                case 1:
+                {
+                    if (this->get_type().is_unsigned())
+                        *reinterpret_cast<uint8_t *>(addr) = static_cast<uint8_t>(value);
+                    else
+                        *reinterpret_cast<int8_t *>(addr) = static_cast<int8_t>(value);
+                    return;
+                }
+                case 2:
+                {
+                    if (this->get_type().is_unsigned())
+                        *reinterpret_cast<uint16_t *>(addr) = static_cast<uint16_t>(value);
+                    else
+                        *reinterpret_cast<int16_t *>(addr) = static_cast<int16_t>(value);
+                    return;
+                }
+                case 4:
+                {
+
+                    if (this->get_type().is_unsigned())
+                        *reinterpret_cast<uint32_t *>(addr) = static_cast<uint32_t>(value);
+                    else
+                        *reinterpret_cast<int32_t *>(addr) = static_cast<int32_t>(value);
+
+                    return;
+                }
+                case 8:
+                {
+                    if (this->get_type().is_unsigned())
+                        *reinterpret_cast<uint64_t *>(addr) = static_cast<uint64_t>(value);
+                    else
+                        *reinterpret_cast<int64_t *>(addr) = static_cast<int64_t>(value);
+                    return;
+                }
+                }
+            }
         }
-        *m = value;
+        else
+        {
+            auto m = this->get_ptr<TValue>(object, o_type);
+            if (!m)
+            {
+                logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name(), o_type.get_name());
+                return;
+            }
+            *m = value;
+        }
     }
     template <typename TValue, ClassWithReflection TObject>
     inline TValue *MemberInfo::get_ptr(const TObject &object) const
@@ -451,6 +577,23 @@ namespace msce
         }
 
         return reinterpret_cast<TValue *>(this->get_ptr(object));
+    }
+    template <typename TValue>
+    inline TValue *MemberInfo::get_ptr(const void *object, const Type &o_type) const
+    {
+        if (!object)
+            return nullptr;
+
+        if (!o_type.has_member(*this))
+        {
+            logger.log_error("Tried to get pointer-to member '{}' in object '{}', but no such member in this object exists.", o_type.get_name(), this->get_name());
+            return nullptr;
+        }
+
+        uintptr_t o_addr = reinterpret_cast<uintptr_t>(object);
+        uintptr_t m_addr = o_addr + this->offset_;
+
+        return reinterpret_cast<TValue *>(m_addr);
     }
     template <ClassWithReflection TObject>
     inline void *MemberInfo::get_ptr(const TObject &object) const
@@ -480,11 +623,24 @@ namespace msce
         return m.get_value<TValue>(object);
     }
 
+    template <typename TValue>
+    inline TValue Type::get_member_value(const void *object, const char *member_name) const
+    {
+        const auto &m = this->get_member_named(member_name);
+        return m.get_value<TValue>(object, *this);
+    }
+
     template <typename TValue, ClassWithReflection TObject>
     inline void Type::set_member_value(const TObject &object, const char *member_name, TValue value) const
     {
+        this->set_member_value<TValue>(reinterpret_cast<const void *>(&object), member_name, *this, value);
+    }
+
+    template <typename TValue>
+    inline void Type::set_member_value(const void *object, const char *member_name, const Type &o_type, TValue value) const
+    {
         const auto &m = this->get_member_named(member_name);
-        m.set_value(object, value);
+        m.set_value(object, value, o_type);
     }
 
     template <typename TValue>
@@ -513,7 +669,7 @@ namespace msce
     }
 
     template <typename TValue>
-    inline TValue Type::get_value(void *target) const
+    inline TValue Type::get_value(const void *target) const
     {
         static_assert(msce::TypeWithReflection<TValue>, "TValue must be reflected.");
         using RawT = std::remove_pointer_t<std::remove_reference_t<TValue>>;
@@ -536,7 +692,7 @@ namespace msce
             throw std::runtime_error("Failed to get value of null object trough reflection");
         }
 
-        TValue *v_ptr = reinterpret_cast<TValue *>(target);
+        const TValue *v_ptr = reinterpret_cast<const TValue *>(target);
 
         if constexpr (get_reflection_of_type<TValue>().is_pointer())
         {

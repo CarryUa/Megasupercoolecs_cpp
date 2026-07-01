@@ -1,10 +1,13 @@
 #ifndef MSCE_I_REGISTRY_HPP
 #define MSCE_I_REGISTRY_HPP
 #include <MSCE/logger.h>
+#include <MSCE/Platform/platform.h>
 
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
+
+#include <execinfo.h>
 
 namespace msce
 {
@@ -37,6 +40,20 @@ namespace msce
         /// @return Entry with provided id.
         TRegistered &get_entry(TIdentifyer id)
         {
+            static Logger logger("Registry");
+            {
+                if (!registry_.contains(id))
+                {
+                    void *frame[1];
+                    backtrace(frame, 1);
+
+                    auto info = Platform::resolve_shared_object_address_source(frame[0]);
+                    logger.log_error("Tried to get registration with id that wasn't registered. '{}'", info.filename);
+
+                    throw new std::runtime_error("Failed to get entry");
+                }
+            }
+
             return registry_.at(id);
         }
 

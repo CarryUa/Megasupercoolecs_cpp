@@ -30,7 +30,7 @@ bool msce::BaseShader::recompile() noexcept
         return false;
     }
 
-    this->shader_handle_ = glCreateShader((GLenum)this->prototype_->type);
+    this->shader_handle_ = glCreateShader((GLenum)this->prototype_->shader_type);
 
     std::string content = "";
     if (!read_shader_source(this->prototype_->source_path, content))

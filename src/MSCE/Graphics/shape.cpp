@@ -239,8 +239,6 @@ double msce::Circle::get_w() const
 
 double msce::Circle::get_h() const
 {
-    // throw std::runtime_error("debug exception at radius()");
-
     return r_ * 2;
 }
 

@@ -23,9 +23,14 @@ namespace msce
 
 #pragma region Prototype Macros
 
-#define MSCE_DEFINE_PROTOTYPE(Type, ...) \
-    MSCE_REFLECTION_DEFINE_CLASS(Type)   \
-    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__)
+#define MSCE_DEFINE_PROTOTYPE(ProtoType, ...)                                       \
+    MSCE_REFLECTION_DEFINE_CLASS(ProtoType)                                         \
+    MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__) \
+    virtual const ::msce::Type &get_type_info_polymorphic() override                \
+    {                                                                               \
+        static const ::msce::Type &t = ::msce::get_reflection_of_type(#ProtoType);  \
+        return t;                                                                   \
+    }
 
 #define MSCE_REGISTER_PROTOTYPE(Type, Name, ...)                                                                                               \
     CEREAL_REGISTER_TYPE(Type)                                                                                                                 \
@@ -40,13 +45,13 @@ namespace msce
             [[gnu::used]] Registration()                                                                                                       \
             {                                                                                                                                  \
                 static Logger logger("StaticPrototypeRegistration");                                                                           \
-                get_g_registered_prototypes().register_entry(#Name, std::cref(typeid(Type)));                                                  \
-                get_g_registered_prototype_factories().register_entry(#Name,                                                                   \
+                get_g_registered_prototypes().register_entry(#Type, std::cref(typeid(Type)));                                                  \
+                get_g_registered_prototype_factories().register_entry(#Type,                                                                   \
                                                                       []()                                                                     \
                                                                       {                                                                        \
                                                                           return std::make_unique<Type>();                                     \
                                                                       });                                                                      \
-                logger.log_info("Registered prototype({}) with name: '{}'", get_g_registered_prototypes().enumerate_registry().size(), #Name); \
+                logger.log_info("Registered prototype({}) with name: '{}'", get_g_registered_prototypes().enumerate_registry().size(), #Type); \
             }                                                                                                                                  \
         };                                                                                                                                     \
         inline Registration<Type> registered_##Name;                                                                                           \
@@ -76,7 +81,19 @@ namespace msce
         /// @brief cereal stuff.
         template <class Archive>
         void load(Archive &ar) { ar(::cereal::make_nvp("id", id)); }
-        MSCE_REFLECTION_DEFINE_CLASS(::msce::IPrototype)
+        template <typename T>
+        friend constexpr const ::msce::Type &get_reflection_of_type();
+        inline static const ::msce::Type &get_type_info()
+        {
+            static const ::msce::Type &t = ::msce::get_reflection_of_type("::msce::IPrototype");
+            return t;
+        }
+
+        virtual const ::msce::Type &get_type_info_polymorphic()
+        {
+            static const ::msce::Type &t = ::msce::get_reflection_of_type("::msce::IPrototype");
+            return t;
+        }
     };
 }
 

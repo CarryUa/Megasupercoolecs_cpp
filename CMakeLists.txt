@@ -15,6 +15,10 @@ if(NOT MSCE_SKIP_TESTS)
     include(CTest)
 endif ()
 
+if(WIN32)
+  add_compile_definitions(_USE_MATH_DEFINES)
+endif()
+
 # Colorfull output
 if(NOT WIN32)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -57,7 +61,7 @@ add_subdirectory(src/MSCE/ECS)
 add_subdirectory(src/MSCE/Graphics)
 add_subdirectory(src/MSCE/Managers)
 add_subdirectory(src/MSCE/Prototypes)
-# add_subdirectory(src/MSCE/ABI)
+add_subdirectory(src/MSCE/ABI)
 
 
 add_subdirectory(tests)

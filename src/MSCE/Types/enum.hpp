@@ -15,17 +15,9 @@ namespace msce
     class EnumManager;
     class Enum;
 
-    inline Registry<std::string, std::function<Enum()>> &get_g_enum_factories_registry()
-    {
-        static Registry<std::string, std::function<Enum()>> reg;
-        return reg;
-    };
+    Registry<std::string, std::function<Enum()>> &get_g_enum_factories_registry();
 
-    inline std::vector<std::reference_wrapper<const std::type_info>> &get_g_enum_types_vec()
-    {
-        static std::vector<std::reference_wrapper<const std::type_info>> vec;
-        return vec;
-    }
+    std::vector<std::reference_wrapper<const std::type_info>> &get_g_enum_types_vec();
     /**
      * @brief Class representation of enums. Mainly exists for ABI manipulatuion, you can and should use normal enums for most use cases.
      * @note You can't create this enum by yourself, use @ref msce::EnumManager instead.
@@ -90,10 +82,13 @@ namespace msce
     }
     inline void Enum::set(const int64_t value) noexcept
     {
-        for (auto &[_, v] : enumerator_value_pairs_)
+        for (auto &[n, v] : enumerator_value_pairs_)
         {
             if (v == value)
+            {
                 this->value_ = value;
+                return;
+            }
         }
 
         logger.log_error("{} has no enumerator tied to ({})", enum_name_, value);
@@ -121,7 +116,7 @@ namespace msce
     evp.emplace(#Enumerator, static_cast<int64_t>(EnumType::Enumerator));
 #define MSCE_WRAP_REGISTER_ENUM_EVP(r, data, x) MSCE_REGISTER_ENUM_EVP_HELPER(data, x)
 
-#define MSCE_REGISTER_ENUM(EnumType, EnumName, ...)                                      \
+#define MSCE_REGISTER_ENUM_IMPL(EnumType, ENUMIDENTIFYER, ...)                           \
     MSCE_CEREAL_GENERATE_ENUM_SERIALIZE_METHODS(EnumType, __VA_ARGS__)                   \
     template <>                                                                          \
     class msce::Registration<EnumType>                                                   \
@@ -131,14 +126,15 @@ namespace msce
         {                                                                                \
             static ::msce::Logger logger("StaticEnumRegistration");                      \
             ::msce::get_g_enum_types_vec().push_back(std::cref(typeid(EnumType)));       \
-            ::msce::get_g_enum_factories_registry().register_entry(#EnumName, []() {     \
+            ::msce::get_g_enum_factories_registry().register_entry(#EnumType, []() {     \
             ::std::unordered_map<std::string, int64_t> evp;                      \
             BOOST_PP_SEQ_FOR_EACH(MSCE_WRAP_REGISTER_ENUM_EVP, EnumType, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))\
-            return Enum(#EnumName, evp); }); \
-            logger.log_info("Registered enum '{}'", #EnumName);                          \
+            return Enum(#EnumType, evp); }); \
+            logger.log_info("Registered enum '{}'", #EnumType);                          \
         }                                                                                \
     };                                                                                   \
-    inline msce::Registration<EnumType> registered_##EnumName;                           \
+    inline msce::Registration<EnumType> BOOST_PP_CAT(registered_, ENUMIDENTIFYER);       \
     MSCE_REFLECT_FUNDAMENTAL(EnumType)
+#define MSCE_REGISTER_ENUM(EnumType, ...) MSCE_REGISTER_ENUM_IMPL(EnumType, __COUNTER__, __VA_ARGS__)
 
 #endif // MSCE_ENUM_H_
