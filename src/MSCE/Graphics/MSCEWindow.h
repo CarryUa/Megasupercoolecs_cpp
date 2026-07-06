@@ -2,11 +2,16 @@
 #define _MSCE_WINDOW_H_
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <MSCE/Types/vector.h>
+
+#include <vector>
 #include <memory>
 
+#include <MSCE/Types/vector.h>
 #include <MSCE/BuiltIns/timeSystem.h>
 #include <MSCE/Managers/componentManager.h>
+#include <MSCE/Graphics/shaders.h>
+#include <MSCE/BuiltIns/defaultShader.hpp>
+#include <MSCE/Events/prototypeEvents.h>
 
 using namespace std;
 
@@ -14,22 +19,31 @@ namespace msce
 {
     class MSCEWindow
     {
-        GLuint shader_program_;
-        TimeSystem *t_sys_;
-        ComponentManager *comp_man_ = nullptr;
-        unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window_;
-        unsigned int vbo_, vao_;
+    private:
+        struct GLContext
+        {
+            std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
+            uint vao = 0, vbo = 0;
+        } context_;
+
+        const Logger logger_;
+        const std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> p_window_;
+        std::string title_;
+        vec2ui size_;
+
+        void prepare_shaders();
+        void use_context();
 
     public:
-        Vector2D<int> window_size;
-        const char *title;
-        MSCEWindow(Vector2D<int> window_size_ = Vector2D<int>(500, 500), const char *title = "Window", GLFWmonitor *glfw_monitor = nullptr, GLFWwindow *glfw_share = nullptr);
-        bool should_close();
-        void render();
-        void swap_buffers();
-        void make_curent_context();
+        MSCEWindow(vec2ui window_size_ = vec2ui(1600, 900), const char *title = "msce", GLFWmonitor *glfw_monitor = nullptr, GLFWwindow *glfw_share = nullptr);
+        vec2ui size();
+        void size(vec2ui s);
 
-        static void on_resize(GLFWwindow *, int w, int h);
+        bool should_close();
+
+        void render();
+
+        void draw();
     };
 }
 

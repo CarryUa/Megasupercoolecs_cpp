@@ -19,20 +19,6 @@ msce::GraphicsSystem::GraphicsSystem()
     this->comp_man_ = ComponentManager::instance;
 }
 
-void GraphicsSystem::select_window(size_t id)
-{
-    MSCEWindow *window = this->get_window(id);
-    if (window == nullptr)
-        cerr << "Window (" << id << ") wasn't selected." << endl;
-
-    window->make_curent_context();
-}
-
-void GraphicsSystem::select_window(MSCEWindow *window)
-{
-    window->make_curent_context();
-}
-
 void msce::GraphicsSystem::pre_rended_all_objects_on_window(MSCEWindow *window)
 {
 }

@@ -1,5 +1,4 @@
-#ifndef MSCE_COLOR_H_
-#define MSCE_COLOR_H_
+#pragma once
 #include <string>
 
 #include <MSCE/Types/vector.h>
@@ -71,6 +70,22 @@ namespace msce
         /// @brief Compares this color to another color.
         bool operator==(const Color &other) const noexcept;
     };
-}
 
-#endif
+    struct Colors
+    {
+
+        inline static const Color white = Color("#ffffff");
+        inline static const Color black = Color("#000000");
+        inline static const Color red = Color("#ff0000");
+        inline static const Color green = Color("#00ff00");
+        inline static const Color blue = Color("#0000ff");
+        inline static const Color yellow = Color("#ffff00");
+        inline static const Color cyan = Color("#00ffff");
+        inline static const Color magenta = Color("#ff00ff");
+        inline static const Color orange = Color("#ffa500");
+        inline static const Color purple = Color("#800080");
+        inline static const Color pink = Color("#ffc0cb");
+        inline static const Color brown = Color("#a52a2a");
+        inline static const Color gray = Color("#808080");
+    };
+}

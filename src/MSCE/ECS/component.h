@@ -6,6 +6,7 @@
 #pragma region Components Macros
 #define MSCE_DEFINE_COMPONENT(Type, ...)                                                                        \
 private:                                                                                                        \
+    friend class ::msce::ComponentManager;                                                                      \
     MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>, __VA_ARGS__)                    \
     /**  @brief This overload is used by cereal. All components must be instantiated using ComponentManager. */ \
     Type() {}
@@ -18,6 +19,7 @@ private:                                                                        
 
 namespace msce
 {
+    class Entity;
     class ComponentManager;
     /**
      * @brief Component interface used for storage.
@@ -25,7 +27,10 @@ namespace msce
     class IComponent
     {
     protected:
-        friend class ComponentManager;
+        friend class ::msce::Entity;
+        friend class ::msce::ComponentManager;
+
+        virtual void set_owner(Entity *owner) = 0;
 
         /// @brief This overload is used by cereal.All components must be instantiated using ComponentManager
         IComponent() {}
@@ -33,6 +38,7 @@ namespace msce
     public:
         virtual ~IComponent() = default;
         virtual IComponent *clone() = 0;
+        virtual Entity *get_entity() = 0;
 
         friend class ::cereal::access;
         /**  @brief Cereal's save function. Refer to their docs for more info.*/
@@ -51,8 +57,17 @@ namespace msce
     template <typename TComp>
     class BaseComponent : public IComponent
     {
+    private:
+        Entity *owner_;
+
+        virtual void set_owner(Entity *owner) final
+        {
+            owner_ = owner;
+        };
+
     protected:
-        friend class ComponentManager;
+        friend class ::msce::Entity;
+        friend class ::msce::ComponentManager;
 
         /**
          * @returns A pointer to the copy.
@@ -65,6 +80,10 @@ namespace msce
         BaseComponent() {}
 
     public:
+        virtual Entity *get_entity() final
+        {
+            return owner_;
+        };
     };
 }
 

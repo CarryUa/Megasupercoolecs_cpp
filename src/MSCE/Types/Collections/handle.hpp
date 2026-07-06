@@ -39,6 +39,8 @@ namespace msce
         bool operator!=(const SmartHandle<TCollection, TItem> &rhs) const noexcept;
         bool operator!=(const std::nullptr_t rhs) const noexcept;
 
+        bool operator!() const noexcept;
+        explicit operator bool() const noexcept;
         /**
          * @note Notice that you can't cast collection type. This is intentional, so handlers won't switch collections and create invalid pointers.
          */
@@ -80,6 +82,16 @@ namespace msce
     inline bool SmartHandle<TCollection, TItem>::operator!=(const std::nullptr_t rhs) const noexcept
     {
         return get() != rhs;
+    }
+    template <typename TCollection, typename TItem>
+    inline bool SmartHandle<TCollection, TItem>::operator!() const noexcept
+    {
+        return get() == nullptr;
+    }
+    template <typename TCollection, typename TItem>
+    inline SmartHandle<TCollection, TItem>::operator bool() const noexcept
+    {
+        return get() != nullptr;
     }
     template <typename TCollection, typename TItem>
     inline SmartHandle<TCollection, TItem> SmartHandle<TCollection, TItem>::create_nullptr() noexcept

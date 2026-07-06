@@ -11,11 +11,17 @@
 
 namespace msce
 {
-#define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback) \
-    EventManager::instance->subscribe<Event>(Callback)
+#define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback) EventManager::instance->subscribe<Event>(Callback)
 
-#define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback) \
-    EventManager::instance->subscribe<Event>([this](Event &ev) { Callback(ev); })
+#define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback) EventManager::instance->subscribe<Event>([this](auto &ev) {\
+     if constexpr (requires { this->Callback(ev); })                            \
+            {                                                                   \
+                this->Callback(ev);                                             \
+            }                                                                   \
+            else                                                                \
+            {                                                                   \
+                this->Callback();                                               \
+            } })
 
     /**
      *  @brief Manages registration and invocation(firing) of events.
@@ -40,8 +46,8 @@ namespace msce
          * @tparam TEv type of event
          * @note Note that regardless of event instance, callback subscribes to event @b type. The event instance is used as args passed into callback parameter.
          */
-        template <typename TEv>
-        void subscribe(std::function<void(TEv &)> callback);
+        template <typename TEv, typename TCallback = std::function<void(TEv &)>>
+        void subscribe(TCallback callback);
 
         /**
          * @brief Fires the event of type TEv, and passes event as parameter for callbacks.
@@ -52,14 +58,17 @@ namespace msce
         void fire(TEv &event);
     };
 
-    template <typename TEv>
-    inline void EventManager::subscribe(std::function<void(TEv &)> callback)
+    template <typename TEv, typename TCallback>
+    inline void EventManager::subscribe(TCallback callback)
     {
         static_assert(std::is_base_of_v<BaseEvent, TEv>, "TEv must inherrit from BaseEvent");
         this->subscriptions_.emplace(std::type_index(typeid(TEv)),
                                      [cb = std::move(callback)](BaseEvent &ev)
                                      {
-                                         cb(static_cast<TEv &>(ev));
+                                         if constexpr (std::is_invocable_v<TCallback, TEv &>)
+                                             cb(static_cast<TEv &>(ev));
+                                         else
+                                             cb();
                                      });
     }
 

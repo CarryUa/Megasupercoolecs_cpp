@@ -77,7 +77,6 @@ namespace msce::macro_helpers
 /// @param ParentClass Name of the parent class type, whos members also need serialization.
 /// @param ... Names of members that need to be serialized.
 #define MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(ParentClass, ...)                                   \
-public:                                                                                                    \
     friend class ::cereal::access;                                                                         \
     /**  @brief Cereal's save function. Refer to their docs for more info.*/                               \
     template <class Archive>                                                                               \

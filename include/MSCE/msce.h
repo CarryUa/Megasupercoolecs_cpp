@@ -25,7 +25,7 @@
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 
 #include <MSCE/BuiltIns/transformComponent.hpp>
-
+#include <MSCE/BuiltIns/RenderComponents/baseRendererComponent.hpp>
 #include <MSCE/BuiltIns/graphicsSystem.h>
 #include <MSCE/BuiltIns/timeSystem.h>
 
@@ -35,7 +35,7 @@
 #include <MSCE/Managers/systemManager.h>
 #include <MSCE/Managers/eventManager.h>
 #include <MSCE/Managers/enumManager.h>
-#include <MSCE/Managers/shaderManager.h>
+// #include <MSCE/Managers/shaderManager.h>
 
 #include <MSCE/Prototypes/prototype.hpp>
 #include <MSCE/Prototypes/entityPrototype.hpp>

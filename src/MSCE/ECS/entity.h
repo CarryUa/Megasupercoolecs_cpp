@@ -25,8 +25,8 @@ namespace msce
         /**
          * @brief List of @ref msce::ComponentHandle 's attached to this entity.
          */
-        std::vector<ComponentHandle<IComponent>> components_;
-        size_t entity_id_;
+        std::vector<ComponentHandle<IComponent>> components_ = {};
+        size_t entity_id_ = 0;
 
     public:
         /**
@@ -149,6 +149,7 @@ namespace msce
 
         if (!has_component<TComp>())
         {
+            comp->set_owner(this);
             components_.push_back(static_cast<ComponentHandle<IComponent>>(comp));
         }
     }
@@ -160,6 +161,7 @@ namespace msce
         if (has_component<TComp>())
             detach_component<TComp>();
 
+        comp->set_owner(this);
         components_.push_back(static_cast<ComponentHandle<IComponent>>(comp));
     }
     template <typename TComp>

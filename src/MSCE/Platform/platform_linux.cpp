@@ -78,6 +78,14 @@ std::string msce::Platform::get_absolute_executable_path()
     return cached;
 }
 
+std::string msce::Platform::get_absolute_executable_directory_path()
+{
+    std::string exe_path = Platform::get_absolute_executable_path();
+
+    size_t pos = exe_path.find_last_of('/');
+    return exe_path.substr(0, pos);
+}
+
 msce::Platform::SourceInfo msce::Platform::resolve_shared_object_address_source(void *address)
 {
     SourceInfo res;

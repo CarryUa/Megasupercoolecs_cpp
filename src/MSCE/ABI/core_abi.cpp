@@ -39,7 +39,7 @@ MSCE_ABI_EXPORT_ATTRIB void msce_initialize_engine()
     static SystemManager g_system_manager;
     g_system_manager.init_all_systems();
     static EntityManager g_entity_manager;
-    static ShaderManager g_shader_manager;
+    // static ShaderManager g_shader_manager;
     static EventManager g_event_manager;
     static PrototypeManager g_prototype_manager;
     static ComponentManager g_component_manager;

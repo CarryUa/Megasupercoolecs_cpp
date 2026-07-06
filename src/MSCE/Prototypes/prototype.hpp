@@ -24,8 +24,10 @@ namespace msce
 #pragma region Prototype Macros
 
 #define MSCE_DEFINE_PROTOTYPE(ProtoType, ...)                                       \
-    MSCE_REFLECTION_DEFINE_CLASS(ProtoType)                                         \
+private:                                                                            \
     MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype, __VA_ARGS__) \
+public:                                                                             \
+    MSCE_REFLECTION_DEFINE_CLASS(ProtoType)                                         \
     virtual const ::msce::Type &get_type_info_polymorphic() override                \
     {                                                                               \
         static const ::msce::Type &t = ::msce::get_reflection_of_type(#ProtoType);  \

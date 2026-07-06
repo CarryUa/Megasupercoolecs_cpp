@@ -2,6 +2,7 @@
 
 msce::EnumManager::EnumManager() : registered_enum_factories_ref_(get_g_enum_factories_registry()), registered_enum_types_ref_(get_g_enum_types_vec())
 {
+    logger.log_info("Initialized EnumManager!");
 }
 
 msce::Enum msce::EnumManager::create_enum(const std::string &enum_name, int64_t value)

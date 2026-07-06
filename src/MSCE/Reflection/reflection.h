@@ -549,16 +549,16 @@ namespace msce
                 }
             }
         }
-        else
+        // else
+        // {
+        auto m = this->get_ptr<TValue>(object, o_type);
+        if (!m)
         {
-            auto m = this->get_ptr<TValue>(object, o_type);
-            if (!m)
-            {
-                logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name(), o_type.get_name());
-                return;
-            }
-            *m = value;
+            logger.log_error("Tried to set value of member '{}' in object {}, but said object has no such member", this->get_name(), o_type.get_name());
+            return;
         }
+        *m = value;
+        // }
     }
     template <typename TValue, ClassWithReflection TObject>
     inline TValue *MemberInfo::get_ptr(const TObject &object) const

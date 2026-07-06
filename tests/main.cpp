@@ -6,6 +6,7 @@
 #include <MSCE/Managers/entityManager.h>
 #include <MSCE/Managers/prototypeManager.h>
 #include <MSCE/Managers/eventManager.h>
+#include <MSCE/Managers/enumManager.h>
 
 #include <chrono>
 
@@ -14,11 +15,12 @@ using namespace msce;
 int main(int argc, char **argv)
 {
     static auto log = Logger("GLOBAL");
+    static EventManager evMan;
     static SystemManager sysMan;
     static ComponentManager compMan;
     static EntityManager entMan;
     static PrototypeManager protoMan;
-    static EventManager evMan;
+    static EnumManager enum_man;
 
     log.log_info("Starting tests");
     sysMan.init_all_systems();

@@ -22,6 +22,7 @@ namespace msce
         };
         static std::string demangle(const std::string &mangled, bool log = true) noexcept;
         static std::string get_absolute_executable_path();
+        static std::string get_absolute_executable_directory_path();
         static SourceInfo resolve_shared_object_address_source(void *address);
     };
 }

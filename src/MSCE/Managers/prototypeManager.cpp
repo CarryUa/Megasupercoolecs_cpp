@@ -2,21 +2,50 @@
 #include <fstream>
 #include <functional>
 
-#if defined(RELEASE)
-#include <cereal/archives/binary.hpp>
-#else
-#include <cereal/archives/json.hpp>
-#endif
-
-#include <cereal/types/memory.hpp>
+#include <MSCE/Serialization/serializer.h>
+#include <MSCE/Events/prototypeEvents.h>
+#include <MSCE/Managers/eventManager.h>
 
 using namespace std;
+
+namespace
+{
+    constexpr const char *prototype_extension = ".msceproto";
+}
+
+void msce::PrototypeManager::load_all_prototypes()
+{
+    logger.log_info("Loading prototypes...");
+    uint successes = 0, failures = 0;
+    for (auto e : std::filesystem::recursive_directory_iterator(Platform::get_absolute_executable_directory_path()))
+    {
+        if (!e.is_regular_file())
+            continue;
+
+        if (e.path().extension() == prototype_extension)
+        {
+            IPrototype *p = deserialize_prototype(e.path());
+
+            if (p == nullptr)
+                failures++;
+            else
+                successes++;
+        }
+    }
+    logger.log_info("Finished loading prototypes. total: {} | successes: {} | failures: {}", successes + failures, successes, failures);
+}
 
 msce::PrototypeManager::PrototypeManager()
     : registered_factories_ref(get_g_registered_prototype_factories()),
       registered_prototypes_ref(get_g_registered_prototypes())
 {
     logger.log_info("Initializing manager...");
+
+    PrototypeLoadingStartingEvent start_ev;
+    EventManager::instance->fire(start_ev);
+    load_all_prototypes();
+    PrototypeLoadingFinishedEvent fin_ev;
+    EventManager::instance->fire(fin_ev);
 }
 
 msce::IPrototype *msce::PrototypeManager::deserialize_prototype(const string &path)
@@ -32,20 +61,15 @@ msce::IPrototype *msce::PrototypeManager::deserialize_prototype(const string &pa
     {
         std::unique_ptr<msce::IPrototype> proto;
 
-#if defined(RELEASE)
-        cereal::BinaryInputArchive ar(file);
-        ar(proto);
-#else
-        cereal::JSONInputArchive ar(file);
-        ar(proto);
-#endif
+        Serializer::deserialize(proto, file);
+
         auto ptr = proto.get();
         this->prototypes_[proto->id] = std::move(proto);
         return ptr;
     }
     catch (const exception &e)
     {
-        logger.log_error("Couldn't deserialize prototype at '{}': ", e.what());
+        logger.log_error("Couldn't deserialize prototype at '{}': {}", path, e.what());
         return nullptr;
     }
     catch (...)
@@ -76,13 +100,7 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path, const 
     {
         auto &uptr_ref = this->prototypes_[id];
 
-#if defined(RELEASE)
-        cereal::BinaryOutputArchive ar(file);
-        ar(uptr_ref);
-#else
-        cereal::JSONOutputArchive ar(file);
-        ar(uptr_ref);
-#endif
+        Serializer::serialize(uptr_ref, file);
     }
     catch (const exception &e)
     {

@@ -23,6 +23,8 @@ namespace msce
         std::unordered_map<std::string, std::unique_ptr<IPrototype>> prototypes_;
         inline static Logger logger = Logger("PrototypeManager");
 
+        void load_all_prototypes();
+
     public:
         PrototypeManager();
 
