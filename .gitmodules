@@ -12,3 +12,9 @@
 [submodule "lib/boost/preprocessor"]
 	path = lib/boost/preprocessor
 	url = https://github.com/boostorg/preprocessor.git
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "lib/stb"]
+	path = lib/stb
+	url = https://github.com/nothings/stb.git

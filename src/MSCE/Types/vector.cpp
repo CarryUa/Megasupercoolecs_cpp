@@ -7,44 +7,28 @@ using namespace msce;
 
 static double round_to_digits(double value, int digits)
 {
-    double multiplier = std::pow(10.0, digits);
-    return std::round(value * multiplier) / multiplier;
+  double multiplier = std::pow(10.0, digits);
+  return std::round(value * multiplier) / multiplier;
 }
 
 static double clamp(double v, double max, double min)
 {
-    if (v > max)
-        return max;
-    if (v < min)
-        return min;
-    return v;
-}
-
-template <typename VecCT>
-Vector2D<VecCT>::Vector2D(VecCT x, VecCT y)
-{
-    this->x = x;
-    this->y = y;
-}
-
-template <typename VecCT>
-Vector2D<VecCT>::Vector2D(const Vector2D &other)
-{
-    this->x = other.x;
-    this->y = other.y;
+  if (v > max) return max;
+  if (v < min) return min;
+  return v;
 }
 
 template <typename VecCT>
 Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_radians(double a)
 {
-    return Vector2D<double>(cos(a), sin(a));
+  return Vector2D<double>(cos(a), sin(a));
 }
 
 template <typename VecCT>
 Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_degrees(double a)
 {
-    constexpr double pi_180th = M_PI / 180.0;
-    return Vector2D::create_unit_from_radians(a * pi_180th);
+  constexpr double pi_180th = M_PI / 180.0;
+  return Vector2D::create_unit_from_radians(a * pi_180th);
 }
 
 #pragma region Scalar Operations
@@ -52,61 +36,61 @@ Vector2D<double> msce::Vector2D<VecCT>::create_unit_from_degrees(double a)
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator+=(const VecCT &scalar)
 {
-    this->x += scalar;
-    this->y += scalar;
-    return *this;
+  this->x += scalar;
+  this->y += scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator+(const VecCT &scalar) const
 {
-    return Vector2D(this->x + scalar, this->y + scalar);
+  return Vector2D(this->x + scalar, this->y + scalar);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator-=(const VecCT &scalar)
 {
-    this->x -= scalar;
-    this->y -= scalar;
-    return *this;
+  this->x -= scalar;
+  this->y -= scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator-(const VecCT &scalar) const
 {
-    return Vector2D(this->x - scalar, this->y - scalar);
+  return Vector2D(this->x - scalar, this->y - scalar);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator*=(const VecCT &scalar)
 {
-    this->x *= scalar;
-    this->y *= scalar;
-    return *this;
+  this->x *= scalar;
+  this->y *= scalar;
+  return *this;
 }
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator*(const VecCT &scalar) const
 {
-    return Vector2D<VecCT>(this->x * scalar, this->y * scalar);
+  return Vector2D<VecCT>(this->x * scalar, this->y * scalar);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator/=(const VecCT &scalar)
 {
-    this->x /= scalar;
-    this->y /= scalar;
-    return *this;
+  this->x /= scalar;
+  this->y /= scalar;
+  return *this;
 }
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator/(const VecCT &scalar) const
 {
-    return Vector2D<VecCT>(this->x / scalar, this->y / scalar);
+  return Vector2D<VecCT>(this->x / scalar, this->y / scalar);
 }
 
 template <typename VecCT>
 bool Vector2D<VecCT>::operator==(const VecCT &scalar) const
 {
-    return (this->x == scalar && this->y == scalar);
+  return (this->x == scalar && this->y == scalar);
 }
 
 #pragma endregion
@@ -116,133 +100,129 @@ bool Vector2D<VecCT>::operator==(const VecCT &scalar) const
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator+=(const Vector2D &other)
 {
-    this->x += other.x;
-    this->y += other.y;
+  this->x += other.x;
+  this->y += other.y;
 
-    return *this;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator+(const Vector2D &other) const
 {
-    return Vector2D(this->x + other.x,
-                    this->y + other.y);
+  return Vector2D(this->x + other.x, this->y + other.y);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator-=(const Vector2D &other)
 {
-    this->x -= other.x;
-    this->y -= other.y;
+  this->x -= other.x;
+  this->y -= other.y;
 
-    return *this;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator-(const Vector2D &other) const
 {
-    return Vector2D(this->x - other.x,
-                    this->y - other.y);
+  return Vector2D(this->x - other.x, this->y - other.y);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator*=(const Vector2D &other)
 {
-    this->x *= other.x;
-    this->y *= other.y;
+  this->x *= other.x;
+  this->y *= other.y;
 
-    return *this;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator*(const Vector2D &other) const
 {
-    return Vector2D(this->x * other.x,
-                    this->y * other.y);
+  return Vector2D(this->x * other.x, this->y * other.y);
 }
 
 template <typename VecCT>
 Vector2D<VecCT> &Vector2D<VecCT>::operator/=(const Vector2D &other)
 {
-    this->x /= other.x;
-    this->y /= other.y;
+  this->x /= other.x;
+  this->y /= other.y;
 
-    return *this;
+  return *this;
 }
 
 template <typename VecCT>
 Vector2D<VecCT> Vector2D<VecCT>::operator/(const Vector2D &other) const
 {
-    return Vector2D(this->x / other.x,
-                    this->y / other.y);
+  return Vector2D(this->x / other.x, this->y / other.y);
 }
 
 template <typename VecCT>
 bool Vector2D<VecCT>::operator==(const Vector2D &other) const
 {
-    return (this->x == other.x && this->y == other.y);
+  return (this->x == other.x && this->y == other.y);
 }
 
 #pragma endregion
 
 #pragma region Other Functions
 
-template <typename VecCT>
-double Vector2D<VecCT>::length() const
+template <typename VecCT> double Vector2D<VecCT>::length() const
 {
-    // Pitagorasian theorem
-    return sqrt(static_cast<double>(this->x) * static_cast<double>(this->x) +
-                static_cast<double>(this->y) * static_cast<double>(this->y));
+  // Pitagorasian theorem
+  return sqrt(static_cast<double>(this->x) * static_cast<double>(this->x) +
+              static_cast<double>(this->y) * static_cast<double>(this->y));
 }
 
 template <typename VecCT>
 double Vector2D<VecCT>::dot(const Vector2D &other) const
 {
-    return static_cast<double>(this->x) * static_cast<double>(other.x) +
-           static_cast<double>(this->y) * static_cast<double>(other.y);
+  return static_cast<double>(this->x) * static_cast<double>(other.x) +
+         static_cast<double>(this->y) * static_cast<double>(other.y);
 }
 
 template <typename VecCT>
 double msce::Vector2D<VecCT>::cross(const Vector2D &other) const
 {
-    return this->x * other.y - this->y * other.x;
+  return this->x * other.y - this->y * other.x;
 }
 
-template <typename VecCT>
-Vector2D<double> Vector2D<VecCT>::normalized() const
+template <typename VecCT> Vector2D<double> Vector2D<VecCT>::normalized() const
 {
-    auto len = this->length();
-    if (len == 0.0)
-        return Vector2D<double>(0.0, 0.0);
+  auto len = this->length();
+  if (len == 0.0) return Vector2D<double>(0.0, 0.0);
 
-    return static_cast<Vector2D<double>>(*this) / len;
+  return static_cast<Vector2D<double>>(*this) / len;
 }
 
 template <typename VecCT>
 double Vector2D<VecCT>::normalized_dot(const Vector2D &other) const
 {
-    Vector2D<double> this_normalized = this->normalized();
-    Vector2D<double> other_normalized = other.normalized();
+  Vector2D<double> this_normalized = this->normalized();
+  Vector2D<double> other_normalized = other.normalized();
 
-    return round_to_digits(this_normalized.dot(other_normalized), 15);
+  return round_to_digits(this_normalized.dot(other_normalized), 15);
 }
 template <typename VecCT>
-double msce::Vector2D<VecCT>::get_angle_between_radians(const Vector2D<VecCT> &other) const noexcept
+double msce::Vector2D<VecCT>::get_angle_between_radians(
+    const Vector2D<VecCT> &other) const noexcept
 {
-    VecCT n_dot = this->normalized_dot(other);
-    clamp(n_dot, -1, 1);
+  VecCT n_dot = this->normalized_dot(other);
+  clamp(n_dot, -1, 1);
 
-    return acos(n_dot);
+  return acos(n_dot);
 }
 template <typename VecCT>
-double msce::Vector2D<VecCT>::get_angle_between_degrees(const Vector2D<VecCT> &other) const noexcept
+double msce::Vector2D<VecCT>::get_angle_between_degrees(
+    const Vector2D<VecCT> &other) const noexcept
 {
-    return get_angle_between_radians(other) * (180 / M_PI);
+  return get_angle_between_radians(other) * (180 / M_PI);
 }
 template <typename VecCT>
-VecCT msce::Vector2D<VecCT>::distance_to(const Vector2D<VecCT> &other) const noexcept
+VecCT msce::Vector2D<VecCT>::distance_to(
+    const Vector2D<VecCT> &other) const noexcept
 {
-    return std::abs(((*this) - other).length());
+  return std::abs(((*this) - other).length());
 }
 
 #pragma endregion
@@ -252,194 +232,180 @@ VecCT msce::Vector2D<VecCT>::distance_to(const Vector2D<VecCT> &other) const noe
 template <typename VecCT>
 msce::Vector3D<VecCT>::Vector3D(VecCT x, VecCT y, VecCT z)
 {
-    this->x = x;
-    this->y = y;
-    this->z = z;
+  this->x = x;
+  this->y = y;
+  this->z = z;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator+=(const VecCT &scalar)
 {
-    this->x += scalar;
-    this->y += scalar;
-    this->z += scalar;
-    return *this;
+  this->x += scalar;
+  this->y += scalar;
+  this->z += scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> msce::Vector3D<VecCT>::operator+(const VecCT &scalar) const
 {
-    return Vector3D<VecCT>(this->x + scalar,
-                           this->y + scalar,
-                           this->z + scalar);
+  return Vector3D<VecCT>(this->x + scalar, this->y + scalar, this->z + scalar);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator-=(const VecCT &scalar)
 {
-    this->x -= scalar;
-    this->y -= scalar;
-    this->z -= scalar;
-    return *this;
+  this->x -= scalar;
+  this->y -= scalar;
+  this->z -= scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> msce::Vector3D<VecCT>::operator-(const VecCT &scalar) const
 {
-    return Vector3D<VecCT>(this->x - scalar,
-                           this->y - scalar,
-                           this->z - scalar);
+  return Vector3D<VecCT>(this->x - scalar, this->y - scalar, this->z - scalar);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator*=(const VecCT &scalar)
 {
-    this->x *= scalar;
-    this->y *= scalar;
-    this->z *= scalar;
-    return *this;
+  this->x *= scalar;
+  this->y *= scalar;
+  this->z *= scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> msce::Vector3D<VecCT>::operator*(const VecCT &scalar) const
 {
-    return Vector3D<VecCT>(this->x * scalar,
-                           this->y * scalar,
-                           this->z * scalar);
+  return Vector3D<VecCT>(this->x * scalar, this->y * scalar, this->z * scalar);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator/=(const VecCT &scalar)
 {
-    this->x /= scalar;
-    this->y /= scalar;
-    this->z /= scalar;
-    return *this;
+  this->x /= scalar;
+  this->y /= scalar;
+  this->z /= scalar;
+  return *this;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> msce::Vector3D<VecCT>::operator/(const VecCT &scalar) const
 {
-    return Vector3D<VecCT>(this->x / scalar,
-                           this->y / scalar,
-                           this->z / scalar);
+  return Vector3D<VecCT>(this->x / scalar, this->y / scalar, this->z / scalar);
 }
 
-template <typename VecCT>
-double msce::Vector3D<VecCT>::length() const
+template <typename VecCT> double msce::Vector3D<VecCT>::length() const
 {
-    return sqrt(static_cast<double>(this->x) * static_cast<double>(this->x) +
-                static_cast<double>(this->y) * static_cast<double>(this->y) +
-                static_cast<double>(this->z) * static_cast<double>(this->z));
+  return sqrt(static_cast<double>(this->x) * static_cast<double>(this->x) +
+              static_cast<double>(this->y) * static_cast<double>(this->y) +
+              static_cast<double>(this->z) * static_cast<double>(this->z));
 }
 
 template <typename VecCT>
 double msce::Vector3D<VecCT>::dot(const Vector3D<VecCT> &other) const
 {
-    return static_cast<double>(this->x) * static_cast<double>(other.x) +
-           static_cast<double>(this->y) * static_cast<double>(other.y) +
-           static_cast<double>(this->z) * static_cast<double>(other.z);
+  return static_cast<double>(this->x) * static_cast<double>(other.x) +
+         static_cast<double>(this->y) * static_cast<double>(other.y) +
+         static_cast<double>(this->z) * static_cast<double>(other.z);
 }
 
 template <typename VecCT>
 double msce::Vector3D<VecCT>::normalized_dot(const Vector3D<VecCT> &other) const
 {
-    const Vector3D<double> other_normalized = other.normalized();
-    const Vector3D<double> this_normalized = this->normalized();
-    return round_to_digits(this_normalized.dot(other_normalized), 15);
+  const Vector3D<double> other_normalized = other.normalized();
+  const Vector3D<double> this_normalized = this->normalized();
+  return round_to_digits(this_normalized.dot(other_normalized), 15);
 }
 
 template <typename VecCT>
 bool msce::Vector3D<VecCT>::operator==(const VecCT &scalar) const
 {
-    return this->x == scalar &&
-           this->y == scalar &&
-           this->z == scalar;
+  return this->x == scalar && this->y == scalar && this->z == scalar;
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator+=(const Vector3D<VecCT> &other)
 {
-    this->x += other.x;
-    this->y += other.y;
-    this->z += other.z;
-    return *this;
+  this->x += other.x;
+  this->y += other.y;
+  this->z += other.z;
+  return *this;
 }
 
 template <typename VecCT>
-Vector3D<VecCT> msce::Vector3D<VecCT>::operator+(const Vector3D<VecCT> &other) const
+Vector3D<VecCT>
+msce::Vector3D<VecCT>::operator+(const Vector3D<VecCT> &other) const
 {
-    return Vector3D<VecCT>(this->x + other.x,
-                           this->y + other.y,
-                           this->z + other.z);
+  return Vector3D<VecCT>(this->x + other.x, this->y + other.y,
+                         this->z + other.z);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator-=(const Vector3D<VecCT> &other)
 {
-    this->x -= other.x;
-    this->y -= other.y;
-    this->z -= other.z;
-    return *this;
+  this->x -= other.x;
+  this->y -= other.y;
+  this->z -= other.z;
+  return *this;
 }
 
 template <typename VecCT>
-Vector3D<VecCT> msce::Vector3D<VecCT>::operator-(const Vector3D<VecCT> &other) const
+Vector3D<VecCT>
+msce::Vector3D<VecCT>::operator-(const Vector3D<VecCT> &other) const
 {
-    return Vector3D<VecCT>(this->x - other.x,
-                           this->y - other.y,
-                           this->z - other.z);
+  return Vector3D<VecCT>(this->x - other.x, this->y - other.y,
+                         this->z - other.z);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator*=(const Vector3D<VecCT> &other)
 {
-    this->x *= other.x;
-    this->y *= other.y;
-    this->z *= other.z;
-    return *this;
+  this->x *= other.x;
+  this->y *= other.y;
+  this->z *= other.z;
+  return *this;
 }
 
 template <typename VecCT>
-Vector3D<VecCT> msce::Vector3D<VecCT>::operator*(const Vector3D<VecCT> &other) const
+Vector3D<VecCT>
+msce::Vector3D<VecCT>::operator*(const Vector3D<VecCT> &other) const
 {
-    return Vector3D<VecCT>(this->x * other.x,
-                           this->y * other.y,
-                           this->z * other.z);
+  return Vector3D<VecCT>(this->x * other.x, this->y * other.y,
+                         this->z * other.z);
 }
 
 template <typename VecCT>
 Vector3D<VecCT> &msce::Vector3D<VecCT>::operator/=(const Vector3D<VecCT> &other)
 {
-    this->x /= other.x;
-    this->y /= other.y;
-    this->z /= other.z;
-    return *this;
+  this->x /= other.x;
+  this->y /= other.y;
+  this->z /= other.z;
+  return *this;
 }
 
 template <typename VecCT>
-Vector3D<VecCT> msce::Vector3D<VecCT>::operator/(const Vector3D<VecCT> &other) const
+Vector3D<VecCT>
+msce::Vector3D<VecCT>::operator/(const Vector3D<VecCT> &other) const
 {
-    return Vector3D<VecCT>(this->x / other.x,
-                           this->y / other.y,
-                           this->z / other.z);
+  return Vector3D<VecCT>(this->x / other.x, this->y / other.y,
+                         this->z / other.z);
 }
 
 template <typename VecCT>
 Vector3D<double> msce::Vector3D<VecCT>::normalized() const
 {
-    auto len = this->length();
-    if (len == 0)
-        return Vector3D<double>(0, 0);
-    return static_cast<Vector3D<double>>(*this) / len;
+  auto len = this->length();
+  if (len == 0) return Vector3D<double>(0, 0);
+  return static_cast<Vector3D<double>>(*this) / len;
 }
 
 template <typename VecCT>
 bool msce::Vector3D<VecCT>::operator==(const Vector3D<VecCT> &other) const
 {
-    return this->x == other.x &&
-           this->y == other.y &&
-           this->z == other.z;
+  return this->x == other.x && this->y == other.y && this->z == other.z;
 }
 
 #pragma endregion

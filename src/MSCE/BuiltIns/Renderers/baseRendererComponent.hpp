@@ -1,0 +1,23 @@
+#pragma once
+#include <MSCE/ECS/component.h>
+#include <MSCE/Graphics/color.h>
+#include <MSCE/Graphics/shaders.h>
+
+namespace msce
+{
+
+struct BaseRendererComponent : public BaseComponent<BaseRendererComponent>
+{
+private:
+  std::string shader_id_ = "DefaultShader";
+
+public:
+  Color color = Colors::white;
+
+  virtual std::string &shader_id() noexcept { return shader_id_; }
+
+  MSCE_DEFINE_COMPONENT(BaseRendererComponent, color, shader_id_)
+};
+
+} // namespace msce
+MSCE_REGISTER_COMPONENT(msce::BaseRendererComponent)

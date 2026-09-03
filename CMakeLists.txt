@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DRELEASE")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -DDEBUG")
 set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-g")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_STANDARD 20)
 
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-invalid-offsetof>)
 add_compile_options(-Wno-pointer-arith )
@@ -64,6 +65,7 @@ add_subdirectory(src/MSCE/Prototypes)
 add_subdirectory(src/MSCE/ABI)
 
 
+
 add_subdirectory(tests)
 
 add_executable(run dummy.cpp)
@@ -72,6 +74,8 @@ target_include_directories(run PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
+add_subdirectory(lib/boost/preprocessor)
+add_subdirectory(lib/zlib)
 
 set(BUILD_DOC OFF CACHE BOOL "" FORCE)
 set(BUILD_SANDBOX OFF CACHE BOOL "" FORCE)
@@ -79,7 +83,6 @@ set(SKIP_PERFORMANCE_COMPARISON ON CACHE BOOL "" FORCE)
 set(WITH_WERROR OFF CACHE BOOL "" FORCE)
 add_subdirectory(lib/cereal)
 
-add_subdirectory(lib/boost/preprocessor)
 
 # Link libraries
 target_link_libraries(${MSCE_TARGET}
@@ -88,12 +91,17 @@ target_link_libraries(${MSCE_TARGET}
                         cereal
                         boost_preprocessor
                         dl
-                        dw)    
+                        dw
+                        zlib)    
 
 # Include dirs
-target_include_directories(${MSCE_TARGET} PUBLIC src)
-target_include_directories(${MSCE_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_include_directories(${MSCE_TARGET} PRIVATE src/MSCE)
-target_include_directories(${MSCE_TARGET} PUBLIC lib/cereal/include)
-target_include_directories(${MSCE_TARGET} PRIVATE lib/boost/include)
-target_include_directories(${MSCE_TARGET} PRIVATE lib/libglfw/include)
+target_include_directories(${MSCE_TARGET} PUBLIC src
+                          PRIVATE ${CMAKE_SOURCE_DIR}/include
+                          PRIVATE src/MSCE
+                          PRIVATE lib/boost/include
+                          PRIVATE lib/libglfw/include
+                          PRIVATE lib/libglfw/include
+                          PUBLIC lib/cereal/include
+                          PUBLIC lib/zlib
+                          PUBLIC lib
+                          )

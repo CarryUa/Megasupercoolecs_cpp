@@ -10,51 +10,55 @@
 
 namespace msce
 {
-    /**
-     * @brief This is @ref msce::SmartHandle alias for entity manager.
-     */
-    using EntityHandle = SmartHandle<SmartUniquePointerList<Entity>, Entity>;
+/**
+ * @brief This is @ref msce::SmartHandle alias for entity manager.
+ */
+using EntityHandle = SmartHandle<SmartUniquePointerList<Entity>, Entity>;
 
-    /**
-     * @brief Manages entities lifetime. Always use if for any entity manipulation
-     */
-    class EntityManager : public Singleton<EntityManager>
-    {
-    private:
-        /// @brief Entity storage.
-        SmartUniquePointerList<Entity> entities_;
-        inline static Logger logger = Logger("EntityManager");
+/**
+ * @brief Manages entities lifetime. Always use if for any entity manipulation
+ */
+class EntityManager : public Singleton<EntityManager>
+{
+private:
+  /// @brief Entity storage.
+  SmartUniquePointerList<Entity> entities_;
+  inline static Logger logger = Logger("EntityManager");
 
-    public:
-        EntityManager();
+public:
+  EntityManager();
 
-        /**
-         * @brief Creates an empty entity.
-         * @return @ref msce::EntityHandle of created entity.
-         */
-        EntityHandle create_entity();
+  /**
+   * @brief Creates an empty entity.
+   * @return @ref msce::EntityHandle of created entity.
+   */
+  EntityHandle create_entity();
 
-        /**
-         * @brief Copies provided entity.
-         * @param other @ref msce::EntityHandle of source entity.
-         * @return @ref msce::EntityHandle of the copy of source entity.
-         */
-        EntityHandle copy_entity(EntityHandle other);
+  /**
+   * @brief Copies provided entity.
+   * @param other @ref msce::EntityHandle of source entity.
+   * @return @ref msce::EntityHandle of the copy of source entity.
+   */
+  EntityHandle copy_entity(EntityHandle other);
 
-        /**
-         * @brief Destroys provided entity.
-         * @param other @ref msce::EntityHandle of entity to be destroyed.
-         * @note Note that it will also destroy all of this entity's components.
-         */
-        bool destroy_entity(EntityHandle other);
+  /**
+   * @brief Destroys provided entity.
+   * @param other @ref msce::EntityHandle of entity to be destroyed.
+   * @note Note that it will also destroy all of this entity's components.
+   */
+  bool destroy_entity(EntityHandle other);
 
-        /**
-         * @brief Gets the entity stored under given id.
-         * @param id The id of the entity.
-         * @return @ref msce::EntityHandle of an entity under id or nullhandle.
-         */
-        EntityHandle get_entity(uint32_t id);
-    };
-}
+  /**
+   * @brief Gets the entity stored under given id.
+   * @param id The id of the entity.
+   * @return @ref msce::EntityHandle of an entity under id or nullhandle.
+   */
+  EntityHandle get_entity(uint32_t id);
+
+  void do_for_each_entity(std::function<void(EntityHandle &)> callback);
+
+  std::vector<EntityHandle> get_entities();
+};
+} // namespace msce
 
 #endif // MSCE_ENTITY_MANAGER_H_

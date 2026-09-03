@@ -4,187 +4,194 @@
 
 namespace msce
 {
-    /// @brief 2D Vector structure with basic operations.
-    template <typename VecCT>
-    struct Vector2D
-    {
-    private:
-        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y)
-    public:
-        VecCT x;
-        VecCT y;
-        Vector2D(VecCT x = 0, VecCT y = 0);
-        Vector2D(const Vector2D &Other);
+/// @brief 2D Vector structure with basic operations.
+template <typename VecCT> struct Vector2D
+{
+private:
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y)
+public:
+  VecCT x;
+  VecCT y;
+  constexpr Vector2D(VecCT x = 0, VecCT y = 0)
+  {
+    this->x = x;
+    this->y = y;
+  }
 
-        static Vector2D<double> create_unit_from_radians(double);
-        static Vector2D<double> create_unit_from_degrees(double);
+  constexpr Vector2D(const Vector2D &other)
+  {
+    this->x = other.x;
+    this->y = other.y;
+  }
 
-        // Scalar operations
-        Vector2D &operator+=(const VecCT &scalar);
-        Vector2D operator+(const VecCT &scalar) const;
+  static Vector2D<double> create_unit_from_radians(double);
+  static Vector2D<double> create_unit_from_degrees(double);
 
-        Vector2D &operator-=(const VecCT &scalar);
-        Vector2D operator-(const VecCT &scalar) const;
+  // Scalar operations
+  Vector2D &operator+=(const VecCT &scalar);
+  Vector2D operator+(const VecCT &scalar) const;
 
-        Vector2D &operator*=(const VecCT &scalar);
-        Vector2D operator*(const VecCT &scalar) const;
+  Vector2D &operator-=(const VecCT &scalar);
+  Vector2D operator-(const VecCT &scalar) const;
 
-        Vector2D &operator/=(const VecCT &scalar);
-        Vector2D operator/(const VecCT &scalar) const;
+  Vector2D &operator*=(const VecCT &scalar);
+  Vector2D operator*(const VecCT &scalar) const;
 
-        /// @brief Calculates the length of a vector.
-        /// @return Length of the vector of given type.
-        double length() const;
+  Vector2D &operator/=(const VecCT &scalar);
+  Vector2D operator/(const VecCT &scalar) const;
 
-        /// @brief Calculates the dot(aka scalar) product of 2 vectors.
-        /// @param other The second vector.
-        /// @return The dot(aka scalar) product of given type.
-        double dot(const Vector2D &other) const;
-        double cross(const Vector2D &other) const;
+  /// @brief Calculates the length of a vector.
+  /// @return Length of the vector of given type.
+  double length() const;
 
-        /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were normalized
-        /// @param other The second vector.
-        /// @return The dot(aka scalar) product of given type.
-        double normalized_dot(const Vector2D &other) const;
+  /// @brief Calculates the dot(aka scalar) product of 2 vectors.
+  /// @param other The second vector.
+  /// @return The dot(aka scalar) product of given type.
+  double dot(const Vector2D &other) const;
+  double cross(const Vector2D &other) const;
 
-        double get_angle_between_radians(const Vector2D<VecCT> &other) const noexcept;
-        double get_angle_between_degrees(const Vector2D<VecCT> &other) const noexcept;
+  /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were
+  /// normalized
+  /// @param other The second vector.
+  /// @return The dot(aka scalar) product of given type.
+  double normalized_dot(const Vector2D &other) const;
 
-        VecCT distance_to(const Vector2D<VecCT> &) const noexcept;
+  double get_angle_between_radians(const Vector2D<VecCT> &other) const noexcept;
+  double get_angle_between_degrees(const Vector2D<VecCT> &other) const noexcept;
 
-        bool operator==(const VecCT &scalar) const;
+  VecCT distance_to(const Vector2D<VecCT> &) const noexcept;
 
-        // Vector functions
+  bool operator==(const VecCT &scalar) const;
 
-        Vector2D &operator+=(const Vector2D &other);
-        Vector2D operator+(const Vector2D &other) const;
+  // Vector functions
 
-        Vector2D &operator-=(const Vector2D &other);
-        Vector2D operator-(const Vector2D &other) const;
+  Vector2D &operator+=(const Vector2D &other);
+  Vector2D operator+(const Vector2D &other) const;
 
-        Vector2D &operator*=(const Vector2D &other);
-        Vector2D operator*(const Vector2D &other) const;
+  Vector2D &operator-=(const Vector2D &other);
+  Vector2D operator-(const Vector2D &other) const;
 
-        Vector2D &operator/=(const Vector2D &other);
-        Vector2D operator/(const Vector2D &other) const;
+  Vector2D &operator*=(const Vector2D &other);
+  Vector2D operator*(const Vector2D &other) const;
 
-        /// @brief Calculates the normalized vector that points in a same direction as on current one.
-        /// @return Normalized vector.
-        Vector2D<double> normalized() const;
+  Vector2D &operator/=(const Vector2D &other);
+  Vector2D operator/(const Vector2D &other) const;
 
-        bool operator==(const Vector2D &other) const;
+  /// @brief Calculates the normalized vector that points in a same direction as
+  /// on current one.
+  /// @return Normalized vector.
+  Vector2D<double> normalized() const;
 
-        // Casts
-        template <typename NewVecCT>
-        operator Vector2D<NewVecCT>() const;
-    };
+  bool operator==(const Vector2D &other) const;
 
-    /// @brief 3D Vector structure with basic operations.
-    template <typename VecCT>
-    struct Vector3D
-    {
-        VecCT x;
-        VecCT y;
-        VecCT z;
-        Vector3D(VecCT x = 0, VecCT y = 0, VecCT z = 0);
-        // Vector3D(const Vector3D<VecCT>&Other);
+  // Casts
+  template <typename NewVecCT> operator Vector2D<NewVecCT>() const;
+};
 
-        // Scalar operations
-        Vector3D<VecCT> &operator+=(const VecCT &scalar);
-        Vector3D<VecCT> operator+(const VecCT &scalar) const;
+/// @brief 3D Vector structure with basic operations.
+template <typename VecCT> struct Vector3D
+{
+  VecCT x;
+  VecCT y;
+  VecCT z;
+  Vector3D(VecCT x = 0, VecCT y = 0, VecCT z = 0);
+  // Vector3D(const Vector3D<VecCT>&Other);
 
-        Vector3D<VecCT> &operator-=(const VecCT &scalar);
-        Vector3D<VecCT> operator-(const VecCT &scalar) const;
+  // Scalar operations
+  Vector3D<VecCT> &operator+=(const VecCT &scalar);
+  Vector3D<VecCT> operator+(const VecCT &scalar) const;
 
-        Vector3D<VecCT> &operator*=(const VecCT &scalar);
-        Vector3D<VecCT> operator*(const VecCT &scalar) const;
+  Vector3D<VecCT> &operator-=(const VecCT &scalar);
+  Vector3D<VecCT> operator-(const VecCT &scalar) const;
 
-        Vector3D<VecCT> &operator/=(const VecCT &scalar);
-        Vector3D<VecCT> operator/(const VecCT &scalar) const;
+  Vector3D<VecCT> &operator*=(const VecCT &scalar);
+  Vector3D<VecCT> operator*(const VecCT &scalar) const;
 
-        /// @brief Calculates the length of a vector.
-        /// @return Length of the vector of given type.
-        double length() const;
+  Vector3D<VecCT> &operator/=(const VecCT &scalar);
+  Vector3D<VecCT> operator/(const VecCT &scalar) const;
 
-        /// @brief Calculates the dot(aka scalar) product of 2 vectors.
-        /// @param other The second vector.
-        /// @return The dot(aka scalar) product of given type.
-        double dot(const Vector3D<VecCT> &other) const;
+  /// @brief Calculates the length of a vector.
+  /// @return Length of the vector of given type.
+  double length() const;
 
-        /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were normalized
-        /// @param other The second vector.
-        /// @return The dot(aka scalar) product of given type.
-        double normalized_dot(const Vector3D<VecCT> &other) const;
+  /// @brief Calculates the dot(aka scalar) product of 2 vectors.
+  /// @param other The second vector.
+  /// @return The dot(aka scalar) product of given type.
+  double dot(const Vector3D<VecCT> &other) const;
 
-        bool operator==(const VecCT &scalar) const;
+  /// @brief Calculates dot(aka scalar) product of 2 vectors as if they were
+  /// normalized
+  /// @param other The second vector.
+  /// @return The dot(aka scalar) product of given type.
+  double normalized_dot(const Vector3D<VecCT> &other) const;
 
-        // Vector functions
+  bool operator==(const VecCT &scalar) const;
 
-        Vector3D<VecCT> &operator+=(const Vector3D<VecCT> &other);
-        Vector3D<VecCT> operator+(const Vector3D<VecCT> &other) const;
+  // Vector functions
 
-        Vector3D<VecCT> &operator-=(const Vector3D<VecCT> &other);
-        Vector3D<VecCT> operator-(const Vector3D<VecCT> &other) const;
+  Vector3D<VecCT> &operator+=(const Vector3D<VecCT> &other);
+  Vector3D<VecCT> operator+(const Vector3D<VecCT> &other) const;
 
-        Vector3D<VecCT> &operator*=(const Vector3D<VecCT> &other);
-        Vector3D<VecCT> operator*(const Vector3D<VecCT> &other) const;
+  Vector3D<VecCT> &operator-=(const Vector3D<VecCT> &other);
+  Vector3D<VecCT> operator-(const Vector3D<VecCT> &other) const;
 
-        Vector3D<VecCT> &operator/=(const Vector3D<VecCT> &other);
-        Vector3D<VecCT> operator/(const Vector3D<VecCT> &other) const;
+  Vector3D<VecCT> &operator*=(const Vector3D<VecCT> &other);
+  Vector3D<VecCT> operator*(const Vector3D<VecCT> &other) const;
 
-        /// @brief Calculates the normalized vector that points in a same direction as on current one.
-        /// @return Normalized vector.
-        Vector3D<double> normalized() const;
+  Vector3D<VecCT> &operator/=(const Vector3D<VecCT> &other);
+  Vector3D<VecCT> operator/(const Vector3D<VecCT> &other) const;
 
-        bool operator==(const Vector3D<VecCT> &other) const;
+  /// @brief Calculates the normalized vector that points in a same direction as
+  /// on current one.
+  /// @return Normalized vector.
+  Vector3D<double> normalized() const;
 
-        // Casts
-        template <typename NewVecCT>
-        operator Vector3D<NewVecCT>() const;
+  bool operator==(const Vector3D<VecCT> &other) const;
 
-    private:
-        MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y, z)
-    };
+  // Casts
+  template <typename NewVecCT> operator Vector3D<NewVecCT>() const;
 
-    template <typename VecCT>
-    template <typename NewVecCT>
-    inline Vector2D<VecCT>::operator Vector2D<NewVecCT>() const
-    {
-        return Vector2D<NewVecCT>(
-            static_cast<NewVecCT>(this->x),
-            static_cast<NewVecCT>(this->y));
-    }
+private:
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(x, y, z)
+};
 
-    template <typename VecCT>
-    template <typename NewVecCT>
-    inline Vector3D<VecCT>::operator Vector3D<NewVecCT>() const
-    {
-        return Vector3D<NewVecCT>(
-            static_cast<NewVecCT>(this->x),
-            static_cast<NewVecCT>(this->y),
-            static_cast<NewVecCT>(this->z));
-    }
-
-    using vec2i = Vector2D<int>;
-    using vec2ui = Vector2D<unsigned int>;
-    using vec2f = Vector2D<float>;
-    using vec2c = Vector2D<char>;
-    using vec2uc = Vector2D<unsigned char>;
-    using vec2d = Vector2D<double>;
-    using vec2i64 = Vector2D<long>;
-    using vec2ui64 = Vector2D<unsigned long>;
-    using vec2l = Vector2D<long>;
-    using vec2ul = Vector2D<unsigned long>;
-
-    using vec3i = Vector3D<int>;
-    using vec3ui = Vector3D<unsigned int>;
-    using vec3f = Vector3D<float>;
-    using vec3c = Vector3D<char>;
-    using vec3uc = Vector3D<unsigned char>;
-    using vec3d = Vector3D<double>;
-    using vec3i64 = Vector3D<long>;
-    using vec3ui64 = Vector3D<unsigned long>;
-    using vec3l = Vector3D<long>;
-    using vec3ul = Vector3D<unsigned long>;
+template <typename VecCT>
+template <typename NewVecCT>
+inline Vector2D<VecCT>::operator Vector2D<NewVecCT>() const
+{
+  return Vector2D<NewVecCT>(static_cast<NewVecCT>(this->x),
+                            static_cast<NewVecCT>(this->y));
 }
+
+template <typename VecCT>
+template <typename NewVecCT>
+inline Vector3D<VecCT>::operator Vector3D<NewVecCT>() const
+{
+  return Vector3D<NewVecCT>(static_cast<NewVecCT>(this->x),
+                            static_cast<NewVecCT>(this->y),
+                            static_cast<NewVecCT>(this->z));
+}
+
+using vec2i = Vector2D<int>;
+using vec2ui = Vector2D<unsigned int>;
+using vec2f = Vector2D<float>;
+using vec2c = Vector2D<char>;
+using vec2uc = Vector2D<unsigned char>;
+using vec2d = Vector2D<double>;
+using vec2i64 = Vector2D<long>;
+using vec2ui64 = Vector2D<unsigned long>;
+using vec2l = Vector2D<long>;
+using vec2ul = Vector2D<unsigned long>;
+
+using vec3i = Vector3D<int>;
+using vec3ui = Vector3D<unsigned int>;
+using vec3f = Vector3D<float>;
+using vec3c = Vector3D<char>;
+using vec3uc = Vector3D<unsigned char>;
+using vec3d = Vector3D<double>;
+using vec3i64 = Vector3D<long>;
+using vec3ui64 = Vector3D<unsigned long>;
+using vec3l = Vector3D<long>;
+using vec3ul = Vector3D<unsigned long>;
+} // namespace msce
 #endif // _MSCE_VECTORS_H

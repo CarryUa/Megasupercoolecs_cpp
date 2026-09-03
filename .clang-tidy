@@ -22,3 +22,5 @@ CheckOptions:
     value: UPPER_CASE
   - key: readability-identifier-naming.IgnoreMainLikeFunctions
     value: "1"
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: UPPER_CASE

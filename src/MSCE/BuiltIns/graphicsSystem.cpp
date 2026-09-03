@@ -19,10 +19,6 @@ msce::GraphicsSystem::GraphicsSystem()
     this->comp_man_ = ComponentManager::instance;
 }
 
-void msce::GraphicsSystem::pre_rended_all_objects_on_window(MSCEWindow *window)
-{
-}
-
 MSCEWindow *GraphicsSystem::get_window(size_t id)
 {
     if (this->windows_.size() <= id)

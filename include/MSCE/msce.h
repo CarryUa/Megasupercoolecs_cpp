@@ -25,7 +25,9 @@
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 
 #include <MSCE/BuiltIns/transformComponent.hpp>
-#include <MSCE/BuiltIns/RenderComponents/baseRendererComponent.hpp>
+#include <MSCE/BuiltIns/Renderers/baseRendererSystem.h>
+#include <MSCE/BuiltIns/Renderers/spriteRendererSystem.h>
+#include <MSCE/BuiltIns/Renderers/baseRendererComponent.hpp>
 #include <MSCE/BuiltIns/graphicsSystem.h>
 #include <MSCE/BuiltIns/timeSystem.h>
 

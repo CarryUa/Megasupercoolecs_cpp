@@ -4,6 +4,7 @@
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Events/event.h>
+#include <MSCE/Events/graphicsEvents.h>
 #include <unordered_map>
 #include <type_traits>
 #include <typeindex>
@@ -11,78 +12,97 @@
 
 namespace msce
 {
-#define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback) EventManager::instance->subscribe<Event>(Callback)
+struct ph
+{
+  static void fn(ObjectBeingRenderedEvent &ev);
+};
 
-#define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback) EventManager::instance->subscribe<Event>([this](auto &ev) {\
-     if constexpr (requires { this->Callback(ev); })                            \
-            {                                                                   \
-                this->Callback(ev);                                             \
-            }                                                                   \
-            else                                                                \
-            {                                                                   \
-                this->Callback();                                               \
-            } })
+#define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback)                               \
+  EventManager::instance->subscribe<Event>(Callback)
 
-    /**
-     *  @brief Manages registration and invocation(firing) of events.
-     */
-    class EventManager : public Singleton<EventManager>
-    {
-    private:
-        inline static Logger logger = Logger("EventManager");
+#define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback)                    \
+  EventManager::instance->subscribe<Event>(                                    \
+      [this](auto &ev)                                                         \
+      {                                                                        \
+        if constexpr (requires { this->Callback(ev); })                        \
+        {                                                                      \
+          this->Callback(ev);                                                  \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+          this->Callback();                                                    \
+        }                                                                      \
+      })
 
-        /**
-         * @brief Stores individual event subscriptions.
-         * @note Essentially a subscription is simply a pair of event type and callback function.
-         */
-        std::unordered_multimap<std::type_index, std::function<void(BaseEvent &)>>
-            subscriptions_;
+/**
+ *  @brief Manages registration and invocation(firing) of events.
+ */
+class EventManager : public Singleton<EventManager>
+{
+private:
+  inline static Logger logger = Logger("EventManager");
 
-    public:
-        EventManager();
+  /**
+   * @brief Stores individual event subscriptions.
+   * @note Essentially a subscription is simply a pair of event type and
+   * callback function.
+   */
+  std::unordered_multimap<std::type_index, std::function<void(BaseEvent &)>>
+      subscriptions_;
 
-        /**
-         * @brief Subsctibes callback to an event of type TEv.
-         * @tparam TEv type of event
-         * @note Note that regardless of event instance, callback subscribes to event @b type. The event instance is used as args passed into callback parameter.
-         */
-        template <typename TEv, typename TCallback = std::function<void(TEv &)>>
-        void subscribe(TCallback callback);
+  std::vector<void (*)(ObjectBeingRenderedEvent &)> render_events_;
 
-        /**
-         * @brief Fires the event of type TEv, and passes event as parameter for callbacks.
-         * @tparam TEv type of event to be fired.
-         * @param event TEv instance passed as parameter for callbacks.
-         */
-        template <typename TEv>
-        void fire(TEv &event);
-    };
+public:
+  EventManager();
 
-    template <typename TEv, typename TCallback>
-    inline void EventManager::subscribe(TCallback callback)
-    {
-        static_assert(std::is_base_of_v<BaseEvent, TEv>, "TEv must inherrit from BaseEvent");
-        this->subscriptions_.emplace(std::type_index(typeid(TEv)),
-                                     [cb = std::move(callback)](BaseEvent &ev)
-                                     {
-                                         if constexpr (std::is_invocable_v<TCallback, TEv &>)
-                                             cb(static_cast<TEv &>(ev));
-                                         else
-                                             cb();
-                                     });
-    }
+  /**
+   * @brief Subsctibes callback to an event of type TEv.
+   * @tparam TEv type of event
+   * @note Note that regardless of event instance, callback subscribes to event
+   * @b type. The event instance is used as args passed into callback parameter.
+   */
+  template <typename TEv, typename TCallback = std::function<void(TEv &)>>
+  void subscribe(TCallback callback);
 
-    template <typename TEv>
-    inline void EventManager::fire(TEv &event)
-    {
-        static_assert(std::is_base_of_v<BaseEvent, TEv>, "TEv must inherrit from BaseEvent");
-        auto range = this->subscriptions_.equal_range(std::type_index(typeid(TEv)));
+  void subsctibe_render_event(void (*callback)(ObjectBeingRenderedEvent &));
+  void fire_render_event(ObjectBeingRenderedEvent &event);
 
-        for (auto ev = range.first; ev != range.second; ++ev)
-        {
-            ev->second(static_cast<BaseEvent &>(event));
-        }
-    }
+  /**
+   * @brief Fires the event of type TEv, and passes event as parameter for
+   * callbacks.
+   * @tparam TEv type of event to be fired.
+   * @param event TEv instance passed as parameter for callbacks.
+   */
+  template <typename TEv> void fire(TEv &event);
+};
+
+template <typename TEv, typename TCallback>
+inline void EventManager::subscribe(TCallback callback)
+{
+  static_assert(std::is_base_of_v<BaseEvent, TEv>,
+                "TEv must inherrit from BaseEvent");
+  this->subscriptions_.emplace(
+      std::type_index(typeid(TEv)),
+      [cb = std::move(callback)](BaseEvent &ev)
+      {
+        if constexpr (std::is_invocable_v<TCallback, TEv &>)
+          cb(static_cast<TEv &>(ev));
+        else
+          cb();
+      });
 }
+
+template <typename TEv> inline void EventManager::fire(TEv &event)
+{
+  static_assert(std::is_base_of_v<BaseEvent, TEv>,
+                "TEv must inherrit from BaseEvent");
+  auto range = this->subscriptions_.equal_range(std::type_index(typeid(TEv)));
+
+  for (auto ev = range.first; ev != range.second; ++ev)
+  {
+    ev->second(static_cast<BaseEvent &>(event));
+  }
+}
+} // namespace msce
 
 #endif
