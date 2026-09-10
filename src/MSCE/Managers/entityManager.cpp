@@ -19,7 +19,7 @@ msce::EntityHandle msce::EntityManager::create_entity()
 
 msce::EntityHandle msce::EntityManager::get_entity(uint32_t id)
 {
-  return this->entities_[id];
+  return this->entities_.get_item(id);
 }
 
 void msce::EntityManager::do_for_each_entity(
@@ -31,11 +31,15 @@ void msce::EntityManager::do_for_each_entity(
 
 std::vector<msce::EntityHandle> msce::EntityManager::get_entities()
 {
-  std::vector<EntityHandle> result(entities_.size(),
+  std::vector<EntityHandle> result(entities_.alive_count(),
                                    EntityHandle::create_nullptr());
 
+  uint32_t i = 0;
   for (const auto &ent : entities_)
-    result.push_back(ent);
+  {
+    if (!ent) continue;
+    result[i++] = ent;
+  }
 
   return result;
 }

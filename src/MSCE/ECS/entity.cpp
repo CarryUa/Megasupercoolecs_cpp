@@ -11,9 +11,10 @@ msce::Entity::get_components() noexcept
   std::vector<ComponentHandle<IComponent>> result(
       components_.size(), ComponentHandle<IComponent>::create_nullptr());
 
-  for (decltype(components_)::iterator it = components_.begin();
-       it != components_.end(); it++)
-    result.push_back(it->second);
+  uint32_t i = 0;
+
+  for (auto &[t, c] : components_)
+    result[i++] = c;
 
   return result;
 }

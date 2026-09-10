@@ -53,6 +53,15 @@ public:
   bool has_component(const std::type_index &type) noexcept;
 
   /**
+   * @param @ref msce::ComponentHandle of component to check.
+   * @tparam TBaseComp type of component to be checked.
+   * @retval true if entity has either TBaseComp or any derived component type
+   * attached.
+   * @retval false if not.
+   */
+  template <typename TBaseComp> bool has_component_based_on() noexcept;
+
+  /**
    * @tparam TComp Type of component to get.
    * @retval @ref msce::ComponentHandle of component of type TComp - if said
    * component is attached.
@@ -130,6 +139,20 @@ inline bool Entity::has_component(ComponentHandle<TComp> component) noexcept
   return (ComponentHandle<IComponent>)component ==
          components_.at(typeid(TComp));
 }
+template <typename TBaseComp>
+inline bool Entity::has_component_based_on() noexcept
+{
+  if (has_component<TBaseComp>()) return true;
+
+  for (auto &[t, c] : components_)
+  {
+
+    auto *candidate = dynamic_cast<TBaseComp *>(c.get());
+    if (candidate) return true;
+  }
+
+  return false;
+}
 template <typename TComp>
 inline SmartHandle<SmartUniquePointerList<IComponent>, TComp>
 Entity::get_component() const noexcept
@@ -143,6 +166,8 @@ Entity::get_component() const noexcept
 template <typename TBaseComp>
 inline ComponentHandle<TBaseComp> Entity::get_component_based_on()
 {
+  if (has_component<TBaseComp>()) return get_component<TBaseComp>();
+
   for (auto &[t, c] : components_)
   {
     auto *candidate = dynamic_cast<TBaseComp *>(c.get());

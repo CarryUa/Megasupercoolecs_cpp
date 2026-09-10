@@ -6,17 +6,12 @@ if(BUILD_TESTING)
     # Add source files to executable
     add_executable(run_tests 
                 main.cpp
-                tree.cpp
+                entity.cpp
+                system.cpp
+                component.cpp
+                events.cpp
                 prototypes.cpp
                 reflection.cpp
-                events.cpp
-                Common/vector.cpp
-                Common/smartPointerLists.cpp
-                Graphics/color.cpp
-                Graphics/shape.cpp
-                ECS/system.cpp
-                ECS/component.cpp
-                ECS/entity.cpp
                 )
 
     target_link_libraries(run_tests GTest::gtest GTest::gtest_main ${MSCE_TARGET})

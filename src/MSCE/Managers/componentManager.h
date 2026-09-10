@@ -70,14 +70,16 @@ public:
    * @tparam TComp Type of component to be destroyed. It's implicit from @ref
    * msce::ComponentHandle param, and doesn't matter for destruction.
    * @param comp The @ref msce::ComponentHandle of component to be destroyed.
+   * @returns true if component was deleted or didn't exist, false otherwise.
    */
-  template <typename TComp> void destroy_component(ComponentHandle<TComp> comp);
+  template <typename TComp> bool destroy_component(ComponentHandle<TComp> comp);
 
   /**
    * @brief Destroys the component with protided id.
    * @param id The id of component to be destroyed.
+   * @returns true if component was deleted or didn't exist, false otherwise.
    */
-  void destroy_component(size_t id);
+  bool destroy_component(size_t id);
 
   /**
    * @return Alive components count.
@@ -125,9 +127,10 @@ ComponentManager::get_all_components_of_type()
   return return_vec;
 }
 template <typename TComp>
-inline void ComponentManager::destroy_component(ComponentHandle<TComp> comp)
+inline bool ComponentManager::destroy_component(ComponentHandle<TComp> comp)
 {
-  this->destroy_component(comp.get_index());
+  return this->components_.remove(
+      static_cast<ComponentHandle<IComponent>>(comp));
 }
 } // namespace msce
 

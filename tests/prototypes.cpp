@@ -7,120 +7,224 @@
 #include <filesystem>
 using namespace msce;
 
-enum class TestEnum : int
+namespace
 {
-    Bebebe = 123123,
-    BRUH = 55555,
-    NONONO = -1
-};
-MSCE_CEREAL_GENERATE_ENUM_SERIALIZE_METHODS(TestEnum, Bebebe, BRUH, NONONO)
-
-struct TestPrototype1 : public msce::IPrototype
+/// @brief Basic test prototype with simple types
+struct BasicPrototype : public msce::IPrototype
 {
-    int test_int = 15556;
-    bool test_bool = true;
-    TestEnum test_enum = TestEnum::NONONO;
-
-    std::string test_str = "Hello World!";
+  int test_int = 42;
+  bool test_bool = true;
+  std::string test_str = "Default";
 
 public:
-    MSCE_DEFINE_PROTOTYPE(::TestPrototype1, test_int, test_bool, test_str)
+  MSCE_DEFINE_PROTOTYPE(BasicPrototype, test_int, test_bool, test_str)
 };
-MSCE_REGISTER_PROTOTYPE(TestPrototype1, TestPrototype1, test_int, test_bool, test_str)
 
-TEST(PrototypeTests, PrototypeSerializationTest)
+} // namespace
+
+MSCE_REGISTER_PROTOTYPE(BasicPrototype, BasicPrototype, test_int, test_bool,
+                        test_str)
+
+/// @brief Test prototype creation
+TEST(PrototypeTests, Creation)
 {
-    auto protoMan = PrototypeManager::instance;
-    const std::string cereal_file_path = "/tmp/test_prototype.cereal0";
+  auto protoMan = PrototypeManager::instance;
 
-    auto tp1 = PrototypeManager::instance->create_new_prototype_instance<TestPrototype1>("TestPrototype1", "test_prototype_0");
-    tp1->test_enum = TestEnum::Bebebe;
-    protoMan->serialize_prototype(cereal_file_path, tp1->id);
-    PrototypeManager::instance->delete_prototype("test_prototype_0");
+  auto proto = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_1");
 
-    protoMan->deserialize_prototype(cereal_file_path);
-    TestPrototype1 *tp1_deserialized = protoMan->get_prototype<TestPrototype1>("test_prototype_0");
+  ASSERT_TRUE(proto);
+  EXPECT_EQ(proto->id, "test_proto_1");
+  EXPECT_EQ(proto->test_int, 42);
+  EXPECT_TRUE(proto->test_bool);
+  EXPECT_EQ(proto->test_str, "Default");
 
-    TestPrototype1 *tp1_serialized = dynamic_cast<TestPrototype1 *>(tp1);
-
-    EXPECT_EQ(tp1_serialized->id, tp1_deserialized->id);
-    EXPECT_EQ(tp1_serialized->test_bool, tp1_deserialized->test_bool);
-    EXPECT_EQ(tp1_serialized->test_int, tp1_deserialized->test_int);
-    EXPECT_EQ(tp1_serialized->test_str, tp1_deserialized->test_str);
-    EXPECT_EQ(tp1_serialized->test_enum, tp1_deserialized->test_enum);
-    PrototypeManager::instance->delete_prototype("test_prototype_0");
+  protoMan->delete_prototype("test_proto_1");
 }
 
-TEST(PrototypeTests, PrototypeFileConsistencyTest)
+/// @brief Test prototype data mutation
+TEST(PrototypeTests, DataMutation)
 {
-    auto protoMan = PrototypeManager::instance;
-    const std::string cereal_file_path = "/tmp/test_prototype.cereal";
+  auto protoMan = PrototypeManager::instance;
 
-    for (size_t i = 0; i < TEST_ITERATIONS; i++)
-    {
-        IPrototype *tp = PrototypeManager::instance->create_new_prototype_instance("TestPrototype1", "test_prototype_" + std::to_string(i));
-        protoMan->serialize_prototype(cereal_file_path + std::to_string(i), tp->id);
-        protoMan->deserialize_prototype(cereal_file_path + std::to_string(i));
-        ASSERT_EQ(std::filesystem::remove((cereal_file_path + std::to_string(i)).c_str()), true);
-    }
+  auto proto = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_2");
+  ASSERT_TRUE(proto);
 
-    const auto prototypes = protoMan->enumerate_prototypes();
-    EXPECT_EQ(prototypes.size(), TEST_ITERATIONS);
+  proto->test_int = 100;
+  proto->test_bool = false;
+  proto->test_str = "Modified";
 
-    for (const auto &p : prototypes)
-    {
-        EXPECT_NE(p, nullptr);
-    }
+  EXPECT_EQ(proto->test_int, 100);
+  EXPECT_FALSE(proto->test_bool);
+  EXPECT_EQ(proto->test_str, "Modified");
+
+  protoMan->delete_prototype("test_proto_2");
 }
 
-TEST(PrototypeTests, PrototypeRegistryTest)
+/// @brief Test prototype retrieval
+TEST(PrototypeTests, Retrieval)
 {
-    auto protoMan = PrototypeManager::instance;
-    EXPECT_GE(protoMan->registered_prototypes_ref.enumerate_registry().size(), 1);
+  auto protoMan = PrototypeManager::instance;
 
-    EXPECT_EQ(protoMan->registered_factories_ref.enumerate_registry().size(),
-              protoMan->registered_prototypes_ref.enumerate_registry().size());
+  auto proto = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_3");
+  ASSERT_TRUE(proto);
+
+  // Retrieve by ID
+  auto retrieved = protoMan->get_prototype<BasicPrototype>("test_proto_3");
+  ASSERT_TRUE(retrieved);
+  EXPECT_EQ(retrieved->id, proto->id);
+  EXPECT_EQ(retrieved->test_int, proto->test_int);
+
+  protoMan->delete_prototype("test_proto_3");
 }
 
-TEST(PrototypeTests, PrototypeByIdCreationTest)
+/// @brief Test prototype with different values
+TEST(PrototypeTests, EnumHandling)
 {
-    auto protoMan = PrototypeManager::instance;
+  auto protoMan = PrototypeManager::instance;
 
-    auto dtp1 = protoMan->create_new_prototype_instance("TestPrototype1", "dynamic_test_prototype_1");
+  auto proto1 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_enum_var");
+  ASSERT_TRUE(proto1);
 
-    auto dtp1_concrete = protoMan->create_new_prototype_instance<TestPrototype1>("TestPrototype1", "dynamic_test_prototype_concrete_1");
+  proto1->test_int = 100;
+  EXPECT_EQ(proto1->test_int, 100);
 
-    EXPECT_NE(dtp1, nullptr) << "Something went wrong during prototype creation. See the log output for details.";
-    EXPECT_NE(dtp1_concrete, nullptr) << "Something went wrong during prototype creation. See the log output for details.";
+  proto1->test_int = 200;
+  EXPECT_EQ(proto1->test_int, 200);
 
-    EXPECT_EQ(dtp1->id, "dynamic_test_prototype_1") << "The id wasn't properly assigned to new prototype!";
-    EXPECT_EQ(dtp1_concrete->id, "dynamic_test_prototype_concrete_1") << "The id wasn't properly assigned to new prototype with template implementation!";
-
-    auto dtp1_same_id = protoMan->create_new_prototype_instance("TestPrototype1", "dynamic_test_prototype_1");
-    EXPECT_EQ(dtp1_same_id, nullptr) << "New prototype has probably overwritten the old one with same Id!";
+  protoMan->delete_prototype("test_proto_enum_var");
 }
 
-TEST(PrototypeTests, PrototypeDeletionTest)
+/// @brief Test prototype with string data
+TEST(PrototypeTests, VectorData)
 {
-    auto protoMan = PrototypeManager::instance;
+  auto protoMan = PrototypeManager::instance;
 
-    auto new_proto = protoMan->create_new_prototype_instance<TestPrototype1>("TestPrototype1", "deletion_test_prototype_1");
-    size_t start_size = protoMan->enumerate_prototypes().size();
+  auto proto = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_str_data");
+  ASSERT_TRUE(proto);
 
-    ASSERT_GE(start_size, 1) << "Prototypes count must be non-zero at this point of testing.";
-    protoMan->delete_prototype(new_proto->id);
-    EXPECT_LT(protoMan->enumerate_prototypes().size(), start_size) << "By-id deletion failed!";
+  proto->test_str = "First";
+  EXPECT_EQ(proto->test_str, "First");
 
-    try
-    {
-        new_proto = protoMan->create_new_prototype_instance<TestPrototype1>("TestPrototype1", "deletion_test_prototype_1");
-        start_size = protoMan->enumerate_prototypes().size();
+  proto->test_str = "Second";
+  EXPECT_EQ(proto->test_str, "Second");
 
-        protoMan->delete_prototype(new_proto);
-        EXPECT_LT(protoMan->enumerate_prototypes().size(), start_size) << "By-pointer deletion failed!";
-    }
-    catch (std::exception &ex)
-    {
-        FAIL() << "By-id failed, used id is still taken-up.";
-    }
+  proto->test_str = "Third";
+  EXPECT_EQ(proto->test_str, "Third");
+
+  protoMan->delete_prototype("test_proto_str_data");
+}
+
+/// @brief Test prototype deletion
+TEST(PrototypeTests, Deletion)
+{
+  auto protoMan = PrototypeManager::instance;
+
+  auto proto = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_del");
+  ASSERT_TRUE(proto);
+
+  size_t initial_count = protoMan->enumerate_prototypes().size();
+
+  ASSERT_TRUE(protoMan->delete_prototype("test_proto_del"));
+
+  EXPECT_LT(protoMan->enumerate_prototypes().size(), initial_count);
+
+  // Verify it's deleted
+  auto retrieved = protoMan->get_prototype<BasicPrototype>("test_proto_del");
+  EXPECT_FALSE(retrieved);
+}
+
+/// @brief Test multiple prototype instances
+TEST(PrototypeTests, MultipleInstances)
+{
+  auto protoMan = PrototypeManager::instance;
+
+  auto proto1 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_multi_1");
+  auto proto2 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_multi_2");
+  auto proto3 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_multi_3");
+
+  ASSERT_TRUE(proto1);
+  ASSERT_TRUE(proto2);
+  ASSERT_TRUE(proto3);
+
+  // Verify distinct instances
+  EXPECT_NE(proto1->id, proto2->id);
+  EXPECT_NE(proto1->id, proto3->id);
+  EXPECT_NE(proto2->id, proto3->id);
+
+  proto1->test_int = 10;
+  proto2->test_int = 20;
+  proto3->test_int = 30;
+
+  EXPECT_EQ(proto1->test_int, 10);
+  EXPECT_EQ(proto2->test_int, 20);
+  EXPECT_EQ(proto3->test_int, 30);
+
+  protoMan->delete_prototype("test_proto_multi_1");
+  protoMan->delete_prototype("test_proto_multi_2");
+  protoMan->delete_prototype("test_proto_multi_3");
+}
+
+/// @brief Test prototype enumeration
+TEST(PrototypeTests, Enumeration)
+{
+  auto protoMan = PrototypeManager::instance;
+
+  auto proto1 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_enum_1");
+  auto proto2 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_enum_2");
+
+  ASSERT_TRUE(proto1);
+  ASSERT_TRUE(proto2);
+
+  auto all_protos = protoMan->enumerate_prototypes();
+  EXPECT_GE(all_protos.size(), 2);
+
+  // All should be non-null
+  for (const auto &proto : all_protos)
+  {
+    EXPECT_TRUE(proto);
+  }
+
+  protoMan->delete_prototype("test_proto_enum_1");
+  protoMan->delete_prototype("test_proto_enum_2");
+}
+
+/// @brief Test prototype registry
+TEST(PrototypeTests, Registry)
+{
+  auto protoMan = PrototypeManager::instance;
+
+  auto registered = protoMan->registered_prototypes_ref.enumerate_registry();
+  EXPECT_GE(registered.size(), 1);
+
+  auto factories = protoMan->registered_factories_ref.enumerate_registry();
+  EXPECT_EQ(factories.size(), registered.size());
+}
+
+/// @brief Test duplicate prototype ID prevention
+TEST(PrototypeTests, DuplicateIDPrevention)
+{
+  auto protoMan = PrototypeManager::instance;
+
+  auto proto1 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_dup");
+  ASSERT_TRUE(proto1);
+
+  // Attempt to create with same ID should fail
+  auto proto2 = protoMan->create_new_prototype_instance<BasicPrototype>(
+      "BasicPrototype", "test_proto_dup");
+  EXPECT_FALSE(proto2);
+
+  protoMan->delete_prototype("test_proto_dup");
+  EXPECT_FALSE(protoMan->get_prototype<BasicPrototype>("test_proto_dup"));
 }

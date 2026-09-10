@@ -5,26 +5,62 @@
 
 using namespace msce;
 
-TEST(TreeTests, NTreeTest)
+/// @brief Test basic tree node creation
+TEST(TreeTests, NodeCreation)
 {
-    NTreeNode<int> t1(0);
-    NTreeNode<int> t2(1);
-    NTreeNode<int> t3(2);
-    NTreeNode<int> t4(2);
-    NTreeNode<int> t5(3);
-    NTreeNode<int> t6(4);
+  NTreeNode<int> root(1);
+  NTreeNode<int> child(2);
 
-    t1.add_child(&t2);
-    t2.add_child(&t3);
-    t2.add_child(&t4);
-    t3.add_child(&t5);
-    t5.add_child(&t6);
+  EXPECT_EQ(root.get_value(), 1);
+  EXPECT_EQ(child.get_value(), 2);
+}
 
-    Logger l("TreeTest");
+/// @brief Test adding children to node
+TEST(TreeTests, AddChild)
+{
+  NTreeNode<int> root(1);
+  NTreeNode<int> child1(2);
+  NTreeNode<int> child2(3);
 
-    auto dfs = t1.traverse_dfs();
-    for (auto e : dfs)
-    {
-        l.log_info("{}", e);
-    }
+  root.add_child(&child1);
+  root.add_child(&child2);
+
+  EXPECT_EQ(root.get_children().size(), 2);
+  EXPECT_EQ(child1.get_parent(), &root);
+  EXPECT_EQ(child2.get_parent(), &root);
+}
+
+/// @brief Test tree hierarchy
+TEST(TreeTests, TreeHierarchy)
+{
+  NTreeNode<int> root(1);
+  NTreeNode<int> level1_1(2);
+  NTreeNode<int> level1_2(3);
+  NTreeNode<int> level2_1(4);
+  NTreeNode<int> level2_2(5);
+
+  root.add_child(&level1_1);
+  root.add_child(&level1_2);
+  level1_1.add_child(&level2_1);
+  level1_1.add_child(&level2_2);
+
+  EXPECT_EQ(root.get_children().size(), 2);
+  EXPECT_EQ(level1_1.get_children().size(), 2);
+  EXPECT_EQ(level2_1.get_parent(), &level1_1);
+}
+
+/// @brief Test depth-first traversal
+TEST(TreeTests, DFSTraversal)
+{
+  NTreeNode<int> root(1);
+  NTreeNode<int> child1(2);
+  NTreeNode<int> child2(3);
+  NTreeNode<int> grandchild(4);
+
+  root.add_child(&child1);
+  root.add_child(&child2);
+  child1.add_child(&grandchild);
+
+  auto dfs = root.traverse_dfs();
+  EXPECT_GE(dfs.size(), 4);
 }
