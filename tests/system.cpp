@@ -1,7 +1,7 @@
 #include "test_configs.h"
 
 #include <gtest/gtest.h>
-#include <MSCE/ECS/system.h>
+#include <MSCE/system.h>
 #include <MSCE/Managers/systemManager.h>
 #include <MSCE/BuiltIns/timeSystem.h>
 
@@ -65,9 +65,9 @@ protected:
 };
 
 } // namespace
-MSCE_REGISTER_SYSTEM(TrackingSystem, TrackingSystem)
-MSCE_REGISTER_SYSTEM(DependentSystem, DependentSystem)
-MSCE_REGISTER_SYSTEM(InactiveTestSystem, InactiveTestSystem)
+MSCE_REGISTER_SYSTEM(TrackingSystem)
+MSCE_REGISTER_SYSTEM(DependentSystem)
+MSCE_REGISTER_SYSTEM(InactiveTestSystem)
 
 /// @brief Test system initialization and lifecycle
 TEST(SystemTests, InitializationLifecycle)

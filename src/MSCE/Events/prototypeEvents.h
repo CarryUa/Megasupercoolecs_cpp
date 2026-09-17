@@ -4,10 +4,10 @@
 
 namespace msce
 {
-    struct PrototypeLoadingStartingEvent : public BaseEvent
-    {
-    };
-    struct PrototypeLoadingFinishedEvent : public BaseEvent
-    {
-    };
-}
+struct PrototypeLoadingStartingEvent : public BaseGlobalEvent
+{
+};
+struct PrototypeLoadingFinishedEvent : public BaseGlobalEvent
+{
+};
+} // namespace msce

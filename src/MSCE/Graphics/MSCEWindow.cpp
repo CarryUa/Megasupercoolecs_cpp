@@ -6,7 +6,7 @@
 #include <MSCE/Managers/eventManager.h>
 #include <MSCE/Managers/entityManager.h>
 #include <MSCE/Events/graphicsEvents.h>
-#include <MSCE/ECS/entity.h>
+#include <MSCE/entity.h>
 #include <MSCE/BuiltIns/Renderers/baseRendererComponent.hpp>
 #include <iostream>
 #include <memory>
@@ -21,6 +21,11 @@ std::shared_ptr<Shader> &
 msce::MSCEWindow::get_shader_ref(const std::string &shader_id)
 {
   return this->context_.shaders[shader_id];
+}
+
+GLFWwindow *msce::MSCEWindow::get_glfw_window() const noexcept
+{
+  return this->p_window_.get();
 }
 
 void msce::MSCEWindow::prepare_shaders()
@@ -49,19 +54,39 @@ void msce::MSCEWindow::prepare_shaders()
     {
       if (!sp) continue;
 
-      auto shrd = std::make_shared<Shader>(*sp);
+      try
+      {
+        auto shrd = std::make_shared<Shader>(*sp);
 
-      if (shrd->is_ready()) suc++;
-      else
+        if (shrd->is_ready()) suc++;
+        else
+          fail++;
+
+        this->context_.shaders.insert_or_assign(sp->id, std::move(shrd));
+        logger_.log_debug("Loaded '{}'", sp->id);
+      }
+      catch (std::exception &e)
+      {
+        logger_.log_error(
+            "Failed to load '{}': {}: {}", sp->id,
+            Platform::demangle(
+                current_exception().__cxa_exception_type()->name()),
+            e.what());
         fail++;
-
-      this->context_.shaders.insert_or_assign(sp->id, std::move(shrd));
-      logger_.log_debug("Loaded '{}'", sp->id);
+      }
     }
-    logger_.log_debug(
-        "Finished compiling shaders. total: {} | successes: {} | failures: {}",
-        suc + fail, suc, fail);
+    logger_.log_debug("Finished compiling shaders. total: {} | successes: {} "
+                      "| failures: {}",
+                      suc + fail, suc, fail);
   }
+}
+
+void msce::MSCEWindow::reload_shaders()
+{
+  context_.shaders.clear();
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  prepare_shaders();
 }
 
 void msce::MSCEWindow::use_context()

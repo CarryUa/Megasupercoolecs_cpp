@@ -10,9 +10,9 @@
 #include <MSCE/ABI/abi_macros.h>
 #include <MSCE/ABI/core_abi.h>
 
-#include <MSCE/ECS/component.h>
-#include <MSCE/ECS/entity.h>
-#include <MSCE/ECS/system.h>
+#include <MSCE/component.h>
+#include <MSCE/entity.h>
+#include <MSCE/system.h>
 
 #include <MSCE/Reflection/reflection.h>
 #include <MSCE/Reflection/reflection_concepts.h>

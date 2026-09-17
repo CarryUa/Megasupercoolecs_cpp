@@ -2,7 +2,7 @@
 #define _MSCE_GRAPHICS_SYSTEM_H_
 #include <MSCE/Managers/componentManager.h>
 #include <MSCE/Graphics/MSCEWindow.h>
-#include <MSCE/ECS/system.h>
+#include <MSCE/system.h>
 #include <MSCE/Types/vector.h>
 #include <vector>
 #include <memory>
@@ -31,6 +31,6 @@ public:
   void init() override;
 };
 } // namespace msce
-MSCE_REGISTER_SYSTEM(msce::GraphicsSystem, GraphicsSystem)
+MSCE_REGISTER_SYSTEM(msce::GraphicsSystem)
 
 #endif //_MSCE_GRAPHICS_SYSTEM_H_

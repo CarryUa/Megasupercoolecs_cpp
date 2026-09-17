@@ -1,5 +1,5 @@
 #pragma once
-#include <MSCE/ECS/system.h>
+#include <MSCE/system.h>
 #include <MSCE/Events/graphicsEvents.h>
 
 namespace msce
@@ -14,4 +14,4 @@ private:
 };
 
 } // namespace msce
-MSCE_REGISTER_SYSTEM(msce::BaseRendererSystem, BaseRendererSystem)
+MSCE_REGISTER_SYSTEM(msce::BaseRendererSystem)

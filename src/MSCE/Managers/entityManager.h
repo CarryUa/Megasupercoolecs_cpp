@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include <MSCE/ECS/entity.h>
+#include <MSCE/entity.h>
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Types/singleton.hpp>
 

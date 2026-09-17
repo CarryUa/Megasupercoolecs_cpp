@@ -5,7 +5,7 @@
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Types/Collections/handle.hpp>
 #include <MSCE/Types/singleton.hpp>
-#include <MSCE/ECS/component.h>
+#include <MSCE/component.h>
 #include <MSCE/logger.h>
 
 namespace msce

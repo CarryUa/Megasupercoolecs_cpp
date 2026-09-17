@@ -1,6 +1,6 @@
 #ifndef _MSCE_TRANSFORM_COMPONENT_H_
 #define _MSCE_TRANSFORM_COMPONENT_H_
-#include <MSCE/ECS/component.h>
+#include <MSCE/component.h>
 #include <MSCE/Types/shape.h>
 #include <MSCE/Types/vector.h>
 

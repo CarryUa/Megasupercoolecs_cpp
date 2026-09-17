@@ -7,22 +7,28 @@ using namespace msce;
 namespace
 {
 /// @brief Test event with counter
-struct TestEvent : public BaseEvent
+struct TestEvent : public BaseGlobalEvent
 {
   uint64_t counter = 0;
 };
 
 /// @brief Test event with data payload
-struct DataEvent : public BaseEvent
+struct DataEvent : public BaseGlobalEvent
 {
   int value = 0;
   std::string message = "";
 };
 
 /// @brief Test event for subscription tracking
-struct SubscriptionTrackEvent : public BaseEvent
+struct SubscriptionTrackEvent : public BaseGlobalEvent
 {
   int callback_count = 0;
+};
+
+struct TestLocalEventArgs
+{
+  int counter = 0;
+  bool called_once = false;
 };
 
 /// @brief Global callback counter for testing
@@ -168,4 +174,37 @@ TEST(EventTests, FiringOrder)
 
   // All callbacks should be invoked
   EXPECT_GE(event.counter, 2);
+}
+
+namespace
+{
+void local_event_count_static_cb(TestLocalEventArgs &args)
+{
+  if (!args.called_once) args.called_once = true;
+  args.counter++;
+}
+} // namespace
+
+TEST(EventTests, LocalEventTest)
+{
+  LocalEvent<TestLocalEventArgs> event;
+
+  bool lambda_called = false;
+
+  event.subscribe(
+      [&](TestLocalEventArgs &args)
+      {
+        if (!args.called_once) args.called_once = true;
+        lambda_called = true;
+        args.counter++;
+      });
+
+  event.subscribe(local_event_count_static_cb);
+
+  TestLocalEventArgs args;
+  event.fire(args);
+
+  EXPECT_TRUE(lambda_called);
+  EXPECT_TRUE(args.called_once);
+  EXPECT_EQ(args.counter, 2);
 }

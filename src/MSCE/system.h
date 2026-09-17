@@ -19,7 +19,7 @@ get_g_system_registry()
 } // namespace msce
 
 #pragma region Systems Macros
-#define MSCE_REGISTER_SYSTEM(Type, Name)                                       \
+#define MSCE_REGISTER_SYSTEM_IMPL(Type, SysNum)                                \
   namespace msce                                                               \
   {                                                                            \
   template <> class Registration<Type>                                         \
@@ -45,8 +45,10 @@ get_g_system_registry()
                       Platform::demangle(typeid(Type).name()));                \
     }                                                                          \
   };                                                                           \
-  inline Registration<Type> registered_##Name;                                 \
+  inline Registration<Type> BOOST_PP_CAT(registered_, SysNum);                 \
   }
+
+#define MSCE_REGISTER_SYSTEM(Type) MSCE_REGISTER_SYSTEM_IMPL(Type, __COUNTER__)
 
 #pragma endregion
 
@@ -81,6 +83,6 @@ public:
   virtual ~System() = default;
 };
 } // namespace msce
-MSCE_REGISTER_SYSTEM(msce::System, System)
+MSCE_REGISTER_SYSTEM(msce::System)
 
 #endif // _MSCE_SYSTEM_H_

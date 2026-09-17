@@ -3,8 +3,35 @@
 #include <MSCE/msce.h>
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
 #include <MSCE/Types/image.hpp>
+#include <MSCE/BuiltIns/inputSystem.h>
 
 using namespace msce;
+
+void log_key(KeyEventArgs &args)
+{
+  if (args.key.control_held() && args.key.keycode == GLFW_KEY_R)
+  {
+    SystemManager::instance->get_system<GraphicsSystem>()
+        ->get_window(0)
+        ->reload_shaders();
+  }
+  else if (args.key.keycode == GLFW_KEY_ESCAPE)
+    exit(0);
+}
+
+void log_click(MouseButtonEventArgs &args)
+{
+  static Logger logger("MouseClick");
+
+  logger.log_info("Mouse {} at: {}, {} (Button: {})",
+                  args.action == InputAction::PRESSED ? "pressed"
+                  : args.action == InputAction::HELD  ? "held"
+                                                      : "released",
+                  args.pos.x, args.pos.y,
+                  args.button == MouseButton::LEFT_MB     ? "LMB"
+                  : args.button == MouseButton::MIDDLE_MB ? "MMB"
+                                                          : "RMB");
+}
 
 int main(int argc, char **argv)
 {
@@ -15,20 +42,6 @@ int main(int argc, char **argv)
   static auto g_comp_man = ComponentManager();
   static auto g_enum_man = EnumManager();
   static auto g_ent_man = EntityManager();
-  // static auto g_shader_man = ShaderManager();
-
-  // ShaderPrototype *shdr =
-  //     (ShaderPrototype *)
-  //         g_proto_man.create_new_prototype_instance<ShaderPrototype>(
-  //             typeof(ShaderPrototype).get_name(), "DefaultShader");
-
-  // shdr->id = "DefaultShader";
-  // shdr->fragment_uniforms = {"color"};
-  // shdr->fragment_source_path = "testfrag.glsl";
-  // shdr->vertex_source_path = "testvert.glsl";
-  // g_proto_man.serialize_prototype("test_shader.msceproto_release",
-  //                                 "DefaultShader");
-
   g_sys_man.init_all_systems();
   std::set_terminate(msce::internal::handle_terminate);
 
@@ -78,15 +91,19 @@ int main(int argc, char **argv)
   int frame = 0;
   double next_fps_time = 0.5;
   g_logger.log_debug("Starting main loop...");
+
+  g_sys_man.get_system<InputSystem>()->on_any_key.subscribe(log_key);
+  g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
+
   while (!root_window->should_close())
   {
     frame++;
     if (time_sys->get_total_millis() > next_fps_time)
     {
-      g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame * 3,
+      g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 5,
                         time_sys->get_total_seconds());
       frame = 0;
-      next_fps_time += 333;
+      next_fps_time += 5000;
     }
     g_sys_man.update_all_systems();
 

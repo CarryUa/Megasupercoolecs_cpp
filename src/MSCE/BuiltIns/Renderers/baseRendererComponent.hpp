@@ -1,5 +1,5 @@
 #pragma once
-#include <MSCE/ECS/component.h>
+#include <MSCE/component.h>
 #include <MSCE/Graphics/color.h>
 #include <MSCE/Graphics/shaders.h>
 

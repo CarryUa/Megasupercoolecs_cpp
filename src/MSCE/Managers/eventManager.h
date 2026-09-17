@@ -12,11 +12,6 @@
 
 namespace msce
 {
-struct ph
-{
-  static void fn(ObjectBeingRenderedEvent &ev);
-};
-
 #define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback)                               \
   EventManager::instance->subscribe<Event>(Callback)
 
@@ -47,7 +42,8 @@ private:
    * @note Essentially a subscription is simply a pair of event type and
    * callback function.
    */
-  std::unordered_multimap<std::type_index, std::function<void(BaseEvent &)>>
+  std::unordered_multimap<std::type_index,
+                          std::function<void(BaseGlobalEvent &)>>
       subscriptions_;
 
   std::vector<void (*)(ObjectBeingRenderedEvent &)> render_events_;
@@ -79,11 +75,11 @@ public:
 template <typename TEv, typename TCallback>
 inline void EventManager::subscribe(TCallback callback)
 {
-  static_assert(std::is_base_of_v<BaseEvent, TEv>,
-                "TEv must inherrit from BaseEvent");
+  static_assert(std::is_base_of_v<BaseGlobalEvent, TEv>,
+                "TEv must inherrit from BaseGlobalEvent");
   this->subscriptions_.emplace(
       std::type_index(typeid(TEv)),
-      [cb = std::move(callback)](BaseEvent &ev)
+      [cb = std::move(callback)](BaseGlobalEvent &ev)
       {
         if constexpr (std::is_invocable_v<TCallback, TEv &>)
           cb(static_cast<TEv &>(ev));
@@ -94,13 +90,13 @@ inline void EventManager::subscribe(TCallback callback)
 
 template <typename TEv> inline void EventManager::fire(TEv &event)
 {
-  static_assert(std::is_base_of_v<BaseEvent, TEv>,
-                "TEv must inherrit from BaseEvent");
+  static_assert(std::is_base_of_v<BaseGlobalEvent, TEv>,
+                "TEv must inherrit from BaseGlobalEvent");
   auto range = this->subscriptions_.equal_range(std::type_index(typeid(TEv)));
 
   for (auto ev = range.first; ev != range.second; ++ev)
   {
-    ev->second(static_cast<BaseEvent &>(event));
+    ev->second(static_cast<BaseGlobalEvent &>(event));
   }
 }
 } // namespace msce

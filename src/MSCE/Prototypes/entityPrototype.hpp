@@ -1,7 +1,7 @@
 #ifndef MSCE_ENTITY_PROTOTYPE_HPP_
 #define MSCE_ENTITY_PROTOTYPE_HPP_
 #include <MSCE/Prototypes/prototype.hpp>
-#include <MSCE/ECS/entity.h>
+#include <MSCE/entity.h>
 
 namespace msce
 {

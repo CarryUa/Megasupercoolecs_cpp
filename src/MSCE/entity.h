@@ -1,7 +1,7 @@
 #ifndef MSCE_ENTITY_H_
 #define MSCE_ENTITY_H_
 #include <vector>
-#include <MSCE/ECS/component.h>
+#include <MSCE/component.h>
 #include <MSCE/Managers/componentManager.h>
 #include <MSCE/Types/Collections/handle.hpp>
 

@@ -3,17 +3,23 @@
 #include "event.h"
 #include <MSCE/Graphics/MSCEWindow.h>
 #include <MSCE/BuiltIns/transformComponent.hpp>
-#include <MSCE/ECS/entity.h>
+#include <MSCE/entity.h>
 
 namespace msce
 {
-struct PreRenderStartEvent : public BaseEvent
+struct WindowCreatedEvent : public BaseGlobalEvent
+{
+  MSCEWindow &window;
+  WindowCreatedEvent(MSCEWindow &win) : window(win) {}
+};
+
+struct PreRenderStartEvent : public BaseGlobalEvent
 {
   msce::MSCEWindow &target_window;
 
   PreRenderStartEvent(MSCEWindow &window) : target_window(window) {}
 };
-struct RenderStartEvent : public BaseEvent
+struct RenderStartEvent : public BaseGlobalEvent
 {
   msce::MSCEWindow &target_window;
 
@@ -21,7 +27,7 @@ struct RenderStartEvent : public BaseEvent
 };
 
 /** Fired per-RenderComponent(per child-of @ref msce::BaseRendererComponent) */
-struct ObjectBeingRenderedEvent : public BaseEvent
+struct ObjectBeingRenderedEvent : public BaseGlobalEvent
 {
   msce::MSCEWindow &target_window;
   TransformComponent &transform_used;

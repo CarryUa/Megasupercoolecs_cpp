@@ -34,6 +34,7 @@ private:
   vec2ui size_;
 
   void prepare_shaders();
+
   void use_context();
 
 public:
@@ -43,6 +44,8 @@ public:
   vec2ui size();
 
   std::shared_ptr<Shader> &get_shader_ref(const std::string &shader_id);
+
+  GLFWwindow *get_glfw_window() const noexcept;
 
   /**
    * @brief Generates a texture for an image for future use. Binding happens
@@ -65,6 +68,8 @@ public:
   void render();
 
   void draw();
+
+  void reload_shaders();
 };
 } // namespace msce
 

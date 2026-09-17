@@ -9,7 +9,7 @@
 #include <typeindex>
 #include <functional>
 #include <iostream>
-#include <MSCE/ECS/system.h>
+#include <MSCE/system.h>
 #include <MSCE/BuiltIns/timeSystem.h>
 
 namespace msce
