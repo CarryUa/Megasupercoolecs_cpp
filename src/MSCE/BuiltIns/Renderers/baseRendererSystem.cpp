@@ -8,7 +8,8 @@
 
 void msce::BaseRendererSystem::init()
 {
-  EventManager::instance->subsctibe_render_event(this->on_object_render);
+  EventManager::instance->subscribe<ObjectBeingRenderedEvent>(
+      this->on_object_render);
 }
 
 void msce::BaseRendererSystem::on_object_render(

@@ -7,6 +7,19 @@
 
 using namespace msce;
 
+class TestSystem : public System
+{
+  SystemDependency<TimeSystem> timesys_;
+
+  virtual void init()
+  {
+    Logger logger("adasd");
+    logger.log_debug("DependencyInjected: {}", timesys_->active);
+  }
+};
+
+MSCE_REGISTER_SYSTEM(TestSystem)
+
 void log_key(KeyEventArgs &args)
 {
   if (args.key.control_held() && args.key.keycode == GLFW_KEY_R)
@@ -35,6 +48,7 @@ void log_click(MouseButtonEventArgs &args)
 
 int main(int argc, char **argv)
 {
+  std::set_terminate(msce::internal::handle_terminate);
 
   static auto g_event_man = EventManager();
   static auto g_sys_man = SystemManager();
@@ -43,7 +57,6 @@ int main(int argc, char **argv)
   static auto g_enum_man = EnumManager();
   static auto g_ent_man = EntityManager();
   g_sys_man.init_all_systems();
-  std::set_terminate(msce::internal::handle_terminate);
 
   srand(time(NULL));
   static auto g_logger = Logger("GLOBAL");
@@ -92,7 +105,7 @@ int main(int argc, char **argv)
   double next_fps_time = 0.5;
   g_logger.log_debug("Starting main loop...");
 
-  g_sys_man.get_system<InputSystem>()->on_any_key.subscribe(log_key);
+  g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
   g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
 
   while (!root_window->should_close())

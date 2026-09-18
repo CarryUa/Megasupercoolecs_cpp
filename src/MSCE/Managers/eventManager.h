@@ -4,7 +4,6 @@
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Events/event.h>
-#include <MSCE/Events/graphicsEvents.h>
 #include <unordered_map>
 #include <type_traits>
 #include <typeindex>
@@ -16,18 +15,8 @@ namespace msce
   EventManager::instance->subscribe<Event>(Callback)
 
 #define MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(Event, Callback)                    \
-  EventManager::instance->subscribe<Event>(                                    \
-      [this](auto &ev)                                                         \
-      {                                                                        \
-        if constexpr (requires { this->Callback(ev); })                        \
-        {                                                                      \
-          this->Callback(ev);                                                  \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-          this->Callback();                                                    \
-        }                                                                      \
-      })
+  EventManager::instance->subscribe<Event>([this](auto &ev)                    \
+                                           { this->Callback(ev); })
 
 /**
  *  @brief Manages registration and invocation(firing) of events.
@@ -46,8 +35,6 @@ private:
                           std::function<void(BaseGlobalEvent &)>>
       subscriptions_;
 
-  std::vector<void (*)(ObjectBeingRenderedEvent &)> render_events_;
-
 public:
   EventManager();
 
@@ -59,10 +46,6 @@ public:
    */
   template <typename TEv, typename TCallback = std::function<void(TEv &)>>
   void subscribe(TCallback callback);
-
-  void subsctibe_render_event(void (*callback)(ObjectBeingRenderedEvent &));
-  void fire_render_event(ObjectBeingRenderedEvent &event);
-
   /**
    * @brief Fires the event of type TEv, and passes event as parameter for
    * callbacks.

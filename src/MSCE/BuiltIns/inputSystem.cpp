@@ -31,7 +31,7 @@ void msce::InputSystem::on_glfw_key_input(GLFWwindow *, int key, int scancode,
   KeyEventArgs args{.key = {.keycode = key, .scancode = scancode, .mods = mods},
                     .action = determain_action(action)};
 
-  InputSystem::on_any_key.fire(args);
+  InputSystem::on_keyboard_input.fire(args);
 }
 
 void msce::InputSystem::on_glfw_cursor_moved(GLFWwindow *, double xpos,

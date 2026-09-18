@@ -4,6 +4,8 @@
 #include <MSCE/Types/Collections/registry.hpp>
 #include <MSCE/msce_macros.h>
 #include <MSCE/logger.h>
+#include <MSCE/Events/systemEvents.h>
+#include <MSCE/Managers/eventManager.h>
 #include <typeindex>
 namespace msce
 {
@@ -81,6 +83,42 @@ public:
   virtual void update(double delta_seconds);
 
   virtual ~System() = default;
+};
+
+/**
+ * @brief Marker class for automatic system dependency injection.
+ *
+ * @note Can be used safely without segfaults in system members, and any other
+ * enviroment where @ref msce::SystemManager exists. @par
+ * @note Dependencies are injected by @ref msce::SystemManager right before
+ * pre_init() is called.
+ */
+template <typename TSystem> class SystemDependency
+{
+  TSystem *system_ = nullptr;
+
+  void on_systems_instantiated(AllSystemsInstantiatedEvent &ev)
+  {
+    auto request = RequestDependencyEvent(typeid(TSystem));
+    EventManager::instance->fire(request);
+    system_ = dynamic_cast<TSystem *>(request.system);
+
+    if (!system_)
+      throw std::runtime_error(
+          std::format("Failed to inject dependency '{}'.",
+                      Platform::demangle(request.requested_type.name())));
+  }
+
+public:
+  SystemDependency()
+  {
+    MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(AllSystemsInstantiatedEvent,
+                                       on_systems_instantiated);
+  }
+
+  TSystem *operator->() const noexcept { return system_; }
+  TSystem &operator*() const noexcept { return *system_; }
+  TSystem *get_ptr() const noexcept { return system_; }
 };
 } // namespace msce
 MSCE_REGISTER_SYSTEM(msce::System)

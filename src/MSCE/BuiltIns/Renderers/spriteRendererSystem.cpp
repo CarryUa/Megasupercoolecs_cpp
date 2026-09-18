@@ -4,7 +4,8 @@
 
 void msce::SpriteRendererSystem::init()
 {
-  EventManager::instance->subsctibe_render_event(this->on_object_render);
+  EventManager::instance->subscribe<ObjectBeingRenderedEvent>(
+      this->on_object_render);
 }
 
 void msce::SpriteRendererSystem::on_object_render(

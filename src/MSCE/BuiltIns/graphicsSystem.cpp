@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <iostream>
 #include <MSCE/Managers/eventManager.h>
+#include <MSCE/Events/graphicsEvents.h>
 
 using namespace msce;
 using namespace std;

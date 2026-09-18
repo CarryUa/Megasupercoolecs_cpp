@@ -32,8 +32,8 @@ void msce::MSCEWindow::prepare_shaders()
 {
 
   if (!PrototypeManager::instance)
-    MSCE_SUBSCRIBE_TO_EVENT_NON_STATIC(PrototypeLoadingFinishedEvent,
-                                       prepare_shaders);
+    EventManager::instance->subscribe<PrototypeLoadingFinishedEvent>(
+        [this](auto &ev) { this->prepare_shaders(); });
 
   else
   {
@@ -276,7 +276,7 @@ void msce::MSCEWindow::render()
           this->size().x, this->size().y);
 
     msce::ObjectBeingRenderedEvent ev(*this, *transform.get(), *ent.get());
-    EventManager::instance->fire_render_event(ev);
+    EventManager::instance->fire(ev);
 
     glDrawElements(GL_TRIANGLES, mesh.index_count(), GL_UNSIGNED_INT, 0);
   };

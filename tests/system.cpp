@@ -37,13 +37,10 @@ protected:
 class DependentSystem : public System
 {
 public:
-  TrackingSystem *dependency = nullptr;
+  SystemDependency<TrackingSystem> dependency;
 
 protected:
-  void pre_init() override
-  {
-    dependency = SystemManager::instance->get_system<TrackingSystem>();
-  }
+  void pre_init() override {}
 
   void init() override {}
 
@@ -87,7 +84,7 @@ TEST(SystemTests, InitializationLifecycle)
   EXPECT_TRUE(tracking->initialized);
 
   // Check dependency resolution
-  EXPECT_EQ(dependent->dependency, tracking);
+  EXPECT_EQ(dependent->dependency.get_ptr(), tracking);
 
   // Check initial active state
   EXPECT_TRUE(tracking->active);
@@ -148,7 +145,7 @@ TEST(SystemTests, DependencyResolution)
   ASSERT_TRUE(dependent);
 
   // Dependency should be resolved during pre_init
-  EXPECT_EQ(dependent->dependency, tracking);
+  EXPECT_EQ(dependent->dependency.get_ptr(), tracking);
 }
 
 /// @brief Test system activation toggling
