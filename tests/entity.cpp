@@ -1,7 +1,7 @@
 #include "test_configs.h"
 #include <gtest/gtest.h>
 
-#include <MSCE/Managers/entityManager.h>
+#include <MSCE/entity.h>
 
 using namespace msce;
 

@@ -1,9 +1,13 @@
 // This is a dummy file for CMake to determain language correctly when creating
 // library. Also used for testing diferent parts of engine
-#include <MSCE/msce.h>
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
-#include <MSCE/Types/image.hpp>
+#include <MSCE/Types/image.h>
 #include <MSCE/BuiltIns/inputSystem.h>
+
+#include <MSCE/prototype.h>
+#include <MSCE/event.h>
+#include <MSCE/Types/enum.h>
+#include <MSCE/terminator.h>
 
 using namespace msce;
 

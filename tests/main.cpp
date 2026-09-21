@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
 
-#include <MSCE/Managers/systemManager.h>
-#include <MSCE/Managers/componentManager.h>
-#include <MSCE/Managers/entityManager.h>
-#include <MSCE/Managers/prototypeManager.h>
-#include <MSCE/Managers/eventManager.h>
-#include <MSCE/Managers/enumManager.h>
+#include <MSCE/system.h>
+#include <MSCE/entity.h>
+#include <MSCE/component.h>
+
+#include <MSCE/prototype.h>
+#include <MSCE/event.h>
+#include <MSCE/Types/enum.h>
 
 #include <chrono>
 

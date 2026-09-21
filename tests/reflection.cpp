@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
 #include <MSCE/msce_macros.h>
-#include <MSCE/Reflection/reflection.h>
+#include <MSCE/reflection.h>
 
 namespace
 {

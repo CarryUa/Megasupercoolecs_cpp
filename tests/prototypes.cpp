@@ -1,8 +1,7 @@
 #include <test_configs.h>
 
 #include <gtest/gtest.h>
-#include <MSCE/Prototypes/prototype.hpp>
-#include <MSCE/Managers/prototypeManager.h>
+#include <MSCE/prototype.h>
 
 #include <filesystem>
 using namespace msce;

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <test_configs.h>
-#include <MSCE/Managers/eventManager.h>
+#include <MSCE/event.h>
 
 using namespace msce;
 

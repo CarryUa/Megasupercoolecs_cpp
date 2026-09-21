@@ -52,16 +52,11 @@ set(MSCE_TARGET "msce")
 add_library(${MSCE_TARGET} SHARED dummy.cpp)
 
 # Subdirs
-add_subdirectory(src/MSCE)
-add_subdirectory(src/MSCE/Platform)
-add_subdirectory(src/MSCE/Termination)
-add_subdirectory(src/MSCE/Reflection)
-add_subdirectory(src/MSCE/BuiltIns)
-add_subdirectory(src/MSCE/Types)
-add_subdirectory(src/MSCE/Graphics)
-add_subdirectory(src/MSCE/Managers)
-add_subdirectory(src/MSCE/Prototypes)
-add_subdirectory(src/MSCE/ABI)
+add_subdirectory(src)
+add_subdirectory(src/Platform)
+add_subdirectory(src/BuiltIns)
+add_subdirectory(src/Types)
+add_subdirectory(src/ABI)
 
 
 

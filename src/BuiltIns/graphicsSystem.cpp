@@ -1,0 +1,49 @@
+#include <MSCE/BuiltIns/graphicsSystem.h>
+#include <MSCE/BuiltIns/transformComponent.hpp>
+#include <glad/glad.h>
+#include <iostream>
+#include <MSCE/event.h>
+#include <MSCE/Events/graphicsEvents.h>
+
+using namespace msce;
+using namespace std;
+
+void GraphicsSystem::init()
+{
+  if (!glfwInit())
+  {
+    throw std::runtime_error("Couldn't initialize glfw.");
+  }
+}
+
+msce::GraphicsSystem::GraphicsSystem()
+{
+  this->comp_man_ = ComponentManager::instance;
+}
+
+MSCEWindow *GraphicsSystem::get_window(size_t id)
+{
+  if (this->windows_.size() <= id)
+  {
+    cerr << "Can't find window at (" << id << "), thera are only "
+         << this->windows_.size() << " windows availible" << endl;
+    return nullptr;
+  }
+
+  return this->windows_[id].get();
+}
+
+MSCEWindow *GraphicsSystem::create_window(Vector2D<int> window_size,
+                                          const char *title,
+                                          GLFWmonitor *glfw_monitor,
+                                          GLFWwindow *glfw_share)
+{
+  this->windows_.push_back(
+      make_unique<MSCEWindow>(window_size, title, glfw_monitor, glfw_share));
+
+  auto *window = this->windows_.back().get();
+  WindowCreatedEvent ev(*window);
+
+  EventManager::instance->fire<WindowCreatedEvent>(ev);
+  return this->windows_.back().get();
+}

@@ -2,7 +2,6 @@
 #include <test_configs.h>
 
 #include <MSCE/component.h>
-#include <MSCE/Managers/componentManager.h>
 
 using namespace msce;
 
