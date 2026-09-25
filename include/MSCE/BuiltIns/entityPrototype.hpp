@@ -9,22 +9,24 @@ namespace msce
 struct EntityPrototype : public IPrototype
 {
   /// @brief List of components for serialization.
-  std::vector<ComponentHandle<IComponent>> components;
+  EntityHandle entity = EntityHandle::create_nullptr();
 
-private:
+public:
   friend class ::cereal::access;
-  template <class Archive> void save(Archive &ar) const
+  void save(SerializationOutArchive &ar) const
   {
-    for (auto &c : components)
-    {
-    }
+    if (!entity) return;
+
     ar(cereal::base_class<::msce::IPrototype>(this),
-       ::cereal::make_nvp("components", components));
+       ::cereal::make_nvp("entity", *entity.get()));
   }
-  template <class Archive> void load(Archive &ar)
+  void load(SerializationInArchive &ar)
   {
+    if (entity != nullptr) EntityManager::instance->destroy_entity(entity);
+    entity = EntityManager::instance->create_entity();
+
     ar(cereal::base_class<::msce::IPrototype>(this),
-       ::cereal::make_nvp("components", components));
+       ::cereal::make_nvp("entity", *entity.get()));
   }
 
 public:
@@ -39,11 +41,11 @@ public:
   virtual const ::msce::Type &get_type_info_polymorphic() override
   {
     static const ::msce::Type &t =
-        ::msce::get_reflection_of_type("EntityPrototype");
+        ::msce::get_reflection_of_type(typeid(EntityPrototype));
     return t;
   }
 };
 } // namespace msce
-MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype, components)
+MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype)
 
 #endif // MSCE_ENTITY_PROTOTYPE_HPP_

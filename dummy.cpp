@@ -9,6 +9,8 @@
 #include <MSCE/Types/enum.h>
 #include <MSCE/terminator.h>
 #include <MSCE/serialization.h>
+#include <MSCE/BuiltIns/entityPrototype.hpp>
+#include <MSCE/reflection.h>
 
 using namespace msce;
 
@@ -44,10 +46,10 @@ int main(int argc, char **argv)
 
   static auto g_event_man = EventManager();
   static auto g_sys_man = SystemManager();
-  static auto g_proto_man = PrototypeManager();
   static auto g_comp_man = ComponentManager();
-  static auto g_enum_man = EnumManager();
   static auto g_ent_man = EntityManager();
+  static auto g_proto_man = PrototypeManager();
+  static auto g_enum_man = EnumManager();
   g_sys_man.init_all_systems();
 
   srand(time(NULL));
@@ -59,56 +61,54 @@ int main(int argc, char **argv)
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
-  auto ent = EntityManager::instance->create_entity();
-  auto trans =
-      ComponentManager::instance->create_component<TransformComponent>();
-  ent->attach_component(trans);
+  // auto ent = EntityManager::instance->create_entity();
+  // auto trans =
+  //     ComponentManager::instance->create_component<TransformComponent>();
+  // ent->attach_component(trans);
 
-  auto rend =
-      ComponentManager::instance->create_component<SpriteRendererComponent>();
-  ent->attach_component(rend);
+  // auto rend =
+  //     ComponentManager::instance->create_component<SpriteRendererComponent>();
+  // ent->attach_component(rend);
 
-  trans->shape = std::make_shared<Rectangle>();
+  // trans->shape = std::make_shared<Rectangle>();
 
-  rend->img = std::make_shared<Image>("./cmss14 yaoi vs yuri.psd.png");
-  auto *img = rend->img.get();
+  // rend->img = std::make_shared<Image>("./cmss14 yaoi vs yuri.psd.png");
+  // auto *img = rend->img.get();
 
-  root_window->bind_image(*img);
+  // root_window->bind_image(*img);
 
-  g_logger.log_info("Image bount: {}x{} at 0x{:X}", img->resolution.x,
-                    img->resolution.y, reinterpret_cast<uintptr_t>(img));
+  // g_logger.log_info("Image bount: {}x{} at 0x{:X}", img->resolution.x,
+  //                   img->resolution.y, reinterpret_cast<uintptr_t>(img));
 
-  for (int i = 0; i < 1; ++i)
-  {
-    auto copy = EntityManager::instance->copy_entity(ent);
-    copy->get_component<TransformComponent>()->position.x += 150;
-    g_logger.log_info(
-        "Has comp: {}; handle({},{}); addr: 0x{:x}",
-        copy->has_component<SpriteRendererComponent>(),
-        copy->get_component<SpriteRendererComponent>().get_index(),
-        copy->get_component<SpriteRendererComponent>().get_generation(),
-        reinterpret_cast<uintptr_t>(
-            copy->get_component<SpriteRendererComponent>().get()));
+  // for (int i = 0; i < 1; ++i)
+  // {
+  //   auto copy = EntityManager::instance->copy_entity(ent);
+  //   copy->get_component<TransformComponent>()->position.x += 150;
+  //   g_logger.log_info(
+  //       "Has comp: {}; handle({},{}); addr: 0x{:x}",
+  //       copy->has_component<SpriteRendererComponent>(),
+  //       copy->get_component<SpriteRendererComponent>().get_index(),
+  //       copy->get_component<SpriteRendererComponent>().get_generation(),
+  //       reinterpret_cast<uintptr_t>(
+  //           copy->get_component<SpriteRendererComponent>().get()));
 
-    copy->get_component<SpriteRendererComponent>()->img = rend->img;
-  }
+  //   copy->get_component<SpriteRendererComponent>()->img = rend->img;
+  // }
 
   int frame = 0;
   double next_fps_time = 0.5;
-  g_logger.log_debug("Starting main loop...");
 
   g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
   g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
 
-  std::ofstream testent("testent.msceproto");
-  Serializer::serialize(*ent.get(), testent);
-  auto ent2 = EntityManager::instance->create_entity();
-  testent.close();
-  std::ifstream testent2("testent.msceproto");
-  Serializer::deserialize(*ent2.get(), testent2);
-  testent2.close();
+  g_proto_man.deserialize_prototype("testent.msceproto");
+  auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
+
+  auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
+  ent2->get_component<TransformComponent>()->position += vec2d(100, 30);
 
   g_logger.log_info("{}", ent2->has_component<SpriteRendererComponent>());
+  g_logger.log_debug("Starting main loop...");
 
   while (!root_window->should_close())
   {

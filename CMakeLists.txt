@@ -49,7 +49,7 @@ message(STATUS "CMAKE BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
 # definitions
 set(MSCE_TARGET "msce")
 
-add_library(${MSCE_TARGET} SHARED dummy.cpp)
+add_library(${MSCE_TARGET} SHARED)
 
 # Subdirs
 add_subdirectory(src)

@@ -35,7 +35,8 @@ public:                                                                        \
   MSCE_REFLECTION_DEFINE_CLASS(ProtoType)                                      \
   virtual const ::msce::Type &get_type_info_polymorphic() override             \
   {                                                                            \
-    static const ::msce::Type &t = ::msce::get_reflection_of_type(#ProtoType); \
+    static const ::msce::Type &t =                                             \
+        ::msce::get_reflection_of_type(typeid(ProtoType));                     \
     return t;                                                                  \
   }
 
