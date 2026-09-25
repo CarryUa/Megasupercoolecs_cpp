@@ -111,7 +111,7 @@ const msce::Type &msce::get_reflection_of_type(const std::string &name)
   }
 }
 
-const msce::Type &msce::get_reflection_of_type(const std::type_info &std_type)
+const msce::Type &msce::get_reflection_of_type(const std::type_index &std_type)
 {
   for (const auto &[n, t] :
        internal::get_g_reflection_types_registry().enumerate_registry())

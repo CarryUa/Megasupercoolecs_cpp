@@ -12,6 +12,7 @@ namespace msce
 {
 /**
  * @brief Base type for all global events.
+ * @note This is POD type and does not produce vtable pointer.
  * @note Callbacks subscribed to global events, unlike local ones, are
  * subscribed to type of an event.
  * @note To rise a global event, you should use @ref msce::EventManager

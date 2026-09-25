@@ -1,5 +1,4 @@
-#ifndef _MSCE_SYSTEM_H_
-#define _MSCE_SYSTEM_H_
+#pragma once
 #include <MSCE/platform.h>
 #include <MSCE/Types/Collections/registry.hpp>
 #include <MSCE/msce_macros.h>
@@ -106,8 +105,9 @@ template <typename TSystem> class SystemDependency
 
     if (!system_)
       throw std::runtime_error(
-          std::format("Failed to inject dependency '{}'.",
-                      Platform::demangle(request.requested_type.name())));
+          std::format("Failed to inject dependency '{}'({}).",
+                      Platform::demangle(request.requested_type.name()),
+                      Platform::demangle(typeid(TSystem).name())));
   }
 
 public:
@@ -166,5 +166,3 @@ public:
 
 } // namespace msce
 MSCE_REGISTER_SYSTEM(msce::System)
-
-#endif // _MSCE_SYSTEM_H_

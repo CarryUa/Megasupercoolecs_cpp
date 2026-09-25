@@ -8,21 +8,9 @@
 #include <MSCE/event.h>
 #include <MSCE/Types/enum.h>
 #include <MSCE/terminator.h>
+#include <MSCE/serialization.h>
 
 using namespace msce;
-
-class TestSystem : public System
-{
-  SystemDependency<TimeSystem> timesys_;
-
-  virtual void init()
-  {
-    Logger logger("adasd");
-    logger.log_debug("DependencyInjected: {}", timesys_->active);
-  }
-};
-
-MSCE_REGISTER_SYSTEM(TestSystem)
 
 void log_key(KeyEventArgs &args)
 {
@@ -111,6 +99,16 @@ int main(int argc, char **argv)
 
   g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
   g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
+
+  std::ofstream testent("testent.msceproto");
+  Serializer::serialize(*ent.get(), testent);
+  auto ent2 = EntityManager::instance->create_entity();
+  testent.close();
+  std::ifstream testent2("testent.msceproto");
+  Serializer::deserialize(*ent2.get(), testent2);
+  testent2.close();
+
+  g_logger.log_info("{}", ent2->has_component<SpriteRendererComponent>());
 
   while (!root_window->should_close())
   {

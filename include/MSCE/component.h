@@ -6,31 +6,71 @@
 #include <MSCE/Types/Collections/handle.hpp>
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Types/singleton.hpp>
+#include <MSCE/serialization.h>
+#include <typeindex>
 
 #pragma region Components Macros
 #define MSCE_DEFINE_COMPONENT(Type, ...)                                       \
 private:                                                                       \
+  friend class ::msce::internal::StaticComponentRegistration<Type>;            \
   friend class ::msce::ComponentManager;                                       \
   MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>,  \
                                                  __VA_ARGS__)                  \
-protected:                                                                     \
+public:                                                                        \
+  virtual void polymophic_save(SerializationOutArchive &ar) const override     \
+  {                                                                            \
+    ar(*this);                                                                 \
+  }                                                                            \
+  virtual void polymophic_load(SerializationInArchive &ar) override            \
+  {                                                                            \
+    ar(*this);                                                                 \
+  }                                                                            \
+                                                                               \
   /**  @brief This overload is used by cereal. All components must be          \
    * instantiated using ComponentManager. */                                   \
   Type() {}
 
 #define MSCE_REGISTER_COMPONENT(Type)                                          \
+  MSCE_REFLECT_CLASS(Type)                                                     \
   CEREAL_REGISTER_TYPE(Type)                                                   \
-  CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::BaseComponent<Type>, Type)
+  CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::BaseComponent<Type>, Type)      \
+  CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IComponent,                     \
+                                       ::msce::BaseComponent<Type>)            \
+  namespace msce::internal                                                     \
+  {                                                                            \
+  template <> class StaticComponentRegistration<Type>                          \
+  {                                                                            \
+  public:                                                                      \
+    StaticComponentRegistration()                                              \
+    {                                                                          \
+      ::msce::ComponentManager::component_factories().register_entry(          \
+          typeof(Type), []() { return std::make_unique<Type>(); });            \
+    }                                                                          \
+  };                                                                           \
+  inline static ::msce::internal::StaticComponentRegistration<Type>            \
+      BOOST_PP_CAT(registration_, __COUNTER__);                                \
+  }
 
 /** @brief Macro for defining components inheriting another component. */
 #define MSCE_DEFINE_DERIVED_COMPONENT(Type, Parent, ...)                       \
 private:                                                                       \
   friend class ::msce::ComponentManager;                                       \
+  friend class ::msce::internal::StaticComponentRegistration<Type>;            \
   MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(Parent, __VA_ARGS__)          \
 protected:                                                                     \
   IComponent *clone() override                                                 \
   {                                                                            \
     return new Type(static_cast<const Type &>(*this));                         \
+  }                                                                            \
+                                                                               \
+public:                                                                        \
+  virtual void polymophic_save(SerializationOutArchive &ar) const override     \
+  {                                                                            \
+    ar(*this);                                                                 \
+  }                                                                            \
+  virtual void polymophic_load(SerializationInArchive &ar) override            \
+  {                                                                            \
+    ar(*this);                                                                 \
   }                                                                            \
   /**  @brief This overload is used by cereal. All components must be          \
    * instantiated using ComponentManager. */                                   \
@@ -38,13 +78,31 @@ protected:                                                                     \
 
 /** @brief Macro for registering components inheriting another component. */
 #define MSCE_REGISTER_DERIVED_COMPONENT(Type, Parent)                          \
+  MSCE_REFLECT_CLASS(Type)                                                     \
   CEREAL_REGISTER_TYPE(Type)                                                   \
-  CEREAL_REGISTER_POLYMORPHIC_RELATION(Parent, Type)
+  CEREAL_REGISTER_POLYMORPHIC_RELATION(Parent, Type)                           \
+  CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IComponent,                     \
+                                       ::msce::BaseComponent<Type>)            \
+  namespace msce::internal                                                     \
+  {                                                                            \
+  template <> class StaticComponentRegistration<Type>                          \
+  {                                                                            \
+  public:                                                                      \
+    StaticComponentRegistration()                                              \
+    {                                                                          \
+      ::msce::ComponentManager::component_factories().register_entry(          \
+          typeof(Type), []() { return std::make_unique<Type>(); });            \
+    }                                                                          \
+  };                                                                           \
+  inline static ::msce::internal::StaticComponentRegistration<Type>            \
+      BOOST_PP_CAT(registration_, __COUNTER__);                                \
+  }
 
 #pragma endregion
 
 namespace msce
 {
+
 class Entity;
 class ComponentManager;
 /**
@@ -58,12 +116,10 @@ protected:
 
   virtual void set_owner(Entity *owner) = 0;
 
-  /// @brief This overload is used by cereal.All components must be instantiated
-  /// using ComponentManager
-  IComponent() {}
-
 public:
-  virtual ~IComponent() = default;
+  /// @brief This overload is used by cereal. All components must be
+  /// instantiated using ComponentManager
+  IComponent() {}
   virtual IComponent *clone() = 0;
   virtual Entity *get_entity() = 0;
 
@@ -75,7 +131,27 @@ public:
   void load(Archive &ar)
   {
   }
+
+  virtual void polymophic_save(SerializationOutArchive &ar) const = 0;
+  virtual void polymophic_load(SerializationInArchive &ar) = 0;
 };
+
+namespace internal
+{
+template <typename T> class StaticComponentRegistration;
+
+struct ComponentSerializeProxy
+{
+  const IComponent *comp;
+  void save(SerializationOutArchive &ar) const { comp->polymophic_save(ar); }
+};
+
+struct ComponentDeserializeProxy
+{
+  IComponent *comp;
+  void load(SerializationInArchive &ar) { comp->polymophic_load(ar); }
+};
+} // namespace internal
 
 /**
  * @brief Base type for all components.
@@ -120,9 +196,21 @@ using ComponentHandle = SmartHandle<SmartUniquePointerList<IComponent>, TComp>;
 class ComponentManager : public Singleton<ComponentManager>
 {
 private:
+  template <typename T>
+  friend class ::msce::internal::StaticComponentRegistration;
+
   /// @brief Component storage
   SmartUniquePointerList<IComponent> components_;
+
   inline static Logger logger = Logger("ComponentManager");
+
+  inline static auto &component_factories()
+  {
+    static Registry<std::reference_wrapper<const Type>,
+                    std::function<std::unique_ptr<IComponent>()>>
+        reg;
+    return reg;
+  };
 
 public:
   ComponentManager();
@@ -133,6 +221,14 @@ public:
    * @return @ref msce::ComponentHandle of newly created component.
    */
   template <typename TComp> ComponentHandle<TComp> create_component();
+
+  /**
+   * @brief Creates new component.
+   * @param type A @ref msce::Type of component that will be created. Use typeof
+   * macro to get it.
+   * @return @ref msce::ComponentHandle of newly created component.
+   */
+  ComponentHandle<IComponent> create_component(const msce::Type &type);
 
   /**
    * @brief Clones new component.
@@ -188,10 +284,7 @@ inline ComponentHandle<TComp> ComponentManager::create_component()
 {
   static_assert(std::is_base_of_v<IComponent, TComp>,
                 "TComp must derive from IComponent");
-
-  auto handle =
-      this->components_.insert(dynamic_cast<IComponent *>(new TComp()));
-  return static_cast<ComponentHandle<TComp>>(handle);
+  return static_cast<ComponentHandle<TComp>>(create_component(typeof(TComp)));
 }
 
 template <typename TComp>

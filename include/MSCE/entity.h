@@ -1,6 +1,7 @@
 #ifndef MSCE_ENTITY_H_
 #define MSCE_ENTITY_H_
 #include <vector>
+#include <MSCE/reflection.h>
 #include <MSCE/component.h>
 #include <MSCE/Types/Collections/handle.hpp>
 
@@ -122,6 +123,35 @@ public:
   void force_attach_component(ComponentHandle<TComp> comp) noexcept;
   void force_attach_component(const std::type_index &type_index,
                               ComponentHandle<IComponent> comp) noexcept;
+
+  friend class ::cereal::access;
+  template <class Archive> void save(Archive &ar) const
+  {
+
+    ar(cereal::make_size_tag(
+        static_cast<cereal::size_type>(components_.size() * 2)));
+    for (auto &[t, c] : components_)
+      ar(typeof_std_type(t).get_name_str(),
+         msce::internal::ComponentSerializeProxy{c.get()});
+  }
+
+  template <class Archive> void load(Archive &ar)
+  {
+    cereal::size_type size;
+    ar(cereal::make_size_tag(size));
+
+    for (cereal::size_type i = 0; i < size; i += 2)
+    {
+      std::string type_name;
+      ar(type_name);
+
+      auto comp =
+          ComponentManager::instance->create_component(typeof_n(type_name));
+      ar(internal::ComponentDeserializeProxy{comp.get()});
+
+      attach_component(typeof_n(type_name).get_std_type(), comp);
+    }
+  }
 };
 
 /**

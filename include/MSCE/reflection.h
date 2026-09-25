@@ -84,10 +84,11 @@ template <typename T> struct TypeRegistration
 {
   inline static constexpr const msce::Type &get_type()
   {
-    static_assert(
-        false,
-        "Type is never registered in reflection. Try using MSCE_REFLECT_CLASS "
-        "or MSCE_REFLECT_FUNDAMENTAL to fix the issue.");
+    static_assert(false, "Tried to get reflection of a type that was never "
+                         "reflected. Try using MSCE_REFLECT_CLASS "
+                         "or MSCE_REFLECT_FUNDAMENTAL to fix the issue. "
+                         "\nNote that reflecting a class requires all its "
+                         "members to be reflected too.");
     throw std::runtime_error(
         "Tried to get a type reflection that is not reflected at point its "
         "reflection was requested.");
@@ -451,11 +452,12 @@ template <typename T> constexpr const Type &get_reflection_of_type()
   return internal::TypeRegistration<T>::get_type();
 }
 const Type &get_reflection_of_type(const std::string &name);
-const Type &get_reflection_of_type(const std::type_info &std_type);
+const Type &get_reflection_of_type(const std::type_index &std_type);
 
 #define typeof(Type) ::msce::get_reflection_of_type<Type>()
 #define typeof_v(Variable) ::msce::get_reflection_of_type(typeid(Variable))
 #define typeof_n(Str) ::msce::get_reflection_of_type(Str)
+#define typeof_std_type(Type) ::msce::get_reflection_of_type(Type)
 
 inline constexpr msce::MemberInfo::MemberInfo(const char *name, uint32_t offset,
                                               const Type &type)
@@ -989,6 +991,34 @@ inline constexpr bool msce::Type::is_move_assignable() const
 }
 } // namespace msce
 
+namespace std
+{
+template <> struct hash<msce::Type>
+{
+  std::size_t operator()(const msce::Type &t) const noexcept
+  {
+    return hash<std::type_index>{}(t.get_std_type());
+  }
+};
+template <> struct hash<std::reference_wrapper<const msce::Type>>
+{
+  std::size_t
+  operator()(const std::reference_wrapper<const msce::Type> &r) const noexcept
+  {
+    return hash<msce::Type>{}(r.get());
+  }
+};
+
+template <> struct equal_to<std::reference_wrapper<const msce::Type>>
+{
+  bool operator()(std::reference_wrapper<const msce::Type> a,
+                  std::reference_wrapper<const msce::Type> b) const noexcept
+  {
+    return a.get() == b.get();
+  }
+};
+} // namespace std
+
 /**
  * @brief Simply generates static get_type_info() method ad adds internal
  * functions as friends. You don't HAVE to define it, but it's highly advised.
@@ -1044,9 +1074,9 @@ inline constexpr bool msce::Type::is_move_assignable() const
   {                                                                            \
     inline static constexpr std::array<const ::msce::MemberInfo,               \
                                        BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)>    \
-        members = {BOOST_PP_SEQ_ENUM(                                          \
+        members = {__VA_OPT__(BOOST_PP_SEQ_ENUM(                               \
             BOOST_PP_SEQ_TRANSFORM(MSCE_REFLECT_CLASS_MEMBER_WRP, ClassName,   \
-                                   BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))};   \
+                                   BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))))};  \
     inline static constexpr msce::Type type =                                  \
         msce::Type(#ClassName, sizeof(ClassName),                              \
                    ::msce::internal::compute_type_traits<ClassName>(),         \

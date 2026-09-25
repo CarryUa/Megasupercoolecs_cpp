@@ -15,7 +15,7 @@ public:
 
   std::shared_ptr<BaseShape2D> shape = std::make_shared<Rectangle>();
 
-  MSCE_DEFINE_COMPONENT(TransformComponent, position, scale, shape)
+  MSCE_DEFINE_COMPONENT(TransformComponent, position, scale, rotation)
 };
 } // namespace msce
 MSCE_REGISTER_COMPONENT(msce::TransformComponent)

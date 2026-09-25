@@ -43,32 +43,7 @@ struct TestTypeWithReflectionDerived : public TestTypeWithReflection
 
 } // namespace
 
-namespace msce::internal
-{
-template <> struct TypeRegistration<TestEnum8>
-{
-  inline static constexpr msce::Type type =
-      msce::Type("TestEnum8", sizeof(TestEnum8),
-                 ::msce::internal::compute_type_traits<TestEnum8>(), {},
-                 typeid(TestEnum8));
-  inline static constexpr const msce::Type &get_type() { return type; }
-  static void register_self()
-  {
-    static const ::msce::Type &r = []()
-    {
-      Logger logger("StaticTypeRegistration");
-      ::msce::internal::get_g_reflection_types_registry().register_entry(
-          "TestEnum8", ::std::cref(TypeRegistration<TestEnum8>::type));
-      logger.log_info("Successfully reflected type '{}'",
-                      TypeRegistration<TestEnum8>::type.get_name_str());
-      return TypeRegistration<TestEnum8>::type;
-    }();
-  }
-  [[gnu::used]] TypeRegistration() { register_self(); }
-};
-inline static TypeRegistration<TestEnum8> refl_t_reg539;
-} // namespace msce::internal
-
+MSCE_REFLECT_FUNDAMENTAL(TestEnum8)
 MSCE_REFLECT_FUNDAMENTAL(TestEnum32)
 MSCE_REFLECT_CLASS(::TestTypeWithReflection, test_int, test_bool, test_str)
 MSCE_REFLECT_CLASS(::TestTypeWithReflectionDerived, test_int, test_bool,

@@ -58,6 +58,7 @@ public:
 
   bool insert(LocalHandle item) noexcept;
   LocalHandle insert(TPointedTo *) noexcept;
+  LocalHandle insert(std::unique_ptr<TPointedTo> &&) noexcept;
   bool remove(LocalHandle item) noexcept;
   bool remove(uint32_t index) noexcept;
 
@@ -140,6 +141,28 @@ SmartUniquePointerList<TPointedTo>::insert(TPointedTo *item) noexcept
   else
   {
     this->list_.at(min_dead_index_).reset(item);
+    this->coresponding_generations_.at(min_dead_index_)++;
+  }
+  alive_items_count_++;
+
+  auto handle = this->get_item(min_dead_index_);
+  this->update_min_dead_index();
+  return handle;
+}
+template <class TPointedTo>
+inline LocalHandle SmartUniquePointerList<TPointedTo>::insert(
+    std::unique_ptr<TPointedTo> &&item) noexcept
+{
+  if (item == nullptr) return LocalHandle::create_nullptr();
+
+  if (this->min_dead_index_ == this->list_.size())
+  {
+    this->list_.push_back(std::move(item));
+    this->coresponding_generations_.push_back(0);
+  }
+  else
+  {
+    this->list_.at(min_dead_index_) = std::move(item);
     this->coresponding_generations_.at(min_dead_index_)++;
   }
   alive_items_count_++;

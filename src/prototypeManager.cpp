@@ -2,7 +2,7 @@
 #include <fstream>
 #include <functional>
 
-#include <MSCE/serializer.h>
+#include <MSCE/serialization.h>
 #include <MSCE/Events/prototypeEvents.h>
 #include <MSCE/event.h>
 
