@@ -7,6 +7,7 @@
 #include <MSCE/Types/Collections/smartUniquePointerList.hpp>
 #include <MSCE/Types/singleton.hpp>
 #include <MSCE/serialization.h>
+#include <MSCE/event.h>
 #include <typeindex>
 
 #pragma region Components Macros
@@ -292,7 +293,10 @@ inline ComponentHandle<TComp>
 ComponentManager::clone_component(ComponentHandle<TComp> other)
 {
   IComponent *cloned = other->clone();
-  return static_cast<ComponentHandle<TComp>>(this->components_.insert(cloned));
+
+  auto handle = this->components_.insert(cloned);
+
+  return static_cast<ComponentHandle<TComp>>(handle);
 }
 
 template <typename TComp>
@@ -325,5 +329,6 @@ inline bool ComponentManager::destroy_component(ComponentHandle<TComp> comp)
 } // namespace msce
 
 CEREAL_REGISTER_TYPE(msce::IComponent)
+MSCE_REFLECT_CLASS(msce::IComponent)
 
 #endif // _MSCE_COMPONENT_H_

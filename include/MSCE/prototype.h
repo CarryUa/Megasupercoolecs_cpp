@@ -122,10 +122,13 @@ private:
   std::unordered_map<std::string, std::unique_ptr<IPrototype>> prototypes_;
   inline static Logger logger = Logger("PrototypeManager");
 
-  void load_all_prototypes();
-
 public:
   PrototypeManager();
+
+  /**
+   * @brief Loads all .msceproto files.
+   */
+  void load_all_prototypes();
 
   /**
    * @brief Reference to staticaly-registered prototype factories.

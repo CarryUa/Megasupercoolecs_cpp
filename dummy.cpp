@@ -1,6 +1,8 @@
 // This is a dummy file for CMake to determain language correctly when creating
 // library. Also used for testing diferent parts of engine
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
+#include <MSCE/BuiltIns/Renderers/spriteRendererSystem.h>
+
 #include <MSCE/Types/image.h>
 #include <MSCE/BuiltIns/inputSystem.h>
 
@@ -50,7 +52,9 @@ int main(int argc, char **argv)
   static auto g_ent_man = EntityManager();
   static auto g_proto_man = PrototypeManager();
   static auto g_enum_man = EnumManager();
+
   g_sys_man.init_all_systems();
+  g_proto_man.load_all_prototypes();
 
   srand(time(NULL));
   static auto g_logger = Logger("GLOBAL");
@@ -101,13 +105,22 @@ int main(int argc, char **argv)
   g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
   g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
 
-  g_proto_man.deserialize_prototype("testent.msceproto");
   auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
 
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
   ent2->get_component<TransformComponent>()->position += vec2d(100, 30);
 
-  g_logger.log_info("{}", ent2->has_component<SpriteRendererComponent>());
+  for (int i = 0; i < 1000; ++i)
+  {
+    auto ent = EntityManager::instance->copy_entity(ent2);
+
+    ent->get_component<TransformComponent>()->position +=
+        i % 2 == 0 ? vec2d(20 * i, 20 * i) : vec2d(-20 * i, 20 * i);
+  }
+
+  g_logger.log_debug(
+      "Image reused: {}",
+      ent2->get_component<SpriteRendererComponent>()->img.use_count());
   g_logger.log_debug("Starting main loop...");
 
   while (!root_window->should_close())
@@ -115,10 +128,10 @@ int main(int argc, char **argv)
     frame++;
     if (time_sys->get_total_millis() > next_fps_time)
     {
-      g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 5,
+      g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 1,
                         time_sys->get_total_seconds());
       frame = 0;
-      next_fps_time += 5000;
+      next_fps_time += 1000;
     }
     g_sys_man.update_all_systems();
 

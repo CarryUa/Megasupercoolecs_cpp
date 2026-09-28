@@ -28,9 +28,13 @@ void msce::PrototypeManager::load_all_prototypes()
 
       if (p == nullptr) failures++;
       else
+      {
         successes++;
+      }
     }
   }
+  AllPrototypesLoadedEvent fin_ev;
+  EventManager::instance->fire(fin_ev);
   logger.log_info(
       "Finished loading prototypes. total: {} | successes: {} | failures: {}",
       successes + failures, successes, failures);
@@ -41,12 +45,6 @@ msce::PrototypeManager::PrototypeManager()
       registered_prototypes_ref(get_g_registered_prototypes())
 {
   logger.log_info("Initializing manager...");
-
-  PrototypeLoadingStartingEvent start_ev;
-  EventManager::instance->fire(start_ev);
-  load_all_prototypes();
-  PrototypeLoadingFinishedEvent fin_ev;
-  EventManager::instance->fire(fin_ev);
 }
 
 msce::IPrototype *
@@ -66,7 +64,14 @@ msce::PrototypeManager::deserialize_prototype(const string &path)
     Serializer::deserialize(proto, file);
 
     auto ptr = proto.get();
+    std::string id = proto->id;
     this->prototypes_[proto->id] = std::move(proto);
+
+    logger.log_info("Prototype '{}' loaded successfuly from '{}'", id, path);
+    PrototypeLoadedEvent ev;
+    ev.prototype = prototypes_.at(id).get();
+    EventManager::instance->fire(ev);
+
     return ptr;
   }
   catch (const exception &e)
@@ -89,8 +94,9 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path,
 {
   if (!prototype_id_exists(id))
   {
-    logger.log_error("Tried serializing non-manager-created prototype. Use "
-                     "create_new_prototype_instance() to create prototypes.");
+    logger.log_error("Tried to load prototype with ID that was already loaded. "
+                     "Check for double occurance of '{}' at '{}'",
+                     id, path);
     return;
   }
 
@@ -104,7 +110,6 @@ void msce::PrototypeManager::serialize_prototype(const std::string &path,
   try
   {
     auto &uptr_ref = this->prototypes_[id];
-
     Serializer::serialize(uptr_ref, file);
   }
   catch (const exception &e)

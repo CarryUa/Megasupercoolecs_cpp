@@ -11,7 +11,9 @@ msce::ComponentManager::ComponentManager()
 ComponentHandle<IComponent>
 msce::ComponentManager::create_component(const msce::Type &type)
 {
-  return this->components_.insert(component_factories().get_entry(type)());
+  auto handle =
+      this->components_.insert(component_factories().get_entry(type)());
+  return handle;
 }
 
 bool msce::ComponentManager::destroy_component(size_t id)

@@ -31,7 +31,7 @@ void msce::MSCEWindow::prepare_shaders()
 {
 
   if (!PrototypeManager::instance)
-    EventManager::instance->subscribe<PrototypeLoadingFinishedEvent>(
+    EventManager::instance->subscribe<AllPrototypesLoadedEvent>(
         [this](auto &ev) { this->prepare_shaders(); });
 
   else
@@ -154,6 +154,8 @@ bool msce::MSCEWindow::bind_image(const Image &image)
                image.pixel_data.get());
 
   this->context_.textures[&image] = handle;
+
+  logger_.log_debug("Image bount!");
   return true;
 }
 

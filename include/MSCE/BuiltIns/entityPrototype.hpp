@@ -35,14 +35,12 @@ public:
   inline static const ::msce::Type &get_type_info()
   {
     static const ::msce::Type &t =
-        ::msce::get_reflection_of_type("EntityPrototype");
+        ::msce::get_reflection_of_type(typeid(EntityPrototype));
     return t;
   }
   virtual const ::msce::Type &get_type_info_polymorphic() override
   {
-    static const ::msce::Type &t =
-        ::msce::get_reflection_of_type(typeid(EntityPrototype));
-    return t;
+    return EntityPrototype::get_type_info();
   }
 };
 } // namespace msce
