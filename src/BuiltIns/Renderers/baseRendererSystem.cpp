@@ -1,5 +1,6 @@
 #include <MSCE/BuiltIns/Renderers/baseRendererSystem.h>
 
+#include <MSCE/MSCEWindow.h>
 #include <MSCE/BuiltIns/Renderers/baseRendererComponent.hpp>
 #include <MSCE/event.h>
 #include <MSCE/logger.h>

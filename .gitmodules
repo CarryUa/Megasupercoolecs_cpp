@@ -15,6 +15,9 @@
 [submodule "lib/zlib"]
 	path = lib/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "lib/stb"]
-	path = lib/stb
-	url = https://github.com/nothings/stb.git
+[submodule "lib/libpng"]
+	path = lib/libpng
+	url = https://github.com/pnggroup/libpng
+[submodule "lib/libjpeg"]
+	path = lib/libjpeg
+	url = https://github.com/winlibs/libjpeg

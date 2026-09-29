@@ -125,6 +125,13 @@ msce::MSCEWindow::MSCEWindow(vec2ui window_size, const char *title,
   glViewport(0, 0, this->size().x, this->size().y);
   glClearColor(0.5, .5, .5, 1);
   prepare_shaders();
+
+  EventManager::instance->subscribe<ImageNeedsBindingEvent>(
+      [this](ImageNeedsBindingEvent &ev)
+      {
+        if (image_bound(ev.image)) unbind_image(ev.image);
+        bind_image(ev.image);
+      });
 }
 
 vec2ui msce::MSCEWindow::size() { return size_; }
@@ -132,7 +139,7 @@ vec2ui msce::MSCEWindow::size() { return size_; }
 bool msce::MSCEWindow::bind_image(const Image &image)
 {
   if (image_bound(image)) return true;
-  if (image.format() == ImageFormat::INVALID) return false;
+  if (image.format == ImageFormat::UNSUPPORTED) return false;
   use_context();
   GLuint handle = 0;
   glGenTextures(1, &handle);
@@ -149,9 +156,9 @@ bool msce::MSCEWindow::bind_image(const Image &image)
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)image.format(), image.resolution.x,
-               image.resolution.y, 0, (GLenum)image.format(), GL_UNSIGNED_BYTE,
-               image.pixel_data.get());
+  glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)image.channels(), image.resolution.x,
+               image.resolution.y, 0, (GLenum)image.channels(),
+               GL_UNSIGNED_BYTE, image.pixel_data.get());
 
   this->context_.textures[&image] = handle;
 

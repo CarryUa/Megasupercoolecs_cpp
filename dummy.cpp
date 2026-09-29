@@ -108,20 +108,26 @@ int main(int argc, char **argv)
   auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
 
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
-  ent2->get_component<TransformComponent>()->position += vec2d(100, 30);
+  ent2->get_component<TransformComponent>()->position = vec2d(0, 0);
+  ent2->get_component<TransformComponent>()->shape =
+      std::make_shared<Rectangle>(root_window->size().x, root_window->size().y);
 
-  for (int i = 0; i < 1000; ++i)
-  {
-    auto ent = EntityManager::instance->copy_entity(ent2);
+  // for (int i = 0; i < 1500; ++i)
+  // {
+  //   auto ent = EntityManager::instance->copy_entity(ent2);
 
-    ent->get_component<TransformComponent>()->position +=
-        i % 2 == 0 ? vec2d(20 * i, 20 * i) : vec2d(-20 * i, 20 * i);
-  }
+  //   ent->get_component<TransformComponent>()->position +=
+  //       i % 2 == 0 ? vec2d(20 * i, 20 * i) : vec2d(-20 * i, 20 * i);
+  // }
 
   g_logger.log_debug(
       "Image reused: {}",
       ent2->get_component<SpriteRendererComponent>()->img.use_count());
   g_logger.log_debug("Starting main loop...");
+
+  auto testimg = Image("earojaoifsnksaknkgs.png");
+  testimg.load("./aot.jpg");
+  testimg.load("./aoafoigoaegvpg");
 
   while (!root_window->should_close())
   {
@@ -132,6 +138,12 @@ int main(int argc, char **argv)
                         time_sys->get_total_seconds());
       frame = 0;
       next_fps_time += 1000;
+
+      if ((int)time_sys->get_total_seconds() % 2 == 0)
+        ent2->get_component<SpriteRendererComponent>()->img->load(
+            "./cmss14 yaoi vs yuri.psd.png");
+      else
+        ent2->get_component<SpriteRendererComponent>()->img->load("./aot.jpg");
     }
     g_sys_man.update_all_systems();
 

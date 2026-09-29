@@ -1,5 +1,6 @@
 #include <MSCE/BuiltIns/Renderers/spriteRendererSystem.h>
 
+#include <MSCE/MSCEWindow.h>
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
 #include <MSCE/BuiltIns/entityPrototype.hpp>
 #include <MSCE/event.h>
@@ -23,7 +24,7 @@ void msce::SpriteRendererSystem::on_object_render(
   if (!ev.target_window.image_bound(*rend->img))
     ev.target_window.bind_image(*rend->img);
 
-  if (rend->img->format() == ImageFormat::INVALID) return;
+  if (rend->img->format == ImageFormat::UNSUPPORTED) return;
 
   auto shader = ev.target_window.get_shader_ref(rend->shader_id());
   if (!shader->is_ready()) return;

@@ -1,6 +1,7 @@
 #pragma once
 #include <MSCE/system.h>
 #include <MSCE/Events/graphicsEvents.h>
+#include <MSCE/Events/prototypeEvents.h>
 #include <MSCE/prototype.h>
 
 namespace msce

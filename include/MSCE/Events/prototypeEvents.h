@@ -4,6 +4,7 @@
 
 namespace msce
 {
+class IPrototype;
 struct PrototypeLoadedEvent : public BaseGlobalEvent
 {
   IPrototype *prototype;

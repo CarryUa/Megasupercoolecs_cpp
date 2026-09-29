@@ -1,12 +1,25 @@
 #ifndef MSCE_GL_EVENTS_H_
 #define MSCE_GL_EVENTS_H_
 #include <MSCE/event.h>
-#include <MSCE/MSCEWindow.h>
 #include <MSCE/BuiltIns/transformComponent.hpp>
 #include <MSCE/entity.h>
 
 namespace msce
 {
+class MSCEWindow;
+struct Image;
+
+/**
+ * @brief Binds an image passed into constructor to all windows.
+ *
+ */
+struct ImageNeedsBindingEvent : public BaseGlobalEvent
+{
+  Image &image;
+
+  ImageNeedsBindingEvent(Image &img) : image(img) {}
+};
+
 struct WindowCreatedEvent : public BaseGlobalEvent
 {
   MSCEWindow &window;
