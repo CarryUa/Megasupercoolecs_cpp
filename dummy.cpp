@@ -13,6 +13,7 @@
 #include <MSCE/serialization.h>
 #include <MSCE/BuiltIns/entityPrototype.hpp>
 #include <MSCE/reflection.h>
+#include <MSCE/Types/animation.h>
 
 using namespace msce;
 
@@ -65,40 +66,6 @@ int main(int argc, char **argv)
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
-  // auto ent = EntityManager::instance->create_entity();
-  // auto trans =
-  //     ComponentManager::instance->create_component<TransformComponent>();
-  // ent->attach_component(trans);
-
-  // auto rend =
-  //     ComponentManager::instance->create_component<SpriteRendererComponent>();
-  // ent->attach_component(rend);
-
-  // trans->shape = std::make_shared<Rectangle>();
-
-  // rend->img = std::make_shared<Image>("./cmss14 yaoi vs yuri.psd.png");
-  // auto *img = rend->img.get();
-
-  // root_window->bind_image(*img);
-
-  // g_logger.log_info("Image bount: {}x{} at 0x{:X}", img->resolution.x,
-  //                   img->resolution.y, reinterpret_cast<uintptr_t>(img));
-
-  // for (int i = 0; i < 1; ++i)
-  // {
-  //   auto copy = EntityManager::instance->copy_entity(ent);
-  //   copy->get_component<TransformComponent>()->position.x += 150;
-  //   g_logger.log_info(
-  //       "Has comp: {}; handle({},{}); addr: 0x{:x}",
-  //       copy->has_component<SpriteRendererComponent>(),
-  //       copy->get_component<SpriteRendererComponent>().get_index(),
-  //       copy->get_component<SpriteRendererComponent>().get_generation(),
-  //       reinterpret_cast<uintptr_t>(
-  //           copy->get_component<SpriteRendererComponent>().get()));
-
-  //   copy->get_component<SpriteRendererComponent>()->img = rend->img;
-  // }
-
   int frame = 0;
   double next_fps_time = 0.5;
 
@@ -110,7 +77,7 @@ int main(int argc, char **argv)
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
   ent2->get_component<TransformComponent>()->position = vec2d(0, 0);
   ent2->get_component<TransformComponent>()->shape =
-      std::make_shared<Rectangle>(root_window->size().x, root_window->size().y);
+      std::make_shared<Rectangle>(100, 100);
 
   // for (int i = 0; i < 1500; ++i)
   // {
@@ -129,23 +96,33 @@ int main(int argc, char **argv)
   testimg.load("./aot.jpg");
   testimg.load("./aoafoigoaegvpg");
 
+  Animation<vec2d, EasingInOut<2.0f>> anim(
+      &ent2->get_component<TransformComponent>()->position, true);
+  anim.add_frame(0, vec2d(-1280 / 2, 0));
+  anim.add_frame(5, vec2d(1280 / 2, 300));
+  anim.add_frame(10, vec2d(0, 0));
+  anim.add_frame(15, vec2d(-1280 / 2, 0));
+
   while (!root_window->should_close())
   {
     frame++;
     if (time_sys->get_total_millis() > next_fps_time)
     {
-      g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 1,
-                        time_sys->get_total_seconds());
+      // g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 1,
+      //                   time_sys->get_total_seconds());
+
       frame = 0;
       next_fps_time += 1000;
 
-      if ((int)time_sys->get_total_seconds() % 2 == 0)
-        ent2->get_component<SpriteRendererComponent>()->img->load(
-            "./cmss14 yaoi vs yuri.psd.png");
-      else
-        ent2->get_component<SpriteRendererComponent>()->img->load("./aot.jpg");
+      // if ((int)time_sys->get_total_seconds() % 2 == 0)
+      //   ent2->get_component<SpriteRendererComponent>()->img->load(
+      //       "./cmss14 yaoi vs yuri.psd.png");
+      // else
+      //   ent2->get_component<SpriteRendererComponent>()->img->load("./aot.jpg");
     }
     g_sys_man.update_all_systems();
+
+    anim.play_frame(time_sys->get_delta_seconds());
 
     root_window->render();
     root_window->draw();

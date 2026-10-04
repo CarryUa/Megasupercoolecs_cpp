@@ -1,5 +1,6 @@
 #pragma once
 #include <MSCE/msce_macros.h>
+#include <MSCE/math.h>
 
 namespace msce
 {
@@ -192,4 +193,27 @@ using vec3i64 = Vector3D<long>;
 using vec3ui64 = Vector3D<unsigned long>;
 using vec3l = Vector3D<long>;
 using vec3ul = Vector3D<unsigned long>;
+
+template <typename Tvec, typename Easing>
+  requires std::is_arithmetic_v<Tvec>
+struct Interpolate<Vector2D<Tvec>, Easing>
+{
+  Vector2D<Tvec> operator()(const Vector2D<Tvec> &a, const Vector2D<Tvec> &b,
+                            float t)
+  {
+    return a + (b - a) * Easing{}(t);
+  }
+};
+
+template <typename Tvec, typename Easing>
+  requires std::is_arithmetic_v<Tvec>
+struct Interpolate<Vector3D<Tvec>, Easing>
+{
+  Vector3D<Tvec> operator()(const Vector3D<Tvec> &a, const Vector3D<Tvec> &b,
+                            float t)
+  {
+    return a + (b - a) * Easing{}(t);
+  }
+};
+
 } // namespace msce
