@@ -152,6 +152,7 @@ struct ComponentDeserializeProxy
   IComponent *comp;
   void load(SerializationInArchive &ar) { comp->polymophic_load(ar); }
 };
+
 } // namespace internal
 
 /**

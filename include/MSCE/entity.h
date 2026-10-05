@@ -10,6 +10,54 @@ namespace msce
 template <typename T> class SmartUniquePointerList;
 class EntityManager;
 
+namespace internal
+{
+
+struct ComponentMapSerializeProxy
+{
+  const std::unordered_map<std::type_index, ComponentHandle<IComponent>> *comps;
+
+  struct LoadedArgs
+  {
+    ComponentHandle<IComponent> comp;
+    std::type_index type;
+  };
+  LocalEvent<LoadedArgs> loaded;
+
+  void save(SerializationOutArchive &ar) const
+  {
+    if (!comps) return;
+    ar(cereal::make_size_tag(
+        static_cast<cereal::size_type>(comps->size() * 2)));
+
+    for (auto &[t, c] : *comps)
+      ar(typeof_std_type(t).get_name_str(),
+         msce::internal::ComponentSerializeProxy{c.get()});
+  }
+
+  void load(SerializationInArchive &ar)
+  {
+
+    cereal::size_type size;
+    ar(cereal::make_size_tag(size));
+
+    for (cereal::size_type i = 0; i < size; i += 2)
+    {
+      std::string type_name;
+      ar(type_name);
+
+      auto comp =
+          ComponentManager::instance->create_component(typeof_n(type_name));
+
+      ar(internal::ComponentDeserializeProxy{comp.get()});
+      LoadedArgs args{.comp = comp, .type = typeof_n(type_name).get_std_type()};
+      loaded.fire(args);
+    }
+  }
+};
+
+}; // namespace internal
+
 /**
  * @brief Class representing an entity in ECS architecture. Containt list of
  * @ref msce::ComponentHandle 's attached to it.
@@ -31,6 +79,8 @@ private:
   size_t entity_id_ = 0;
 
 public:
+  bool active = true;
+
   /**
    * @tparam TComp type of component to check.
    * @retval true if entity has component of type TComp attached.
@@ -127,30 +177,19 @@ public:
   friend class ::cereal::access;
   template <class Archive> void save(Archive &ar) const
   {
-
-    ar(cereal::make_size_tag(
-        static_cast<cereal::size_type>(components_.size() * 2)));
-    for (auto &[t, c] : components_)
-      ar(typeof_std_type(t).get_name_str(),
-         msce::internal::ComponentSerializeProxy{c.get()});
+    ar(cereal::make_nvp("active", this->active));
+    msce::internal::ComponentMapSerializeProxy proxy;
+    proxy.comps = &components_;
+    ar(cereal::make_nvp("components", proxy));
   }
 
   template <class Archive> void load(Archive &ar)
   {
-    cereal::size_type size;
-    ar(cereal::make_size_tag(size));
-
-    for (cereal::size_type i = 0; i < size; i += 2)
-    {
-      std::string type_name;
-      ar(type_name);
-
-      auto comp =
-          ComponentManager::instance->create_component(typeof_n(type_name));
-      ar(internal::ComponentDeserializeProxy{comp.get()});
-
-      attach_component(typeof_n(type_name).get_std_type(), comp);
-    }
+    ar(cereal::make_nvp("active", this->active));
+    msce::internal::ComponentMapSerializeProxy proxy;
+    proxy.loaded.subscribe([this](auto &args)
+                           { this->attach_component(args.type, args.comp); });
+    ar(cereal::make_nvp("components", proxy));
   }
 };
 
@@ -197,11 +236,12 @@ public:
    * @param id The id of the entity.
    * @return @ref msce::EntityHandle of an entity under id or nullhandle.
    */
-  EntityHandle get_entity(uint32_t id);
+  EntityHandle get_entity(uint32_t id, bool force = false);
 
-  void do_for_each_entity(std::function<void(EntityHandle &)> callback);
+  void do_for_each_entity(std::function<void(EntityHandle &)> callback,
+                          bool force = false);
 
-  std::vector<EntityHandle> get_entities();
+  std::vector<EntityHandle> get_entities(bool force = false);
 };
 
 template <typename TComp> inline bool Entity::has_component() const noexcept

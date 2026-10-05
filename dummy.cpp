@@ -66,6 +66,51 @@ int main(int argc, char **argv)
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
+<<<<<<< HEAD
+=======
+  // auto ent = EntityManager::instance->create_entity();
+  // auto trans =
+  //     ComponentManager::instance->create_component<TransformComponent>();
+  // ent->attach_component(trans);
+
+  // auto rend =
+  //     ComponentManager::instance->create_component<SpriteRendererComponent>();
+  // ent->attach_component(rend);
+
+  // trans->shape = std::make_shared<Rectangle>();
+
+  // rend->img = std::make_shared<Image>("./cmss14 yaoi vs yuri.psd.png");
+  // auto *img = rend->img.get();
+
+  // PrototypeManager::instance
+  //     ->create_new_prototype_instance<EntityPrototype>("msce::EntityPrototype",
+  //                                                      "testentity")
+  //     ->entity = ent;
+
+  // PrototypeManager::instance->serialize_prototype("dfaijfaij.msceproto",
+  //                                                 "testentity");
+
+  // root_window->bind_image(*img);
+
+  // g_logger.log_info("Image bount: {}x{} at 0x{:X}", img->resolution.x,
+  //                   img->resolution.y, reinterpret_cast<uintptr_t>(img));
+
+  // for (int i = 0; i < 1; ++i)
+  // {
+  //   auto copy = EntityManager::instance->copy_entity(ent);
+  //   copy->get_component<TransformComponent>()->position.x += 150;
+  //   g_logger.log_info(
+  //       "Has comp: {}; handle({},{}); addr: 0x{:x}",
+  //       copy->has_component<SpriteRendererComponent>(),
+  //       copy->get_component<SpriteRendererComponent>().get_index(),
+  //       copy->get_component<SpriteRendererComponent>().get_generation(),
+  //       reinterpret_cast<uintptr_t>(
+  //           copy->get_component<SpriteRendererComponent>().get()));
+
+  //   copy->get_component<SpriteRendererComponent>()->img = rend->img;
+  // }
+
+>>>>>>> 0b5668b (Entity can now be disabled)
   int frame = 0;
   double next_fps_time = 0.5;
 
@@ -75,6 +120,7 @@ int main(int argc, char **argv)
   auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
 
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
+  ent2->active = true;
   ent2->get_component<TransformComponent>()->position = vec2d(0, 0);
   ent2->get_component<TransformComponent>()->shape =
       std::make_shared<Rectangle>(100, 100);

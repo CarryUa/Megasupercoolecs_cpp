@@ -16,19 +16,23 @@ msce::EntityHandle msce::EntityManager::create_entity()
   return this->entities_.insert(entity);
 }
 
-msce::EntityHandle msce::EntityManager::get_entity(uint32_t id)
+msce::EntityHandle msce::EntityManager::get_entity(uint32_t id, bool force)
 {
-  return this->entities_.get_item(id);
+  auto ent = this->entities_.get_item(id);
+  return (ent->active || force) ? ent : EntityHandle::create_nullptr();
 }
 
 void msce::EntityManager::do_for_each_entity(
-    std::function<void(EntityHandle &)> callback)
+    std::function<void(EntityHandle &)> callback, bool force)
 {
   for (auto ent : entities_)
+  {
+    if (!ent->active && !force) continue;
     callback(ent);
+  }
 }
 
-std::vector<msce::EntityHandle> msce::EntityManager::get_entities()
+std::vector<msce::EntityHandle> msce::EntityManager::get_entities(bool force)
 {
   std::vector<EntityHandle> result(entities_.alive_count(),
                                    EntityHandle::create_nullptr());
@@ -36,6 +40,7 @@ std::vector<msce::EntityHandle> msce::EntityManager::get_entities()
   uint32_t i = 0;
   for (const auto &ent : entities_)
   {
+    if (!ent->active && !force) continue;
     if (!ent) continue;
     result[i++] = ent;
   }
@@ -46,6 +51,7 @@ std::vector<msce::EntityHandle> msce::EntityManager::get_entities()
 msce::EntityHandle msce::EntityManager::copy_entity(EntityHandle other)
 {
   auto copy = this->create_entity();
+  copy->active = other->active;
   for (auto &[t, comp] : other->components_)
   {
     auto cc = ComponentManager::instance->clone_component(comp);
