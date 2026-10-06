@@ -129,9 +129,12 @@ msce::MSCEWindow::MSCEWindow(vec2ui window_size, const char *title,
   EventManager::instance->subscribe<ImageNeedsBindingEvent>(
       [this](ImageNeedsBindingEvent &ev)
       {
-        if (image_bound(ev.image)) unbind_image(ev.image);
+        unbind_image(ev.image);
         bind_image(ev.image);
       });
+
+  EventManager::instance->subscribe<ImageNeedsBindingEvent>(
+      [this](ImageNeedsBindingEvent &ev) { unbind_image(ev.image); });
 }
 
 vec2ui msce::MSCEWindow::size() { return size_; }
@@ -158,11 +161,10 @@ bool msce::MSCEWindow::bind_image(const Image &image)
 
   glTexImage2D(GL_TEXTURE_2D, 0, (GLenum)image.channels(), image.resolution.x,
                image.resolution.y, 0, (GLenum)image.channels(),
-               GL_UNSIGNED_BYTE, image.pixel_data.get());
+               GL_UNSIGNED_BYTE, image.pixel_data_.get());
 
   this->context_.textures[&image] = handle;
 
-  logger_.log_debug("Image bount!");
   return true;
 }
 

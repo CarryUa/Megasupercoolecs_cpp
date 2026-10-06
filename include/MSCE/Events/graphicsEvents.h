@@ -11,7 +11,6 @@ struct Image;
 
 /**
  * @brief Binds an image passed into constructor to all windows.
- *
  */
 struct ImageNeedsBindingEvent : public BaseGlobalEvent
 {
@@ -19,7 +18,15 @@ struct ImageNeedsBindingEvent : public BaseGlobalEvent
 
   ImageNeedsBindingEvent(Image &img) : image(img) {}
 };
+/**
+ * @brief Binds an image passed into constructor to all windows.
+ */
+struct ImageNeedsUnbindingEvent : public BaseGlobalEvent
+{
+  Image &image;
 
+  ImageNeedsUnbindingEvent(Image &img) : image(img) {}
+};
 struct WindowCreatedEvent : public BaseGlobalEvent
 {
   MSCEWindow &window;

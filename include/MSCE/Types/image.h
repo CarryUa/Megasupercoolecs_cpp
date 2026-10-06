@@ -8,6 +8,8 @@
 
 namespace msce
 {
+class MSCEWindow;
+
 /**
  * @brief Image format from which the image was last loaded.
  */
@@ -33,6 +35,8 @@ enum class ImageChannels : GLenum
 /// @ref msce::ImageResource
 struct Image
 {
+  friend class MSCEWindow;
+
 private:
   /**
    * @brief Utility class used to determain @ref msce::ImageFormat, and fully
@@ -57,12 +61,12 @@ private:
   };
 
   inline static Logger logger = Logger("Image");
-
-public:
   /**
    * @brief Tightly packed pixel color values.
    */
-  std::unique_ptr<uint8_t[]> pixel_data;
+  std::unique_ptr<uint8_t[]> pixel_data_;
+
+public:
   vec2ui resolution;
   uint8_t channel_count;
   ImageFormat format;
@@ -71,6 +75,7 @@ public:
    */
   ImageChannels channels() const;
   Image(const std::string &source);
+  ~Image();
 
   /**
    * @brief Loads or reloads an image to one at specified source.

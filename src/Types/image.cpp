@@ -41,6 +41,12 @@ msce::ImageChannels msce::Image::channels() const
 
 msce::Image::Image(const std::string &source) { load(source); }
 
+msce::Image::~Image()
+{
+  ImageNeedsUnbindingEvent ev(*this);
+  EventManager::instance->fire(ev);
+}
+
 void msce::Image::load(const std::string &source)
 {
   if (!std::filesystem::exists(source))
@@ -52,24 +58,25 @@ void msce::Image::load(const std::string &source)
     return;
   }
 
-  if (pixel_data != nullptr)
+  if (pixel_data_ != nullptr)
   {
-    pixel_data.reset(nullptr);
+    pixel_data_.reset(nullptr);
     resolution = vec2ui(0, 0);
     channel_count = 0;
     format = ImageFormat::UNSUPPORTED;
   };
 
-  this->pixel_data = Codec::load_image(source, this->resolution,
-                                       this->channel_count, this->format);
-  if (!pixel_data)
+  this->pixel_data_ = Codec::load_image(source, this->resolution,
+                                        this->channel_count, this->format);
+  if (!pixel_data_)
   {
     logger.log_error("Failed to load image at '{}'.", source);
-    this->pixel_data = nullptr;
+    this->pixel_data_ = nullptr;
   }
 
   ImageNeedsBindingEvent ev(*this);
   EventManager::instance->fire(ev);
+  pixel_data_.reset();
 }
 #pragma region Codec
 

@@ -66,14 +66,13 @@ int main(int argc, char **argv)
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
-<<<<<<< HEAD
-=======
   // auto ent = EntityManager::instance->create_entity();
   // auto trans =
   //     ComponentManager::instance->create_component<TransformComponent>();
   // ent->attach_component(trans);
 
   // auto rend =
+
   //     ComponentManager::instance->create_component<SpriteRendererComponent>();
   // ent->attach_component(rend);
 
@@ -110,7 +109,6 @@ int main(int argc, char **argv)
   //   copy->get_component<SpriteRendererComponent>()->img = rend->img;
   // }
 
->>>>>>> 0b5668b (Entity can now be disabled)
   int frame = 0;
   double next_fps_time = 0.5;
 
