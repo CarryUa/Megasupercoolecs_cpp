@@ -56,6 +56,8 @@ public:
   /// @return The dot(aka scalar) product of given type.
   double normalized_dot(const Vector2D &other) const;
 
+  void move_towards(const Vector2D &other, double max_dist);
+
   double get_angle_between_radians(const Vector2D<VecCT> &other) const noexcept;
   double get_angle_between_degrees(const Vector2D<VecCT> &other) const noexcept;
 

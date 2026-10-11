@@ -5,60 +5,18 @@
 
 #include <MSCE/msce_macros.h>
 #include <MSCE/Types/vector.h>
+#include <variant>
 #include "mesh.hpp"
 #include <vector>
 namespace msce
 {
-
-/**
- * @brief Shape interface for storing purposes. */
-class IShape2D
-{
-private:
-public:
-  friend class ::cereal::access;
-  /// @brief Cereal's save method. See cereal's docs for more info.
-  template <class Archive> void save(Archive &ar) const {}
-  /// @brief Cereal's load method. See cereal's docs for more info.
-  template <class Archive> void load(Archive &ar) {}
-
-public:
-  virtual ~IShape2D() = default;
-  /**
-   * @returns All the vertecies of this shape.
-   */
-  virtual const IMesh &get_mesh_ref() const = 0;
-  /**
-   * @returns Calculated perimetr of this shape.
-   */
-  virtual double get_perimetr() const = 0;
-  /**
-   * @returns Calculated area of this shape.
-   */
-  virtual double get_area() const = 0;
-  /**
-   * @returns Calculated height of rectangle containing this shape.
-   */
-  virtual double get_h() const = 0;
-  /**
-   * @returns Calculated width of rectangle containing this shape.
-   */
-  virtual double get_w() const = 0;
-};
-
-/** @brief Base type for all 2D shapes. */
-class BaseShape2D : public IShape2D
-{
-public:
-  /// @brief Default constructor.
-  BaseShape2D();
-};
+class Shape2D;
 
 /** @brief Class representation of a triangle in 2D space.
  * @note Factory methods are aproximations, because they use unperfect
  * trygonometry.
  */
-class Triangle : public BaseShape2D
+class Triangle
 {
 private:
   Mesh<3, 3> mesh_ =
@@ -97,19 +55,21 @@ public:
    * @returns Triangle with given data.
    */
   static Triangle create_asa(double deg1, double side, double deg2);
-  virtual const IMesh &get_mesh_ref() const override;
-  virtual double get_perimetr() const override;
-  virtual double get_area() const override;
-  virtual double get_h() const override;
-  virtual double get_w() const override;
+  const IMesh &get_mesh_ref() const;
+  double get_perimetr() const;
+  double get_area() const;
+  double get_h() const;
+  double get_w() const;
 
-  MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(BaseShape2D, mesh_)
+  operator Shape2D() const;
+
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(mesh_)
 };
 
 /**
  * @brief Class representation of a rectangle in 2D space.
  */
-class Rectangle : public BaseShape2D
+class Rectangle
 {
 private:
   /// @brief Width of the rectangle.
@@ -134,12 +94,12 @@ public:
    */
   Rectangle(double a, double b);
 
-  virtual const IMesh &get_mesh_ref() const override;
+  const IMesh &get_mesh_ref() const;
 
-  virtual double get_perimetr() const override;
-  virtual double get_area() const override;
-  virtual double get_w() const override;
-  virtual double get_h() const override;
+  double get_perimetr() const;
+  double get_area() const;
+  double get_w() const;
+  double get_h() const;
   /// @brief Getter for a_
   /// @return copy of a_
   double a() const noexcept;
@@ -154,13 +114,15 @@ public:
   /// @param a New value.
   void b(double) noexcept;
 
-  MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(BaseShape2D, a_, b_)
+  operator Shape2D() const;
+
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(a_, b_)
 };
 
 /**
  * @brief Class representation of a circle in 2D space.
  */
-class Circle : public BaseShape2D
+class Circle
 {
 private:
   /// @brief Circle's radius.
@@ -178,12 +140,12 @@ public:
    * @param r Radius of the circle.
    */
   Circle(double r);
-  virtual const IMesh &get_mesh_ref() const override;
+  const IMesh &get_mesh_ref() const;
 
-  virtual double get_perimetr() const override;
-  virtual double get_area() const override;
-  virtual double get_w() const override;
-  virtual double get_h() const override;
+  double get_perimetr() const;
+  double get_area() const;
+  double get_w() const;
+  double get_h() const;
 
   /// @brief Setter for r_
   /// @param r New value.
@@ -191,18 +153,78 @@ public:
   /// @brief Getter for r_
   /// @return copy of r_
   double radius() const noexcept;
+  operator Shape2D() const;
 
-  MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(BaseShape2D, r_)
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(r_)
+};
+
+struct Shape2D
+{
+  friend class ::cereal::access;
+  std::variant<Triangle, Rectangle, Circle> shape;
+
+  /**
+   * @returns All the vertecies of this shape.
+   */
+  const IMesh &get_mesh_ref() const
+  {
+    return std::visit([](const auto &s) -> const IMesh &
+                      { return s.get_mesh_ref(); }, shape);
+  }
+  /**
+   * @returns Calculated perimetr of this shape.
+   */
+  double get_perimetr() const
+  {
+    return std::visit([](const auto &s) -> double { return s.get_perimetr(); },
+                      shape);
+  }
+  /**
+   * @returns Calculated area of this shape.
+   */
+  double get_area() const
+  {
+    return std::visit([](const auto &s) -> double { return s.get_area(); },
+                      shape);
+  }
+  /**
+   * @returns Calculated height of rectangle containing this shape.
+   */
+  double get_h() const
+  {
+    return std::visit([](const auto &s) -> double { return s.get_h(); }, shape);
+  }
+  /**
+   * @returns Calculated width of rectangle containing this shape.
+   */
+  double get_w() const
+  {
+    return std::visit([](const auto &s) -> double { return s.get_w(); }, shape);
+  }
+
+  friend class ::cereal::access;
+  template <class Archive> void save(Archive &ar) const
+  {
+    ar(CEREAL_NVP(shape));
+  }
+  template <class Archive> void load(Archive &ar) { ar(CEREAL_NVP(shape)); }
+
+  Shape2D &operator=(Triangle s)
+  {
+    shape = std::move(s);
+    return *this;
+  }
+  Shape2D &operator=(Circle s)
+  {
+    shape = std::move(s);
+    return *this;
+  }
+  Shape2D &operator=(Rectangle s)
+  {
+    shape = std::move(s);
+    return *this;
+  }
 };
 
 } // namespace msce
-CEREAL_REGISTER_TYPE(msce::IShape2D)
-CEREAL_REGISTER_TYPE(msce::BaseShape2D)
-CEREAL_REGISTER_TYPE(msce::Triangle)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::Triangle, msce::BaseShape2D)
-CEREAL_REGISTER_TYPE(msce::Rectangle)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::Rectangle, msce::BaseShape2D)
-CEREAL_REGISTER_TYPE(msce::Circle)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(msce::Circle, msce::BaseShape2D)
-
 #endif

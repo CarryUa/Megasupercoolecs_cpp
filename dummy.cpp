@@ -1,5 +1,6 @@
 // This is a dummy file for CMake to determain language correctly when creating
 // library. Also used for testing diferent parts of engine
+#include <MSCE/physics.h>
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
 #include <MSCE/BuiltIns/Renderers/spriteRendererSystem.h>
 
@@ -66,108 +67,51 @@ int main(int argc, char **argv)
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
-  // auto ent = EntityManager::instance->create_entity();
-  // auto trans =
-  //     ComponentManager::instance->create_component<TransformComponent>();
-  // ent->attach_component(trans);
-
-  // auto rend =
-
-  //     ComponentManager::instance->create_component<SpriteRendererComponent>();
-  // ent->attach_component(rend);
-
-  // trans->shape = std::make_shared<Rectangle>();
-
-  // rend->img = std::make_shared<Image>("./cmss14 yaoi vs yuri.psd.png");
-  // auto *img = rend->img.get();
-
-  // PrototypeManager::instance
-  //     ->create_new_prototype_instance<EntityPrototype>("msce::EntityPrototype",
-  //                                                      "testentity")
-  //     ->entity = ent;
-
-  // PrototypeManager::instance->serialize_prototype("dfaijfaij.msceproto",
-  //                                                 "testentity");
-
-  // root_window->bind_image(*img);
-
-  // g_logger.log_info("Image bount: {}x{} at 0x{:X}", img->resolution.x,
-  //                   img->resolution.y, reinterpret_cast<uintptr_t>(img));
-
-  // for (int i = 0; i < 1; ++i)
-  // {
-  //   auto copy = EntityManager::instance->copy_entity(ent);
-  //   copy->get_component<TransformComponent>()->position.x += 150;
-  //   g_logger.log_info(
-  //       "Has comp: {}; handle({},{}); addr: 0x{:x}",
-  //       copy->has_component<SpriteRendererComponent>(),
-  //       copy->get_component<SpriteRendererComponent>().get_index(),
-  //       copy->get_component<SpriteRendererComponent>().get_generation(),
-  //       reinterpret_cast<uintptr_t>(
-  //           copy->get_component<SpriteRendererComponent>().get()));
-
-  //   copy->get_component<SpriteRendererComponent>()->img = rend->img;
-  // }
-
   int frame = 0;
   double next_fps_time = 0.5;
 
   g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
   g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
 
+  // auto ent = g_ent_man.create_entity();
+  // ent->attach_component(g_comp_man.create_component<TransformComponent>());
+  // auto sprite = g_comp_man.create_component<SpriteRendererComponent>();
+  // ent->attach_component(sprite);
+  // sprite->img_path = "./aot.jpg";
+
+  // g_proto_man.create_new_prototype_instance(
+  //     typeof(EntityPrototype).get_name_str(), "testentity");
+  // g_proto_man.get_prototype<EntityPrototype>("testentity")->entity = ent;
+
+  // g_proto_man.serialize_prototype("testent2.msceproto", "testentity");
   auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
 
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
   ent2->active = true;
   ent2->get_component<TransformComponent>()->position = vec2d(0, 0);
-  ent2->get_component<TransformComponent>()->shape =
-      std::make_shared<Rectangle>(100, 100);
+  ent2->get_component<TransformComponent>()->shape = Rectangle(100, 100);
 
-  // for (int i = 0; i < 1500; ++i)
-  // {
-  //   auto ent = EntityManager::instance->copy_entity(ent2);
+  Animation<vec2d, EasingIn<72.283f>> anim;
+  anim.set_target(&ent2->get_component<TransformComponent>()->position);
+  anim.add_frame(0, vec2d(0, 0));
+  anim.add_frame(3, vec2d(root_window->size().x / 2, 0));
+  anim.add_frame(6,
+                 vec2d(root_window->size().x / 2, root_window->size().y / 2));
+  anim.add_frame(9, vec2d(0, root_window->size().y / 2));
+  anim.add_frame(12, vec2d(0, 0));
 
-  //   ent->get_component<TransformComponent>()->position +=
-  //       i % 2 == 0 ? vec2d(20 * i, 20 * i) : vec2d(-20 * i, 20 * i);
-  // }
-
-  g_logger.log_debug(
-      "Image reused: {}",
-      ent2->get_component<SpriteRendererComponent>()->img.use_count());
   g_logger.log_debug("Starting main loop...");
-
-  auto testimg = Image("earojaoifsnksaknkgs.png");
-  testimg.load("./aot.jpg");
-  testimg.load("./aoafoigoaegvpg");
-
-  Animation<vec2d, EasingInOut<2.0f>> anim(
-      &ent2->get_component<TransformComponent>()->position, true);
-  anim.add_frame(0, vec2d(-1280 / 2, 0));
-  anim.add_frame(5, vec2d(1280 / 2, 300));
-  anim.add_frame(10, vec2d(0, 0));
-  anim.add_frame(15, vec2d(-1280 / 2, 0));
-
   while (!root_window->should_close())
   {
     frame++;
     if (time_sys->get_total_millis() > next_fps_time)
     {
-      // g_logger.log_info("FPS: {}\tTimestamp: {}sec", frame / 1,
-      //                   time_sys->get_total_seconds());
-
       frame = 0;
       next_fps_time += 1000;
-
-      // if ((int)time_sys->get_total_seconds() % 2 == 0)
-      //   ent2->get_component<SpriteRendererComponent>()->img->load(
-      //       "./cmss14 yaoi vs yuri.psd.png");
-      // else
-      //   ent2->get_component<SpriteRendererComponent>()->img->load("./aot.jpg");
     }
     g_sys_man.update_all_systems();
 
-    anim.play_frame(time_sys->get_delta_seconds());
-
+    // anim.play_frame(time_sys->get_delta_seconds());
     root_window->render();
     root_window->draw();
   }

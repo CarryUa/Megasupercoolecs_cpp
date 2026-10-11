@@ -178,4 +178,7 @@ msce::Image::Codec::load_image(const std::string &path, vec2ui &o_res,
       file_content[2] == 0xff)
     return Codec::load_jpg(file_content.get(), size, o_res, o_chann_count,
                            o_format);
+
+  logger.log_error("Unsuported image format for file: '{}'", path);
+  return nullptr;
 }

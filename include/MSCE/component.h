@@ -12,19 +12,33 @@
 
 #pragma region Components Macros
 #define MSCE_DEFINE_COMPONENT(Type, ...)                                       \
-private:                                                                       \
+public:                                                                        \
   friend class ::msce::internal::StaticComponentRegistration<Type>;            \
   friend class ::msce::ComponentManager;                                       \
-  MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::BaseComponent<Type>,  \
-                                                 __VA_ARGS__)                  \
+  friend class ::cereal::access;                                               \
+  /**  @brief Cereal's save function. Refer to their docs for more info.*/     \
+  template <class Archive> void save(Archive &ar) const                        \
+  {                                                                            \
+    IComponent::save(ar);                                                      \
+    ar(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(                               \
+        WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))));                 \
+  }                                                                            \
+  /**  @brief Cereal's load function. Refer to their docs for more info.*/     \
+  template <class Archive> void load(Archive &ar)                              \
+  {                                                                            \
+    IComponent::load(ar);                                                      \
+    ar(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(                               \
+        WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))));                 \
+  }                                                                            \
+                                                                               \
 public:                                                                        \
   virtual void polymophic_save(SerializationOutArchive &ar) const override     \
   {                                                                            \
-    ar(*this);                                                                 \
+    this->save(ar);                                                            \
   }                                                                            \
   virtual void polymophic_load(SerializationInArchive &ar) override            \
   {                                                                            \
-    ar(*this);                                                                 \
+    this->load(ar);                                                            \
   }                                                                            \
                                                                                \
   /**  @brief This overload is used by cereal. All components must be          \
@@ -54,10 +68,27 @@ public:                                                                        \
 
 /** @brief Macro for defining components inheriting another component. */
 #define MSCE_DEFINE_DERIVED_COMPONENT(Type, Parent, ...)                       \
-private:                                                                       \
+public:                                                                        \
   friend class ::msce::ComponentManager;                                       \
   friend class ::msce::internal::StaticComponentRegistration<Type>;            \
-  MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(Parent, __VA_ARGS__)          \
+  friend class ::cereal::access;                                               \
+  /**  @brief Cereal's save function. Refer to their docs for more info.*/     \
+  template <class Archive> void save(Archive &ar) const                        \
+  {                                                                            \
+    IComponent::save(ar);                                                      \
+    Parent::save(ar);                                                          \
+    ar(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(                               \
+        WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))));                 \
+  }                                                                            \
+  /**  @brief Cereal's load function. Refer to their docs for more info.*/     \
+  template <class Archive> void load(Archive &ar)                              \
+  {                                                                            \
+    IComponent::load(ar);                                                      \
+    Parent::load(ar);                                                          \
+    ar(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(                               \
+        WRAP_NVP, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))));                 \
+  }                                                                            \
+                                                                               \
 protected:                                                                     \
   IComponent *clone() override                                                 \
   {                                                                            \
@@ -67,11 +98,11 @@ protected:                                                                     \
 public:                                                                        \
   virtual void polymophic_save(SerializationOutArchive &ar) const override     \
   {                                                                            \
-    ar(*this);                                                                 \
+    this->save(ar);                                                            \
   }                                                                            \
   virtual void polymophic_load(SerializationInArchive &ar) override            \
   {                                                                            \
-    ar(*this);                                                                 \
+    this->load(ar);                                                            \
   }                                                                            \
   /**  @brief This overload is used by cereal. All components must be          \
    * instantiated using ComponentManager. */                                   \

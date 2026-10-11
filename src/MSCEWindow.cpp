@@ -239,7 +239,7 @@ void msce::MSCEWindow::render()
     if (!shader.is_ready()) return;
     auto prog = shader.get_handle();
 
-    const IMesh &mesh = transform->shape->get_mesh_ref();
+    const IMesh &mesh = transform->shape.get_mesh_ref();
     auto verts_count = std::min(mesh.vertex_count(), MAX_ENTITY_VERTEX_COUNT);
     for (uint32_t i = 0; i < verts_count; i++)
     {
@@ -278,7 +278,7 @@ void msce::MSCEWindow::render()
     if (shader.unitorm_locations.contains(SHADER_TRANSFORM_SIZ_UNIFORM_NAME))
       glUniform2f(
           shader.unitorm_locations.at(SHADER_TRANSFORM_SIZ_UNIFORM_NAME),
-          transform->shape->get_w(), transform->shape->get_h());
+          transform->shape.get_w(), transform->shape.get_h());
 
     if (shader.unitorm_locations.contains(SHADER_WIN_RESOLUTION_UNIFORM_NAME))
       glUniform2f(

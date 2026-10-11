@@ -19,6 +19,8 @@ msce::EntityHandle msce::EntityManager::create_entity()
 msce::EntityHandle msce::EntityManager::get_entity(uint32_t id, bool force)
 {
   auto ent = this->entities_.get_item(id);
+  if (!ent) return EntityHandle::create_nullptr();
+
   return (ent->active || force) ? ent : EntityHandle::create_nullptr();
 }
 

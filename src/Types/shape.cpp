@@ -108,6 +108,8 @@ double msce::Triangle::get_w() const
   return maxx;
 }
 
+msce::Triangle::operator Shape2D() const { return Shape2D{.shape = *this}; }
+
 void msce::Rectangle::update_vertecies() noexcept
 {
   mesh_.vertecies[0] = vec2d(0, 0);
@@ -152,7 +154,7 @@ void msce::Rectangle::b(double b) noexcept
   update_vertecies();
 }
 
-msce::BaseShape2D::BaseShape2D() {}
+msce::Rectangle::operator Shape2D() const { return Shape2D{.shape = *this}; }
 
 void msce::Circle::update_vertecies() noexcept
 {
@@ -201,3 +203,5 @@ double msce::Circle::get_h() const { return r_ * 2; }
 void msce::Circle::radius(double r) { r_ = r; }
 
 double msce::Circle::radius() const noexcept { return r_; }
+
+msce::Circle::operator Shape2D() const { return Shape2D{.shape = *this}; }

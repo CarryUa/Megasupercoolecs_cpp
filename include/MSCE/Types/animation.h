@@ -29,9 +29,9 @@ private:
   void move_frames() noexcept;
 
 public:
-  bool playing;
+  bool playing = true;
 
-  Animation(T *target = nullptr, bool start_playing = false);
+  Animation(T *target = nullptr, bool start_playing = true);
 
   void set_target(T *);
   void add_frame(float timestamp, T frame);

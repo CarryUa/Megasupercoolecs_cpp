@@ -42,21 +42,15 @@ void msce::SpriteRendererSystem::on_object_render(
 
 void msce::SpriteRendererSystem::on_prototype_loaded(PrototypeLoadedEvent &ev)
 {
-  static Logger logger("\n\n");
-  logger.log_debug("Prototype loaded");
   if (!ev.prototype) return;
-  logger.log_debug("Prototype exists");
   if (ev.prototype->get_type_info_polymorphic() != typeof(EntityPrototype))
     return;
-  logger.log_debug("Prototype is entproto");
   EntityPrototype *proto = dynamic_cast<EntityPrototype *>(ev.prototype);
   if (!proto) return;
-  logger.log_debug("Prototype cast");
   if (!proto->entity) return;
-  logger.log_debug("Prototype has entity");
   if (!proto->entity->has_component<SpriteRendererComponent>()) return;
 
   auto comp = proto->entity->get_component<SpriteRendererComponent>();
-  logger.log_debug("\nImage path: {}\n", comp->img_path);
-  comp->img = std::make_shared<Image>(comp->img_path);
+  EventManager::instance->subscribe<WindowCreatedEvent>(
+      [comp]() { comp->img = std::make_shared<Image>(comp->img_path); });
 }

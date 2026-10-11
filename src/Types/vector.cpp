@@ -203,6 +203,24 @@ double Vector2D<VecCT>::normalized_dot(const Vector2D &other) const
 
   return round_to_digits(this_normalized.dot(other_normalized), 15);
 }
+
+template <typename VecCT>
+void msce::Vector2D<VecCT>::move_towards(const Vector2D &other, double max_dist)
+{
+  if (max_dist == 0) return;
+
+  Vector2D delta = other - *this;
+  double dist = delta.length();
+  if (dist <= 0) return;
+  if (dist <= max_dist)
+  {
+    *this = other;
+    return;
+  }
+
+  *this = Interpolate<Vector2D>{}(*this, other, max_dist / dist);
+}
+
 template <typename VecCT>
 double msce::Vector2D<VecCT>::get_angle_between_radians(
     const Vector2D<VecCT> &other) const noexcept
