@@ -6,6 +6,25 @@
 
 namespace msce
 {
+class TransformComponent;
+
+struct Transform
+{
+  Transform() = delete;
+
+  static vec2d rotate_point_deg(const vec2d point, const vec2d center,
+                                double angle_deg)
+  {
+    return rotate_point_rad(point, center, angle_deg * (M_PI / 180));
+  }
+
+  static vec2d rotate_point_rad(const vec2d point, const vec2d center,
+                                double angle_rad);
+
+  static std::vector<vec2d>
+  rotate_vectecies(const ComponentHandle<TransformComponent> &t, double angle);
+};
+
 class TransformComponent : public BaseComponent<TransformComponent>
 {
 public:
@@ -13,7 +32,7 @@ public:
   vec2d scale = vec2d(1.0, 1.0);
   vec2d rotation = vec2d(0, 0);
 
-  Shape2D shape = Rectangle(100, 100);
+  Shape2D shape;
 
 public:
   friend class ::msce::internal::StaticComponentRegistration<
@@ -38,6 +57,8 @@ public:
 
     shape.load(ar);
   }
+
+  std::vector<vec2d> get_transformed_verts();
 
 public:
   virtual void polymophic_save(SerializationOutArchive &ar) const override

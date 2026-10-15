@@ -24,6 +24,7 @@ private:
 
 public:
   static SmartHandle create_nullptr() noexcept;
+  SmartHandle(const TCollection *collection = nullptr);
   SmartHandle(uint32_t index, uint32_t generation,
               const TCollection *collection);
 
@@ -106,6 +107,12 @@ inline SmartHandle<TCollection, TItem>
 SmartHandle<TCollection, TItem>::create_nullptr() noexcept
 {
   return SmartHandle(UINT32_MAX, UINT32_MAX, nullptr);
+}
+template <typename TCollection, typename TItem>
+inline SmartHandle<TCollection, TItem>::SmartHandle(
+    const TCollection *collection)
+{
+  smart_collection_ptr_ = collection;
 }
 template <typename TCollection, typename TItem>
 inline SmartHandle<TCollection, TItem>::SmartHandle(

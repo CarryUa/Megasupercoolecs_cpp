@@ -13,8 +13,6 @@ constexpr double rad_to_deg(const double rad) { return rad / pi_180th; }
 Logger logger("Triangle");
 } // namespace
 
-void msce::Triangle::update_vertecies() noexcept {}
-
 msce::Triangle::Triangle() {}
 
 Triangle msce::Triangle::create_sss(double a, double b, double c)
@@ -35,7 +33,6 @@ Triangle msce::Triangle::create_sss(double a, double b, double c)
   t.mesh_.vertecies[1] =
       vec2d::create_unit_from_radians(angle_between_a_and_c) * b;
 
-  t.update_vertecies();
   return t;
 }
 
@@ -51,7 +48,6 @@ Triangle msce::Triangle::create_sas(double a, double degrees, double b)
   t.mesh_.vertecies[2] = vec2d(a, 0);
   t.mesh_.vertecies[1] = vec2d::create_unit_from_degrees(degrees) * b;
 
-  t.update_vertecies();
   return t;
 }
 
@@ -75,7 +71,6 @@ Triangle msce::Triangle::create_asa(double deg_A, double a, double deg_C)
 
   t.mesh_.vertecies[1] = vec2d::create_unit_from_radians(A_rad) * ab_len;
 
-  t.update_vertecies();
   return t;
 }
 
@@ -108,15 +103,12 @@ double msce::Triangle::get_w() const
   return maxx;
 }
 
-msce::Triangle::operator Shape2D() const { return Shape2D{.shape = *this}; }
-
-void msce::Rectangle::update_vertecies() noexcept
+std::vector<vec2d> msce::Triangle::get_vertecies()
 {
-  mesh_.vertecies[0] = vec2d(0, 0);
-  mesh_.vertecies[1] = vec2d(a_, 0);
-  mesh_.vertecies[2] = vec2d(a_, b_);
-  mesh_.vertecies[3] = vec2d(0, b_);
+  return std::vector<vec2d>();
 }
+
+msce::Triangle::operator Shape2D() const { return Shape2D{.shape = *this}; }
 
 msce::Rectangle::Rectangle() {}
 
@@ -124,11 +116,9 @@ msce::Rectangle::Rectangle(double a, double b)
 {
   a_ = a;
   b_ = b;
-
-  update_vertecies();
 }
 
-const IMesh &msce::Rectangle::get_mesh_ref() const { return mesh_; }
+const IMesh &msce::Rectangle::get_mesh_ref() const { return mesh; }
 
 double msce::Rectangle::get_perimetr() const { return 2 * (a_ + b_); }
 
@@ -138,55 +128,38 @@ double msce::Rectangle::get_w() const { return a_; }
 
 double msce::Rectangle::get_h() const { return b_; }
 
+double msce::Rectangle::get_diagonal() const
+{
+  return std::sqrt(a_ * a_ + b_ * b_);
+}
+
+std::vector<vec2d> msce::Rectangle::get_vertecies()
+{
+  std::vector<vec2d> r;
+  r.reserve(4);
+  r.push_back(vec2d(0, 0));
+  r.push_back(vec2d(a_, 0));
+  r.push_back(vec2d(a_, b_));
+  r.push_back(vec2d(0, b_));
+
+  return r;
+}
+
 double msce::Rectangle::a() const noexcept { return this->a_; }
 
-void msce::Rectangle::a(double a) noexcept
-{
-  this->a_ = a;
-  update_vertecies();
-}
+void msce::Rectangle::a(double a) noexcept { this->a_ = a; }
 
 double msce::Rectangle::b() const noexcept { return this->b_; }
 
-void msce::Rectangle::b(double b) noexcept
-{
-  this->b_ = b;
-  update_vertecies();
-}
+void msce::Rectangle::b(double b) noexcept { this->b_ = b; }
 
 msce::Rectangle::operator Shape2D() const { return Shape2D{.shape = *this}; }
 
-void msce::Circle::update_vertecies() noexcept
-{
-  static const std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT> normal_verts = []()
-  {
-    constexpr const double rads_per_vertex_step =
-        (2 * M_PI) / MSCE_CIRCLE_VERTICES_COUNT;
-    std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT> res;
-    for (int i = 0; i < MSCE_CIRCLE_VERTICES_COUNT; ++i)
-    {
-      double current_angle = i * rads_per_vertex_step;
-      res[i] = vec2d(sin(current_angle), cos(current_angle));
-    }
-
-    return res;
-  }();
-
-  for (int i = 0; i < MSCE_CIRCLE_VERTICES_COUNT; i++)
-  {
-    mesh_.vertecies[i] = normal_verts[i] * r_ + r_;
-  }
-}
-
 msce::Circle::Circle() {}
 
-msce::Circle::Circle(double r)
-{
-  r_ = r;
-  update_vertecies();
-}
+msce::Circle::Circle(double r) { r_ = r; }
 
-const IMesh &msce::Circle::get_mesh_ref() const { return mesh_; }
+const IMesh &msce::Circle::get_mesh_ref() const { return mesh; }
 
 double msce::Circle::get_perimetr() const
 {
@@ -199,6 +172,16 @@ double msce::Circle::get_area() const { return M_PI * r_ * r_; }
 double msce::Circle::get_w() const { return r_ * 2; }
 
 double msce::Circle::get_h() const { return r_ * 2; }
+
+std::vector<vec2d> msce::Circle::get_vertecies()
+{
+  std::vector<vec2d> r;
+  r.reserve(mesh.vertex_count());
+  for (vec2d v : mesh.vertecies)
+    r.push_back(v * r_ + r_);
+
+  return r;
+}
 
 void msce::Circle::radius(double r) { r_ = r; }
 

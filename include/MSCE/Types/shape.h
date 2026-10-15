@@ -23,8 +23,6 @@ private:
       Mesh<3, 3>({vec2d(0, 0), vec2d(300, 0), vec2d(150, 300)},
                  {vec2d(0, 0), vec2d(1, 0), vec2d(0.5, 1)}, {0, 1, 2});
 
-  void update_vertecies() noexcept;
-
 public:
   /// @brief Default constructor.
   Triangle();
@@ -60,10 +58,11 @@ public:
   double get_area() const;
   double get_h() const;
   double get_w() const;
+  std::vector<vec2d> get_vertecies();
 
   operator Shape2D() const;
 
-  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(mesh_)
+  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS()
 };
 
 /**
@@ -78,11 +77,9 @@ private:
   /// @brief Height of the rectangle.
   double b_ = 300;
 
-  Mesh<4, 6> mesh_ = Mesh<4, 6>(
-      {vec2d(0, 0), vec2d(a_, 0), vec2d(a_, b_), vec2d(0, b_)},
+  inline static msce::Mesh<4, 6> mesh = msce::Mesh<4, 6>(
+      {vec2d(0, 0), vec2d(1, 0), vec2d(1, 1), vec2d(0, 1)},
       {vec2d(0, 0), vec2d(1, 0), vec2d(1, 1), vec2d(0, 1)}, {0, 1, 2, 0, 2, 3});
-
-  void update_vertecies() noexcept;
 
 public:
   /// @brief Default constructor
@@ -100,6 +97,9 @@ public:
   double get_area() const;
   double get_w() const;
   double get_h() const;
+  double get_diagonal() const;
+  std::vector<vec2d> get_vertecies();
+
   /// @brief Getter for a_
   /// @return copy of a_
   double a() const noexcept;
@@ -116,7 +116,15 @@ public:
 
   operator Shape2D() const;
 
-  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(a_, b_)
+  friend class ::cereal::access;
+  template <class Archive> void save(Archive &ar) const
+  {
+    ar(CEREAL_NVP(a_), CEREAL_NVP(b_));
+  }
+  template <class Archive> void load(Archive &ar)
+  {
+    ar(CEREAL_NVP(a_), CEREAL_NVP(b_));
+  }
 };
 
 /**
@@ -128,9 +136,48 @@ private:
   /// @brief Circle's radius.
   double r_ = 300;
 
-  Mesh<MSCE_CIRCLE_VERTICES_COUNT, (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3> mesh_;
+  inline static Mesh<MSCE_CIRCLE_VERTICES_COUNT,
+                     (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3>
+      mesh = Mesh<MSCE_CIRCLE_VERTICES_COUNT,
+                  (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3>(
+          []() -> std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT>
+          {
+            constexpr const double rads_per_vertex_step =
+                (2 * M_PI) / MSCE_CIRCLE_VERTICES_COUNT;
+            std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT> res;
+            for (int i = 0; i < MSCE_CIRCLE_VERTICES_COUNT; ++i)
+            {
+              double current_angle = i * rads_per_vertex_step;
+              res[i] = vec2d(sin(current_angle), cos(current_angle));
+            }
 
-  void update_vertecies() noexcept;
+            return res;
+          }(),
+          []() -> std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT>
+          {
+            constexpr const double rads_per_vertex_step =
+                (2 * M_PI) / MSCE_CIRCLE_VERTICES_COUNT;
+            std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT> res;
+            for (int i = 0; i < MSCE_CIRCLE_VERTICES_COUNT; ++i)
+            {
+              double current_angle = i * rads_per_vertex_step;
+              res[i] =
+                  vec2d(sin(current_angle), cos(current_angle)) * 0.5 + 0.5;
+            }
+
+            return res;
+          }(),
+          []() -> std::array<uint32_t, (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3>
+          {
+            std::array<uint32_t, (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3> res;
+            for (uint32_t i = 1; i + 1 < MSCE_CIRCLE_VERTICES_COUNT; ++i)
+            {
+              res[(i - 1) * 3] = 0;
+              res[(i - 1) * 3 + 1] = i;
+              res[(i - 1) * 3 + 2] = i + 1;
+            }
+            return res;
+          }());
 
 public:
   /// @brief Default constructor.
@@ -146,6 +193,7 @@ public:
   double get_area() const;
   double get_w() const;
   double get_h() const;
+  std::vector<vec2d> get_vertecies();
 
   /// @brief Setter for r_
   /// @param r New value.
@@ -155,7 +203,9 @@ public:
   double radius() const noexcept;
   operator Shape2D() const;
 
-  MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(r_)
+  friend class ::cereal::access;
+  template <class Archive> void save(Archive &ar) const { ar(CEREAL_NVP(r_)); }
+  template <class Archive> void load(Archive &ar) { ar(CEREAL_NVP(r_)); }
 };
 
 struct Shape2D
@@ -201,6 +251,12 @@ struct Shape2D
   {
     return std::visit([](const auto &s) -> double { return s.get_w(); }, shape);
   }
+
+  std::vector<vec2d> get_vertecies()
+  {
+    return std::visit([](auto &s) -> std::vector<vec2d>
+                      { return s.get_vertecies(); }, shape);
+  };
 
   friend class ::cereal::access;
   template <class Archive> void save(Archive &ar) const

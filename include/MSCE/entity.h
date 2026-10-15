@@ -242,6 +242,8 @@ public:
                           bool force = false);
 
   std::vector<EntityHandle> get_entities(bool force = false);
+
+  size_t entity_count() const noexcept;
 };
 
 template <typename TComp> inline bool Entity::has_component() const noexcept

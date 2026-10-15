@@ -86,18 +86,41 @@ int main(int argc, char **argv)
   // g_proto_man.serialize_prototype("testent2.msceproto", "testentity");
   auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
 
+  auto ent = g_ent_man.copy_entity(ent_proto2.entity);
+  ent->active = true;
+  ent->get_component<PhysicsBodyComponent>()->body_type =
+      PhysicsBodyType::STATIC;
+  ent->get_component<TransformComponent>()->position.y -= 200;
+
   auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
   ent2->active = true;
-  ent2->get_component<TransformComponent>()->position = vec2d(0, 0);
-  ent2->get_component<TransformComponent>()->shape = Rectangle(100, 100);
-
-  Animation<vec2d, EasingIn<72.283f>> anim;
-  anim.set_target(&ent2->get_component<TransformComponent>()->position);
+  // ent2->get_component<PhysicsBodyComponent>()->velocity = vec2d(10, 500);
+  ent2->get_component<RectColliderComponent>()->on_collision_begin.subscribe(
+      [&](Collision &col)
+      {
+        auto t = ent2->get_component<TransformComponent>();
+        auto t2 = col.other->get_component<TransformComponent>();
+        g_logger.log_debug("Collision with {} started for main ent. Positions: "
+                           "{}, {} and {}, {}",
+                           col.other.get_index(), t->position.x, t->position.y,
+                           t2->position.x, t2->position.y);
+      });
+  ent2->get_component<RectColliderComponent>()->on_collision_end.subscribe(
+      [&](Collision &col)
+      {
+        g_logger.log_debug("Collision with {} ended for main ent",
+                           col.other.get_index());
+      });
+  ent2->get_component<PhysicsBodyComponent>()->body_type =
+      PhysicsBodyType::DYNAMIC;
+  Animation<vec2d> anim;
+  // anim.set_target(&ent2->get_component<TransformComponent>()->position);
   anim.add_frame(0, vec2d(0, 0));
-  anim.add_frame(3, vec2d(root_window->size().x / 2, 0));
-  anim.add_frame(6,
-                 vec2d(root_window->size().x / 2, root_window->size().y / 2));
-  anim.add_frame(9, vec2d(0, root_window->size().y / 2));
+  anim.add_frame(
+      3, vec2d(root_window->size().x / 2, (int)(root_window->size().y) / 2));
+  anim.add_frame(6, vec2d(0, 0));
+  anim.add_frame(9, vec2d((int)(root_window->size().x) / -2,
+                          (int)(root_window->size().y) / -2));
   anim.add_frame(12, vec2d(0, 0));
 
   g_logger.log_debug("Starting main loop...");
@@ -106,12 +129,13 @@ int main(int argc, char **argv)
     frame++;
     if (time_sys->get_total_millis() > next_fps_time)
     {
+      g_logger.log_debug("FPS: {}", frame * 3);
       frame = 0;
-      next_fps_time += 1000;
+      next_fps_time += 333;
     }
     g_sys_man.update_all_systems();
 
-    // anim.play_frame(time_sys->get_delta_seconds());
+    anim.play_frame(time_sys->get_delta_seconds());
     root_window->render();
     root_window->draw();
   }

@@ -50,6 +50,25 @@ public:
       cb(arg1);
   }
 };
+template <> class LocalEvent<void>
+{
+public:
+  using callback_t = std::function<void()>;
+
+private:
+  std::vector<callback_t> cbs_;
+
+public:
+  LocalEvent() {}
+
+  void subscribe(callback_t callback) { cbs_.push_back(callback); }
+  void fire()
+  {
+    if (cbs_.size() <= 0) return;
+    for (auto &cb : cbs_)
+      cb();
+  }
+};
 
 #define MSCE_SUBSCRIBE_TO_EVENT(Event, Callback)                               \
   EventManager::instance->subscribe<Event>(Callback)

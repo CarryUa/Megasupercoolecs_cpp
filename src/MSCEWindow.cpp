@@ -101,6 +101,7 @@ msce::MSCEWindow::MSCEWindow(vec2ui window_size, const char *title,
       size_(window_size), title_(title),
       logger_(std::format("Window('{}')", title))
 {
+
   if (!p_window_)
   {
     logger_.log_error("Failed to create window '{}'.", title_);
@@ -114,10 +115,29 @@ msce::MSCEWindow::MSCEWindow(vec2ui window_size, const char *title,
     logger_.log_error("Failed to load glad GL-loader for this window.");
     throw std::runtime_error("Failed to load GL-loader.");
   }
-
   logger_.log_info("GL version: {}",
                    reinterpret_cast<const char *>(glGetString(GL_VERSION)));
 
+  windows_map.emplace(p_window_.get(), this);
+
+  glfwSetFramebufferSizeCallback(
+      this->get_glfw_window(),
+      [](GLFWwindow *win, int w, int h) -> void
+      {
+        MSCEWindow *window = MSCEWindow::windows_map.at(win);
+        if (!window) return;
+        window->size_ = vec2ui(w, h);
+        window->on_screen_resized.fire(window->size_);
+      });
+
+  this->on_screen_resized.subscribe(
+      [this](const vec2ui &size)
+      {
+        use_context();
+        glViewport(0, 0, static_cast<GLsizei>(size.x),
+                   static_cast<GLsizei>(size.y));
+        logger_.log_debug("Size: {}, {}", size.x, size.y);
+      });
   glGenBuffers(1, &this->context_.vbo);
   glGenBuffers(1, &this->context_.ebo);
   glGenVertexArrays(1, &this->context_.vao);
@@ -240,11 +260,13 @@ void msce::MSCEWindow::render()
     auto prog = shader.get_handle();
 
     const IMesh &mesh = transform->shape.get_mesh_ref();
+    std::vector<vec2d> shape_verts =
+        std::move(transform->shape.get_vertecies());
     auto verts_count = std::min(mesh.vertex_count(), MAX_ENTITY_VERTEX_COUNT);
     for (uint32_t i = 0; i < verts_count; i++)
     {
-      verts[i * 5] = mesh.get_vertecies()[i].x;
-      verts[i * 5 + 1] = mesh.get_vertecies()[i].y;
+      verts[i * 5] = shape_verts[i].x;
+      verts[i * 5 + 1] = shape_verts[i].y;
       verts[i * 5 + 2] = 0.0f;
       verts[i * 5 + 3] = mesh.get_uv()[i].x;
       verts[i * 5 + 4] = mesh.get_uv()[i].y;
@@ -254,7 +276,7 @@ void msce::MSCEWindow::render()
                  GL_STREAM_DRAW);
 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.index_count() * sizeof(uint32_t),
-                 mesh.get_indecies(), GL_STREAM_DRAW);
+                 mesh.get_indecies().data(), GL_STREAM_DRAW);
 
     glBindVertexArray(this->context_.vao);
 

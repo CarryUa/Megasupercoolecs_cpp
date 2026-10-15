@@ -35,12 +35,7 @@ struct TestLocalEventArgs
 int global_callback_count = 0;
 
 /// @brief Test callback that increments counter
-void onTestEvent(TestEvent &ev)
-{
-  ev.counter++;
-  Logger logger("");
-  logger.log_info("Event rised: {}", ev.counter);
-}
+void onTestEvent(TestEvent &ev) { ev.counter++; }
 
 /// @brief Test callback that modifies data
 void onDataEvent(DataEvent &ev)

@@ -18,6 +18,8 @@ namespace msce
 class MSCEWindow
 {
 private:
+  inline static unordered_map<GLFWwindow *, MSCEWindow *> windows_map;
+
   struct GLContext
   {
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders = {};
@@ -35,6 +37,8 @@ private:
   void use_context();
 
 public:
+  LocalEvent<const vec2ui> on_screen_resized;
+
   MSCEWindow(vec2ui window_size_ = vec2ui(1600, 900),
              const char *title = "msce", GLFWmonitor *glfw_monitor = nullptr,
              GLFWwindow *glfw_share = nullptr);

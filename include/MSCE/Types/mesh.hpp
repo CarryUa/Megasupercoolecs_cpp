@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include <vector>
 #include <type_traits>
+#include <span>
 #include <MSCE/msce_macros.h>
 
 namespace msce
@@ -11,9 +11,9 @@ class IMesh
 {
 public:
   virtual ~IMesh() = default;
-  virtual const vec2d *get_vertecies() const = 0;
-  virtual const vec2d *get_uv() const = 0;
-  virtual const uint32_t *get_indecies() const = 0;
+  virtual const constexpr std::span<const vec2d> get_vertecies() const = 0;
+  virtual const constexpr std::span<const vec2d> get_uv() const = 0;
+  virtual const constexpr std::span<const uint32_t> get_indecies() const = 0;
   virtual constexpr const uint32_t vertex_count() const = 0;
   virtual constexpr const uint32_t index_count() const = 0;
 };
@@ -26,24 +26,29 @@ public:
   //     (t_vert_count <= UINT8_MAX), uint8_t,
   //     std::conditional_t<(t_vert_count <= UINT16_MAX), uint16_t, uint32_t>>;
 
-  vec2d vertecies[t_vert_count];
-  vec2d texture_uv[t_vert_count];
-  uint32_t indecies[t_index_count];
+  std::array<vec2d, t_vert_count> vertecies;
+  std::array<vec2d, t_vert_count> texture_uv;
+  std::array<uint32_t, t_index_count> indecies;
 
-  Mesh(std::initializer_list<vec2d> verts = {},
-       std::initializer_list<vec2d> uv = {},
-       std::initializer_list<uint32_t> inds = {});
+  constexpr Mesh(std::initializer_list<vec2d> verts = {},
+                 std::initializer_list<vec2d> uv = {},
+                 std::initializer_list<uint32_t> inds = {});
 
-  virtual const vec2d *get_vertecies() const override;
-  virtual const uint32_t *get_indecies() const override;
-  virtual const vec2d *get_uv() const override;
+  constexpr Mesh(std::array<vec2d, t_vert_count> &&verts,
+                 std::array<vec2d, t_vert_count> &&uv,
+                 std::array<uint32_t, t_index_count> &&inds);
+
+  virtual const constexpr std::span<const vec2d> get_vertecies() const override;
+  virtual const constexpr std::span<const vec2d> get_uv() const override;
+  virtual const constexpr std::span<const uint32_t>
+  get_indecies() const override;
   virtual constexpr const uint32_t vertex_count() const override;
   virtual constexpr const uint32_t index_count() const override;
 
   MSCE_CEREAL_GENERATE_SERIALIZE_METHODS(vertecies, indecies)
 };
 template <uint32_t t_vert_count, uint32_t t_index_count>
-inline Mesh<t_vert_count, t_index_count>::Mesh(
+inline constexpr Mesh<t_vert_count, t_index_count>::Mesh(
     std::initializer_list<vec2d> verts, std::initializer_list<vec2d> uv,
     std::initializer_list<uint32_t> inds)
 {
@@ -51,25 +56,41 @@ inline Mesh<t_vert_count, t_index_count>::Mesh(
   assert(uv.size() == t_vert_count);
   assert(inds.size() == t_index_count);
 
-  std::copy(verts.begin(), verts.end(), vertecies);
-  std::copy(uv.begin(), uv.end(), texture_uv);
-  std::copy(inds.begin(), inds.end(), indecies);
+  std::copy(verts.begin(), verts.end(), vertecies.begin());
+  std::copy(uv.begin(), uv.end(), texture_uv.begin());
+  std::copy(inds.begin(), inds.end(), indecies.begin());
 }
+
 template <uint32_t t_vert_count, uint32_t t_index_count>
-inline const vec2d *Mesh<t_vert_count, t_index_count>::get_vertecies() const
+inline constexpr Mesh<t_vert_count, t_index_count>::Mesh(
+    std::array<vec2d, t_vert_count> &&verts,
+    std::array<vec2d, t_vert_count> &&uv,
+    std::array<uint32_t, t_index_count> &&inds)
+    : vertecies(verts), texture_uv(uv), indecies(inds)
 {
-  return vertecies;
 }
+
 template <uint32_t t_vert_count, uint32_t t_index_count>
-inline const uint32_t *Mesh<t_vert_count, t_index_count>::get_indecies() const
+inline constexpr const std::span<const vec2d>
+Mesh<t_vert_count, t_index_count>::get_vertecies() const
 {
-  return indecies;
+  return std::span<const vec2d, t_vert_count>(vertecies);
 }
+
 template <uint32_t t_vert_count, uint32_t t_index_count>
-inline const vec2d *Mesh<t_vert_count, t_index_count>::get_uv() const
+inline constexpr const std::span<const vec2d>
+Mesh<t_vert_count, t_index_count>::get_uv() const
 {
-  return texture_uv;
+  return std::span<const vec2d, t_vert_count>(texture_uv);
 }
+
+template <uint32_t t_vert_count, uint32_t t_index_count>
+inline constexpr const std::span<const uint32_t>
+Mesh<t_vert_count, t_index_count>::get_indecies() const
+{
+  return std::span<const uint32_t, t_index_count>(indecies);
+}
+
 template <uint32_t t_vert_count, uint32_t t_index_count>
 inline constexpr const uint32_t
 Mesh<t_vert_count, t_index_count>::vertex_count() const

@@ -3,6 +3,8 @@ target_sources(${MSCE_TARGET}
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/math.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/physics.cpp
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/collision.cpp
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/transform.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/reflection.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/terminator.cpp
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/shader.cpp

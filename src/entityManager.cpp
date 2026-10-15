@@ -50,6 +50,11 @@ std::vector<msce::EntityHandle> msce::EntityManager::get_entities(bool force)
   return result;
 }
 
+size_t msce::EntityManager::entity_count() const noexcept
+{
+  return entities_.alive_count();
+}
+
 msce::EntityHandle msce::EntityManager::copy_entity(EntityHandle other)
 {
   auto copy = this->create_entity();
