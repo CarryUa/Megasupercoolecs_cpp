@@ -1,5 +1,7 @@
 // This is a dummy file for CMake to determain language correctly when creating
 // library. Also used for testing diferent parts of engine
+#include <MSCE/msce.h>
+
 #include <MSCE/physics.h>
 #include <MSCE/BuiltIns/Renderers/spriteRendererComponent.hpp>
 #include <MSCE/BuiltIns/Renderers/spriteRendererSystem.h>
@@ -7,10 +9,7 @@
 #include <MSCE/Types/image.h>
 #include <MSCE/BuiltIns/inputSystem.h>
 
-#include <MSCE/prototype.h>
-#include <MSCE/event.h>
 #include <MSCE/Types/enum.h>
-#include <MSCE/terminator.h>
 #include <MSCE/serialization.h>
 #include <MSCE/BuiltIns/entityPrototype.hpp>
 #include <MSCE/reflection.h>
@@ -46,53 +45,50 @@ void log_click(MouseButtonEventArgs &args)
 
 int main(int argc, char **argv)
 {
-  std::set_terminate(msce::internal::handle_terminate);
-
-  static auto g_event_man = EventManager();
-  static auto g_sys_man = SystemManager();
-  static auto g_comp_man = ComponentManager();
-  static auto g_ent_man = EntityManager();
-  static auto g_proto_man = PrototypeManager();
-  static auto g_enum_man = EnumManager();
-
-  g_sys_man.init_all_systems();
-  g_proto_man.load_all_prototypes();
+  msce::init_engine();
 
   srand(time(NULL));
   static auto g_logger = Logger("GLOBAL");
   g_logger.log_debug("Initializing all...");
 
-  auto graphic_sys = g_sys_man.get_system<GraphicsSystem>();
-  auto time_sys = g_sys_man.get_system<TimeSystem>();
+  auto graphic_sys =
+      msce::SystemManager::instance->get_system<GraphicsSystem>();
+  auto time_sys = msce::SystemManager::instance->get_system<TimeSystem>();
 
   static auto root_window = graphic_sys->create_window(vec2i(1280, 720));
 
   int frame = 0;
   double next_fps_time = 0.5;
 
-  g_sys_man.get_system<InputSystem>()->on_keyboard_input.subscribe(log_key);
-  g_sys_man.get_system<InputSystem>()->on_mouse_input.subscribe(log_click);
+  msce::SystemManager::instance->get_system<InputSystem>()
+      ->on_keyboard_input.subscribe(log_key);
+  msce::SystemManager::instance->get_system<InputSystem>()
+      ->on_mouse_input.subscribe(log_click);
 
-  // auto ent = g_ent_man.create_entity();
+  // auto ent = msce::EntityManager::instance->create_entity();
   // ent->attach_component(g_comp_man.create_component<TransformComponent>());
   // auto sprite = g_comp_man.create_component<SpriteRendererComponent>();
   // ent->attach_component(sprite);
   // sprite->img_path = "./aot.jpg";
 
-  // g_proto_man.create_new_prototype_instance(
+  // msce::PrototypeManager::instance->create_new_prototype_instance(
   //     typeof(EntityPrototype).get_name_str(), "testentity");
-  // g_proto_man.get_prototype<EntityPrototype>("testentity")->entity = ent;
+  // msce::PrototypeManager::instance->get_prototype<EntityPrototype>("testentity")->entity
+  // = ent;
 
-  // g_proto_man.serialize_prototype("testent2.msceproto", "testentity");
-  auto &ent_proto2 = *g_proto_man.get_prototype<EntityPrototype>("testentity");
+  // msce::PrototypeManager::instance->serialize_prototype("testent2.msceproto",
+  // "testentity");
+  auto &ent_proto2 =
+      *msce::PrototypeManager::instance->get_prototype<EntityPrototype>(
+          "testentity");
 
-  auto ent = g_ent_man.copy_entity(ent_proto2.entity);
+  auto ent = msce::EntityManager::instance->copy_entity(ent_proto2.entity);
   ent->active = true;
   ent->get_component<PhysicsBodyComponent>()->body_type =
       PhysicsBodyType::STATIC;
   ent->get_component<TransformComponent>()->position.y -= 200;
 
-  auto ent2 = g_ent_man.copy_entity(ent_proto2.entity);
+  auto ent2 = msce::EntityManager::instance->copy_entity(ent_proto2.entity);
   ent2->active = true;
   // ent2->get_component<PhysicsBodyComponent>()->velocity = vec2d(10, 500);
   ent2->get_component<RectColliderComponent>()->on_collision_begin.subscribe(
@@ -133,7 +129,7 @@ int main(int argc, char **argv)
       frame = 0;
       next_fps_time += 333;
     }
-    g_sys_man.update_all_systems();
+    msce::SystemManager::instance->update_all_systems();
 
     anim.play_frame(time_sys->get_delta_seconds());
     root_window->render();
