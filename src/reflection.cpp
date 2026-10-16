@@ -10,6 +10,29 @@ constexpr uint16_t trait_shared_mask = 0b1111'1111'1100'0000;
 
 } // namespace
 
+std::vector<std::reference_wrapper<const msce::Type>>
+msce::Type::get_all_types()
+{
+  std::vector<std::reference_wrapper<const msce::Type>> result;
+  for (const auto &[name, type] :
+       msce::internal::get_g_reflection_types_registry())
+  {
+    result.push_back(type.get());
+  };
+  return result;
+}
+
+std::vector<std::string_view> msce::Type::get_all_type_names()
+{
+  std::vector<std::string_view> result;
+  for (const auto &[name, type] :
+       msce::internal::get_g_reflection_types_registry())
+  {
+    result.push_back(std::string_view(name));
+  };
+  return result;
+}
+
 const std::type_info &msce::Type::get_std_type() const
 {
   return this->std_type_;

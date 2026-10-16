@@ -325,6 +325,9 @@ private:
   const std::span<const MemberInfo> members_;
 
 public:
+  static std::vector<std::reference_wrapper<const msce::Type>> get_all_types();
+  static std::vector<std::string_view> get_all_type_names();
+
   constexpr Type(const char *name, uint64_t size, uint16_t trait_flags,
                  std::span<const MemberInfo> members,
                  const std::type_info &std_type)

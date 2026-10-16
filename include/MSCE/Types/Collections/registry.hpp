@@ -23,6 +23,15 @@ public:
     logger.log_debug("New registry was created");
   }
 
+  std::unordered_map<TIdentifyer, TRegistered>::const_iterator begin()
+  {
+    return registry_.begin();
+  }
+  std::unordered_map<TIdentifyer, TRegistered>::const_iterator end()
+  {
+    return registry_.end();
+  }
+
   void register_entry(TIdentifyer id, const TRegistered &entry)
   {
     static Logger logger("Registry");

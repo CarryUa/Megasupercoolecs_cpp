@@ -68,7 +68,7 @@ add_subdirectory(tests)
 
 add_executable(run dummy.cpp)
 target_link_libraries(run ${MSCE_TARGET})
-target_include_directories(run PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(run PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
@@ -78,7 +78,7 @@ set(ZLIB_BUILD_STATIC off CACHE BOOL "" FORCE)
 set(ZLIB_BUILD_SHARED on CACHE BOOL "" FORCE)
 set(ZLIB_BUILD_TESTING off CACHE BOOL "" FORCE)
 add_subdirectory(lib/zlib)
-set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/lib/zlib" CACHE PATH "" FORCE)
+set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zlib" CACHE PATH "" FORCE)
 set(ZLIB_LIBRARY "$<TARGET_FILE:zlib>" CACHE FILEPATH "" FORCE)
 
 
@@ -87,7 +87,7 @@ set(PNG_SHARED off CACHE BOOL "" FORCE)
 add_subdirectory(lib/libpng)
 
 
-set(JPEG_PREFIX ${CMAKE_BINARY_DIR}/lib/libjpeg)
+set(JPEG_PREFIX ${CMAKE_CURRENT_BINARY_DIRR}/lib/libjpeg)
 if(MSVC)
   set(JPEG_LIB ${JPEG_PREFIX}/lib/jpeg-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 else()
@@ -95,7 +95,7 @@ else()
 endif()
 
 ExternalProject_Add(libjpeg_ext
-SOURCE_DIR ${CMAKE_SOURCE_DIR}/lib/libjpeg
+SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg
 CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${JPEG_PREFIX}
     -DCMAKE_INSTALL_LIBDIR=lib
@@ -129,7 +129,7 @@ target_link_libraries(${MSCE_TARGET}
 
 # Include dirs
 target_include_directories(${MSCE_TARGET} PUBLIC src
-                          PRIVATE ${CMAKE_SOURCE_DIR}/include
+                          PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
                           PRIVATE src/MSCE
                           PRIVATE lib/boost/include
                           PRIVATE lib/libglfw/include
