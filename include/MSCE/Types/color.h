@@ -11,6 +11,7 @@ namespace msce
 struct Color
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(Color)
   /// @brief Individual channel byte.
   unsigned char r_, g_, b_, a_;
 
@@ -79,7 +80,6 @@ public:
 
 struct Colors
 {
-
   inline static const Color white = Color("#ffffff");
   inline static const Color black = Color("#000000");
   inline static const Color red = Color("#ff0000");
@@ -95,3 +95,4 @@ struct Colors
   inline static const Color gray = Color("#808080");
 };
 } // namespace msce
+MSCE_REFLECT_CLASS(Color, r_, g_, b_, a_)

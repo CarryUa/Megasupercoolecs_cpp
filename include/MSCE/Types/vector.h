@@ -1,6 +1,7 @@
 #pragma once
 #include <MSCE/msce_macros.h>
 #include <MSCE/math.h>
+#include <MSCE/reflection.h>
 
 namespace msce
 {
@@ -219,3 +220,20 @@ struct Interpolate<Vector3D<Tvec>, Easing>
 };
 
 } // namespace msce
+
+MSCE_REFLECT_CLASS(msce::Vector2D<int>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<unsigned int>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<float>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<char>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<unsigned char>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<double>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<long>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector2D<unsigned long>, x, y)
+MSCE_REFLECT_CLASS(msce::Vector3D<int>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<unsigned int>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<float>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<char>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<unsigned char>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<double>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<long>, x, y, z)
+MSCE_REFLECT_CLASS(msce::Vector3D<unsigned long>, x, y, z)

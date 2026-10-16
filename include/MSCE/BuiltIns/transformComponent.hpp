@@ -72,6 +72,7 @@ public:
   TransformComponent() {}
 };
 } // namespace msce
-MSCE_REGISTER_COMPONENT(msce::TransformComponent)
+MSCE_REGISTER_COMPONENT(msce::TransformComponent, position, scale, rotation,
+                        shape)
 
 #endif //_MSCE_TRANSFORM_COMPONENT_H_

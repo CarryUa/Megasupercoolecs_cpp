@@ -44,6 +44,6 @@ public:
   }
 };
 } // namespace msce
-MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype)
+MSCE_REGISTER_PROTOTYPE(msce::EntityPrototype, EntityPrototype, entity)
 
 #endif // MSCE_ENTITY_PROTOTYPE_HPP_

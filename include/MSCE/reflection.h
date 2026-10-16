@@ -1036,7 +1036,7 @@ template <> struct equal_to<std::reference_wrapper<const msce::Type>>
     return t;                                                                  \
   }
 
-#define MSCE_FUNDAMENTAL_HELPER(TypeName, UID)                                 \
+#define MSCE_REFLECT_FUNDAMENTAL_HELPER(TypeName, UID)                         \
   namespace msce::internal                                                     \
   {                                                                            \
   template <> struct TypeRegistration<TypeName>                                \
@@ -1065,8 +1065,12 @@ template <> struct equal_to<std::reference_wrapper<const msce::Type>>
 
 #define MSCE_REFLECT_CLASS_MEMBER_IMPL(ClassName, MemberName)                  \
   ::msce::MemberInfo(                                                          \
-      #MemberName, __builtin_offsetof(ClassName, MemberName),                  \
-      ::msce::get_reflection_of_type<decltype(ClassName::MemberName)>())
+      #MemberName,                                                             \
+      offsetof(std::remove_cvref_t<std::remove_pointer_t<ClassName>>,          \
+               MemberName),                                                    \
+      ::msce::get_reflection_of_type<                                          \
+          decltype(std::remove_cvref_t<                                        \
+                   std::remove_pointer_t<ClassName>>::MemberName)>())
 #define MSCE_REFLECT_CLASS_MEMBER_WRP(r, data, x)                              \
   MSCE_REFLECT_CLASS_MEMBER_IMPL(data, x)
 
@@ -1077,9 +1081,10 @@ template <> struct equal_to<std::reference_wrapper<const msce::Type>>
   {                                                                            \
     inline static constexpr std::array<const ::msce::MemberInfo,               \
                                        BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)>    \
-        members = {__VA_OPT__(BOOST_PP_SEQ_ENUM(                               \
-            BOOST_PP_SEQ_TRANSFORM(MSCE_REFLECT_CLASS_MEMBER_WRP, ClassName,   \
-                                   BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))))};  \
+        members = {__VA_OPT__(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(        \
+            MSCE_REFLECT_CLASS_MEMBER_WRP,                                     \
+            std::remove_cvref_t<std::remove_pointer_t<ClassName>>,             \
+            BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))))};                         \
     inline static constexpr msce::Type type =                                  \
         msce::Type(#ClassName, sizeof(ClassName),                              \
                    ::msce::internal::compute_type_traits<ClassName>(),         \
@@ -1103,13 +1108,36 @@ template <> struct equal_to<std::reference_wrapper<const msce::Type>>
   }
 
 #define MSCE_REFLECT_CLASS(ClassName, ...)                                     \
-  MSCE_REFLECT_CLASS_HELPER(ClassName, __COUNTER__, __VA_ARGS__)
+  MSCE_REFLECT_CLASS_HELPER(ClassName, __COUNTER__, __VA_ARGS__)               \
+  MSCE_REFLECT_CLASS_HELPER(const ClassName, __COUNTER__, __VA_ARGS__)         \
+  MSCE_REFLECT_CLASS_HELPER(ClassName *, __COUNTER__, __VA_ARGS__)             \
+  MSCE_REFLECT_CLASS_HELPER(const ClassName *, __COUNTER__, __VA_ARGS__)       \
+  MSCE_REFLECT_CLASS_HELPER(ClassName &, __COUNTER__, __VA_ARGS__)             \
+  MSCE_REFLECT_CLASS_HELPER(const ClassName &, __COUNTER__, __VA_ARGS__)       \
+  MSCE_REFLECT_CLASS_HELPER(std::vector<ClassName>, __COUNTER__)
 
 #define MSCE_REFLECT_FUNDAMENTAL(TypeName)                                     \
-  MSCE_FUNDAMENTAL_HELPER(TypeName, __COUNTER__)
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(TypeName, __COUNTER__)                       \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(const TypeName, __COUNTER__)                 \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(TypeName *, __COUNTER__)                     \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(const TypeName *, __COUNTER__)               \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(TypeName &, __COUNTER__)                     \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(const TypeName &, __COUNTER__)               \
+  MSCE_REFLECT_FUNDAMENTAL_HELPER(std::vector<TypeName>, __COUNTER__)
 
-MSCE_REFLECT_FUNDAMENTAL(void)
-MSCE_REFLECT_FUNDAMENTAL(void *)
+#define MSCE_REFLECTION_ALLOW_PRIVATE(TypeName)                                \
+  friend class ::msce::internal::TypeRegistration<TypeName>;                   \
+  friend class ::msce::internal::TypeRegistration<const TypeName>;             \
+  friend class ::msce::internal::TypeRegistration<TypeName *>;                 \
+  friend class ::msce::internal::TypeRegistration<const TypeName *>;           \
+  friend class ::msce::internal::TypeRegistration<TypeName &>;                 \
+  friend class ::msce::internal::TypeRegistration<const TypeName &>;           \
+  friend class ::msce::internal::TypeRegistration<std::vector<TypeName>>;
+
+MSCE_REFLECT_FUNDAMENTAL_HELPER(void, __COUNTER__)
+MSCE_REFLECT_FUNDAMENTAL_HELPER(const void, __COUNTER__)
+MSCE_REFLECT_FUNDAMENTAL_HELPER(void *, __COUNTER__)
+
 MSCE_REFLECT_FUNDAMENTAL(bool)
 MSCE_REFLECT_FUNDAMENTAL(char)
 MSCE_REFLECT_FUNDAMENTAL(unsigned char)
@@ -1127,6 +1155,4 @@ MSCE_REFLECT_FUNDAMENTAL(unsigned long long)
 MSCE_REFLECT_FUNDAMENTAL(float)
 MSCE_REFLECT_FUNDAMENTAL(double)
 MSCE_REFLECT_FUNDAMENTAL(long double)
-MSCE_REFLECT_FUNDAMENTAL(const char *)
-MSCE_REFLECT_FUNDAMENTAL(char *)
 MSCE_REFLECT_FUNDAMENTAL(std::string)

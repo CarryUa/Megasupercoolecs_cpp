@@ -65,6 +65,8 @@ private:
 
 } // namespace msce
 
-MSCE_REGISTER_COMPONENT(msce::RectColliderComponent)
-MSCE_REGISTER_COMPONENT(msce::PhysicsBodyComponent)
+MSCE_REGISTER_COMPONENT(msce::RectColliderComponent, box)
+MSCE_REFLECT_FUNDAMENTAL(msce::PhysicsBodyType);
+MSCE_REGISTER_COMPONENT(msce::PhysicsBodyComponent, velocity, linear_drag, mass,
+                        body_type)
 MSCE_REGISTER_SYSTEM(msce::PhysicsSystem)

@@ -2,7 +2,10 @@
 #include <cstdint>
 #include <type_traits>
 #include <span>
+#include <array>
 #include <MSCE/msce_macros.h>
+#include <MSCE/Types/vector.h>
+#include <MSCE/reflection.h>
 
 namespace msce
 {
@@ -103,4 +106,22 @@ Mesh<t_vert_count, t_index_count>::index_count() const
 {
   return t_index_count;
 }
+namespace internal
+{
+using Vec2dArray3 = std::array<vec2d, 3>;
+using Vec2dArray4 = std::array<vec2d, 4>;
+using U32Array3 = std::array<uint32_t, 3>;
+using U32Array6 = std::array<uint32_t, 6>;
+using TriangleMesh = Mesh<3, 3>;
+using QuadMesh = Mesh<4, 6>;
+} // namespace internal
 } // namespace msce
+
+MSCE_REFLECT_CLASS(msce::IMesh)
+MSCE_REFLECT_CLASS(msce::internal::Vec2dArray3)
+MSCE_REFLECT_CLASS(msce::internal::Vec2dArray4)
+MSCE_REFLECT_CLASS(msce::internal::U32Array3)
+MSCE_REFLECT_CLASS(msce::internal::U32Array6)
+MSCE_REFLECT_CLASS(msce::internal::TriangleMesh, vertecies, texture_uv,
+                   indecies)
+MSCE_REFLECT_CLASS(msce::internal::QuadMesh, vertecies, texture_uv, indecies)

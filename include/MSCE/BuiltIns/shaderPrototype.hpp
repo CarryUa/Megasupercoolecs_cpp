@@ -23,4 +23,5 @@ struct ShaderPrototype : public IPrototype
 };
 } // namespace msce
 MSCE_REGISTER_PROTOTYPE(::msce::ShaderPrototype, ShaderPrototype,
-                        vertex_source_path, fragment_source_path)
+                         vertex_source_path, fragment_source_path,
+                         vertex_uniforms, fragment_uniforms)

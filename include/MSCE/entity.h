@@ -65,6 +65,7 @@ struct ComponentMapSerializeProxy
 class Entity
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(Entity)
   friend class EntityManager;
 
   template <typename TComp>
@@ -322,4 +323,6 @@ template <typename TComp> inline void Entity::detach_component() noexcept
 }
 } // namespace msce
 
+MSCE_REFLECT_CLASS(msce::Entity, entity_id_, active)
+MSCE_REFLECT_CLASS(msce::EntityHandle)
 #endif // MSCE_ENTITY_H_

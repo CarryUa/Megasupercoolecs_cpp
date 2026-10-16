@@ -9,6 +9,7 @@ namespace msce
 struct BaseRendererComponent : public BaseComponent<BaseRendererComponent>
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(BaseRendererComponent);
   std::string shader_id_ = "DefaultShader";
 
 public:
@@ -20,4 +21,4 @@ public:
 };
 
 } // namespace msce
-MSCE_REGISTER_COMPONENT(msce::BaseRendererComponent)
+MSCE_REGISTER_COMPONENT(msce::BaseRendererComponent, color, shader_id_)

@@ -5,6 +5,7 @@
 
 #include <MSCE/msce_macros.h>
 #include <MSCE/Types/vector.h>
+#include <MSCE/reflection.h>
 #include <variant>
 #include "mesh.hpp"
 #include <vector>
@@ -19,6 +20,8 @@ class Shape2D;
 class Triangle
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(Triangle);
+
   Mesh<3, 3> mesh_ =
       Mesh<3, 3>({vec2d(0, 0), vec2d(300, 0), vec2d(150, 300)},
                  {vec2d(0, 0), vec2d(1, 0), vec2d(0.5, 1)}, {0, 1, 2});
@@ -71,6 +74,7 @@ public:
 class Rectangle
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(Rectangle);
   /// @brief Width of the rectangle.
   double a_ = 300;
 
@@ -133,6 +137,7 @@ public:
 class Circle
 {
 private:
+  MSCE_REFLECTION_ALLOW_PRIVATE(Circle);
   /// @brief Circle's radius.
   double r_ = 300;
 
@@ -208,10 +213,16 @@ public:
   template <class Archive> void load(Archive &ar) { ar(CEREAL_NVP(r_)); }
 };
 
+using ShapeVariant = std::variant<Triangle, Rectangle, Circle>;
+using Vec2dArray32 = std::array<vec2d, MSCE_CIRCLE_VERTICES_COUNT>;
+using U32Array90 = std::array<uint32_t, (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3>;
+using CircleMesh =
+    Mesh<MSCE_CIRCLE_VERTICES_COUNT, (MSCE_CIRCLE_VERTICES_COUNT - 2) * 3>;
+
 struct Shape2D
 {
   friend class ::cereal::access;
-  std::variant<Triangle, Rectangle, Circle> shape;
+  ShapeVariant shape;
 
   /**
    * @returns All the vertecies of this shape.
@@ -283,4 +294,13 @@ struct Shape2D
 };
 
 } // namespace msce
+
+MSCE_REFLECT_CLASS(msce::Triangle, mesh_)
+MSCE_REFLECT_CLASS(msce::Rectangle, a_, b_)
+MSCE_REFLECT_CLASS(msce::Circle, r_)
+MSCE_REFLECT_CLASS(msce::ShapeVariant)
+MSCE_REFLECT_CLASS(msce::Shape2D, shape)
+MSCE_REFLECT_CLASS(msce::Vec2dArray32)
+MSCE_REFLECT_CLASS(msce::U32Array90)
+MSCE_REFLECT_CLASS(msce::CircleMesh, vertecies, texture_uv, indecies)
 #endif

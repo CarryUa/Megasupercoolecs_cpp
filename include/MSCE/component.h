@@ -45,8 +45,8 @@ public:                                                                        \
    * instantiated using ComponentManager. */                                   \
   Type() {}
 
-#define MSCE_REGISTER_COMPONENT(Type)                                          \
-  MSCE_REFLECT_CLASS(Type)                                                     \
+#define MSCE_REGISTER_COMPONENT(Type, ...)                                     \
+  MSCE_REFLECT_CLASS(Type, __VA_ARGS__)                                        \
   CEREAL_REGISTER_TYPE(Type)                                                   \
   CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::BaseComponent<Type>, Type)      \
   CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IComponent,                     \
@@ -109,8 +109,8 @@ public:                                                                        \
   Type() {}
 
 /** @brief Macro for registering components inheriting another component. */
-#define MSCE_REGISTER_DERIVED_COMPONENT(Type, Parent)                          \
-  MSCE_REFLECT_CLASS(Type)                                                     \
+#define MSCE_REGISTER_DERIVED_COMPONENT(Type, Parent, ...)                     \
+  MSCE_REFLECT_CLASS(Type, __VA_ARGS__)                                        \
   CEREAL_REGISTER_TYPE(Type)                                                   \
   CEREAL_REGISTER_POLYMORPHIC_RELATION(Parent, Type)                           \
   CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IComponent,                     \
