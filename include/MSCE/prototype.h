@@ -9,17 +9,12 @@
 namespace msce
 {
 class IPrototype;
-inline Registry<std::string, std::reference_wrapper<const std::type_info>> &
-get_g_registered_prototypes()
-{
-  static Registry<std::string, std::reference_wrapper<const std::type_info>>
-      reg;
-  return reg;
-};
-inline Registry<std::string, std::function<std::unique_ptr<IPrototype>()>> &
+inline Registry<std::reference_wrapper<const msce::Type>,
+                std::function<std::unique_ptr<IPrototype>()>> &
 get_g_registered_prototype_factories()
 {
-  static Registry<std::string, std::function<std::unique_ptr<IPrototype>()>>
+  static Registry<std::reference_wrapper<const msce::Type>,
+                  std::function<std::unique_ptr<IPrototype>()>>
       reg;
   return reg;
 };
@@ -32,6 +27,7 @@ private:                                                                       \
   MSCE_CEREAL_GENERATE_DERIVED_SERIALIZE_METHODS(::msce::IPrototype,           \
                                                  __VA_ARGS__)                  \
 public:                                                                        \
+  MSCE_REFLECTION_ALLOW_PRIVATE(ProtoType)                                     \
   MSCE_REFLECTION_DEFINE_CLASS(ProtoType)                                      \
   virtual const ::msce::Type &get_type_info_polymorphic() override             \
   {                                                                            \
@@ -43,7 +39,7 @@ public:                                                                        \
 #define MSCE_REGISTER_PROTOTYPE(Type, Name, ...)                               \
   CEREAL_REGISTER_TYPE(Type)                                                   \
   CEREAL_REGISTER_POLYMORPHIC_RELATION(::msce::IPrototype, Type)               \
-  MSCE_REFLECT_CLASS(Type, __VA_ARGS__)                                        \
+  MSCE_REFLECT_CLASS(Type, __VA_ARGS__, id)                                    \
   namespace msce                                                               \
   {                                                                            \
   template <> class Registration<Type>                                         \
@@ -52,13 +48,12 @@ public:                                                                        \
     [[gnu::used]] Registration()                                               \
     {                                                                          \
       static Logger logger("StaticPrototypeRegistration");                     \
-      get_g_registered_prototypes().register_entry(#Type,                      \
-                                                   std::cref(typeid(Type)));   \
       get_g_registered_prototype_factories().register_entry(                   \
-          #Type, []() { return std::make_unique<Type>(); });                   \
+          typeof(Type), []() { return std::make_unique<Type>(); });            \
       logger.log_info(                                                         \
           "Registered prototype({}) with name: '{}'",                          \
-          get_g_registered_prototypes().enumerate_registry().size(), #Type);   \
+          get_g_registered_prototype_factories().enumerate_registry().size(),  \
+          #Type);                                                              \
     }                                                                          \
   };                                                                           \
   inline Registration<Type> registered_##Name;                                 \
@@ -133,13 +128,12 @@ public:
   /**
    * @brief Reference to staticaly-registered prototype factories.
    */
-  Registry<std::string, std::function<std::unique_ptr<IPrototype>()>>
+  Registry<std::reference_wrapper<const msce::Type>,
+           std::function<std::unique_ptr<IPrototype>()>>
       &registered_factories_ref;
   /**
    * @brief Reference to staticaly-registered prototype types.
    */
-  Registry<std::string, std::reference_wrapper<const std::type_info>>
-      &registered_prototypes_ref;
 
   /**
    * @brief Uses cereal to desetialize prototype file into actiall prototype,
@@ -147,6 +141,9 @@ public:
    * @param path Path to serialized file.
    */
   IPrototype *deserialize_prototype(const std::string &path);
+
+  std::vector<std::reference_wrapper<const msce::Type>>
+  get_prototype_types() const;
 
   /**
    * @brief Serializes runtime prototype object into a file. TRUNCATES THE FILE.
@@ -270,7 +267,7 @@ template <typename TProto>
 inline TProto *PrototypeManager::create_new_prototype_instance(
     const std::string &type, const std::string &new_id) noexcept
 {
-  if (!registered_factories_ref.is_registered(type))
+  if (!registered_factories_ref.is_registered(typeof_n(type)))
   {
     logger.log_error("Prototype with type '{} ' wasn't ever registered!", type);
     return nullptr;
@@ -281,7 +278,8 @@ inline TProto *PrototypeManager::create_new_prototype_instance(
     return nullptr;
   }
 
-  this->prototypes_[new_id] = registered_factories_ref.get_entry(type)();
+  this->prototypes_[new_id] =
+      registered_factories_ref.get_entry(typeof_n(type))();
   this->prototypes_[new_id]->id = new_id;
 
   auto ptr = dynamic_cast<TProto *>(this->prototypes_[new_id].get());
@@ -295,5 +293,5 @@ inline TProto *PrototypeManager::create_new_prototype_instance(
 }
 } // namespace msce
 
-MSCE_REFLECT_CLASS(::msce::IPrototype, id)
+MSCE_REFLECT_CLASS(msce::IPrototype, id)
 CEREAL_REGISTER_TYPE(msce::IPrototype)

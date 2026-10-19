@@ -41,8 +41,7 @@ void msce::PrototypeManager::load_all_prototypes()
 }
 
 msce::PrototypeManager::PrototypeManager()
-    : registered_factories_ref(get_g_registered_prototype_factories()),
-      registered_prototypes_ref(get_g_registered_prototypes())
+    : registered_factories_ref(get_g_registered_prototype_factories())
 {
   logger.log_info("Initializing manager...");
 }
@@ -87,6 +86,17 @@ msce::PrototypeManager::deserialize_prototype(const string &path)
   }
 
   return nullptr;
+}
+
+std::vector<std::reference_wrapper<const msce::Type>>
+msce::PrototypeManager::get_prototype_types() const
+{
+
+  std::vector<std::reference_wrapper<const msce::Type>> res;
+  for (auto &[t, f] : registered_factories_ref)
+    res.push_back(t);
+
+  return res;
 }
 
 void msce::PrototypeManager::serialize_prototype(const std::string &path,
@@ -149,7 +159,7 @@ unordered_set<msce::IPrototype *> msce::PrototypeManager::enumerate_prototypes()
 msce::IPrototype *msce::PrototypeManager::create_new_prototype_instance(
     const std::string &type, const std::string &id) noexcept
 {
-  if (!registered_factories_ref.is_registered(type))
+  if (!registered_factories_ref.is_registered(typeof_n(type)))
   {
     logger.log_error("Error: Prototype with type '{}' wasn't ever registered!",
                      type);
@@ -161,7 +171,7 @@ msce::IPrototype *msce::PrototypeManager::create_new_prototype_instance(
     return nullptr;
   }
 
-  this->prototypes_[id] = registered_factories_ref.get_entry(type)();
+  this->prototypes_[id] = registered_factories_ref.get_entry(typeof_n(type))();
   prototypes_[id]->id = id;
 
   return this->prototypes_[id].get();
@@ -174,8 +184,7 @@ bool msce::PrototypeManager::prototype_id_exists(
 bool msce::PrototypeManager::prototype_type_registered(
     const std::string &type) const noexcept
 {
-  return registered_prototypes_ref.is_registered(type) &&
-         registered_prototypes_ref.is_registered(type);
+  return registered_factories_ref.is_registered(typeof_n(type));
 }
 bool msce::PrototypeManager::delete_prototype(const std::string &id) noexcept
 {

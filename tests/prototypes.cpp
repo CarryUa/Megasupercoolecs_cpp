@@ -198,18 +198,6 @@ TEST(PrototypeTests, Enumeration)
   protoMan->delete_prototype("test_proto_enum_2");
 }
 
-/// @brief Test prototype registry
-TEST(PrototypeTests, Registry)
-{
-  auto protoMan = PrototypeManager::instance;
-
-  auto registered = protoMan->registered_prototypes_ref.enumerate_registry();
-  EXPECT_GE(registered.size(), 1);
-
-  auto factories = protoMan->registered_factories_ref.enumerate_registry();
-  EXPECT_EQ(factories.size(), registered.size());
-}
-
 /// @brief Test duplicate prototype ID prevention
 TEST(PrototypeTests, DuplicateIDPrevention)
 {
