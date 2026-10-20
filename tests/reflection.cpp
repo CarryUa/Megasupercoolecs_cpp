@@ -284,3 +284,31 @@ TEST(ReflectionTests, DerivedClassMemberModification)
   EXPECT_EQ("Changed", td.test_str);
   EXPECT_EQ(200, td.derived_int);
 }
+
+TEST(ReflectionTests, ConstructorTest)
+{
+  TestEnum8 *e8 = nullptr;
+  TestEnum32 *e32 = nullptr;
+  int32_t *i32 = nullptr;
+
+  e8 = typeof(TestEnum8).construct<TestEnum8>();
+  e32 = typeof(TestEnum8).construct<TestEnum32>();
+  i32 = typeof(int32_t).construct<int32_t>();
+
+  EXPECT_NE(e8, nullptr);
+  EXPECT_NE(e32, nullptr);
+  EXPECT_NE(i32, nullptr);
+
+  e8 = nullptr;
+  e32 = nullptr;
+  i32 = nullptr;
+
+  e8 = typeof(TestEnum8).construct_at<TestEnum8>(e8);
+  e32 = typeof(TestEnum8).construct_at<TestEnum32>(e8);
+  i32 = typeof(int32_t).construct_at<int32_t>(e8);
+
+  // If trying to construct at nullptr, result will be allocated.
+  EXPECT_NE(e8, nullptr);
+  EXPECT_NE(e32, nullptr);
+  EXPECT_NE(i32, nullptr);
+}

@@ -184,30 +184,34 @@ get_g_reflection_types_registry()
   return reg;
 }
 
-/**
- * @brief Internal function used by reflection. Calculates the offset of member
- * pointer passed in.
- * @tparam TC Type of compound containint member. Dublicate it into Context
- * tparam.
- * @tparam TM Type of member under the pointer.
- * @tparam Context The actual type. You need to pass it it to avoid template
- * deduction.
- */
-// template <typename Context, typename TC, typename TM>
-// inline constexpr uint32_t get_offset_of_member(TM TC::*m_ptr)
-// {
-//     static_assert(ClassWithReflection<Context>,
-//                   "Context must satisfy the ClassWithReflection concept!");
+template <typename T> void *generic_constructor(void *at)
+{
+  using U = std::remove_cvref_t<T>;
 
-//     // const Context *c = nullptr;
-//     // const TM *m = &(c->*m_ptr);
+  if constexpr (std::is_void_v<T>)
+    throw std::runtime_error("Tried to construct void type with reflection. (" +
+                             Platform::demangle(typeid(T).name()) + ")");
 
-//     return __builtin_offsetof(Context, m_ptr);
+  else if constexpr (std::is_reference_v<T>)
+    throw std::runtime_error(
+        "Tried to construct reference type with reflection. (" +
+        Platform::demangle(typeid(T).name()) + ")");
 
-//     // return static_cast<uint32_t>(
-//     //     reinterpret_cast<const char *>(m) - reinterpret_cast<const char
-//     *>(c));
-// }
+  else if constexpr (!std::is_default_constructible_v<T>)
+    throw std::runtime_error("Tried to construct type that is not default "
+                             "constructible type with reflection. (" +
+                             Platform::demangle(typeid(T).name()) + ")");
+
+  else
+  {
+    if (!at) return new U();
+    else
+      return new (at) U();
+  }
+
+  return nullptr;
+}
+
 } // namespace internal
 
 /**
@@ -297,6 +301,10 @@ class Type
 private:
   inline static const Logger logger = Logger("Reflection(Type)");
 
+  /** @brief Stores default constructor for types that have it. */
+  /** @note Currently constructors are only suported for fundamentals. */
+  void *(*construct_)(void *);
+
   /// @brief std::type_info reference of underlying type.
   const std::type_info &std_type_;
   /// @brief Human-readable name of this type.
@@ -330,9 +338,10 @@ public:
 
   constexpr Type(const char *name, uint64_t size, uint16_t trait_flags,
                  std::span<const MemberInfo> members,
-                 const std::type_info &std_type)
+                 const std::type_info &std_type,
+                 void *(*constructor)(void *) = nullptr)
       : name_(name), size_(size), traits_(trait_flags), members_(members),
-        std_type_(std_type)
+        std_type_(std_type), construct_(constructor)
 
   {
   }
@@ -410,6 +419,19 @@ public:
    * @brief Getter for size of this object. Same as sizeof(RepresentedType).
    */
   uint32_t get_size() const;
+
+  /** @brief Calls default constructor for this type. */
+  /** @note Always allocates @ref msce::Type::size_ bytes for the objet. */
+  void *construct() const;
+  /** @brief Calls default constructor for this type at given address.
+   * @param at Memory address at which to construct object.
+   * @note Only allocates if at is nullptr.
+   */
+
+  void *construct_at(void *at) const;
+
+  template <typename TValue> TValue *construct() const;
+  template <typename TValue> TValue *construct_at(void *) const;
 
   std::vector<std::reference_wrapper<const MemberInfo>> get_members() const;
 
@@ -876,6 +898,16 @@ inline void Type::set_value(void *target, TValue value) const
   }
 }
 
+template <typename TValue> inline TValue *Type::construct() const
+{
+  return reinterpret_cast<TValue *>(construct());
+}
+
+template <typename TValue> inline TValue *Type::construct_at(void *at) const
+{
+  return reinterpret_cast<TValue *>(construct_at(at));
+}
+
 inline constexpr bool msce::Type::is_numeric() const
 {
   return (this->traits_ & 0x7) == (uint16_t)TypeTraitFlags::NUMERIC;
@@ -1041,10 +1073,10 @@ template <> struct equal_to<std::reference_wrapper<const msce::Type>>
   {                                                                            \
   template <> struct TypeRegistration<TypeName>                                \
   {                                                                            \
-    inline static constexpr msce::Type type =                                  \
-        msce::Type(#TypeName, sizeof(TypeName),                                \
-                   ::msce::internal::compute_type_traits<TypeName>(), {},      \
-                   typeid(TypeName));                                          \
+    inline static constexpr msce::Type type = msce::Type(                      \
+        #TypeName, sizeof(TypeName),                                           \
+        ::msce::internal::compute_type_traits<TypeName>(), {},                 \
+        typeid(TypeName), ::msce::internal::generic_constructor<TypeName>);    \
     inline static constexpr const msce::Type &get_type() { return type; }      \
     static void register_self()                                                \
     {                                                                          \

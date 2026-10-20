@@ -80,6 +80,18 @@ const msce::MemberInfo &msce::Type::get_member_named(const char *name) const
 
 uint32_t msce::Type::get_size() const { return this->size_; }
 
+void *msce::Type::construct() const
+{
+  assert(!is_class()); // currently unsoported for classes.
+  return construct_(nullptr);
+}
+
+void *msce::Type::construct_at(void *at) const
+{
+  assert(!is_class()); // currently unsuported for classes.
+  return construct_(at);
+}
+
 std::vector<std::reference_wrapper<const msce::MemberInfo>>
 msce::Type::get_members() const
 {
