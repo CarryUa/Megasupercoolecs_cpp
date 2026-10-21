@@ -47,10 +47,9 @@ void msce::SpriteRendererSystem::on_prototype_loaded(PrototypeLoadedEvent &ev)
     return;
   EntityPrototype *proto = dynamic_cast<EntityPrototype *>(ev.prototype);
   if (!proto) return;
-  if (!proto->entity) return;
-  if (!proto->entity->has_component<SpriteRendererComponent>()) return;
+  if (!proto->entity.has_component<SpriteRendererComponent>()) return;
 
-  auto comp = proto->entity->get_component<SpriteRendererComponent>();
+  auto comp = proto->entity.get_component<SpriteRendererComponent>();
   EventManager::instance->subscribe<WindowCreatedEvent>(
       [comp]() { comp->img = std::make_shared<Image>(comp->img_path); });
 }

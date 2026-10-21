@@ -226,6 +226,13 @@ public:
   EntityHandle copy_entity(EntityHandle other);
 
   /**
+   * @brief Copies provided entity.
+   * @param other @ref msce::Entity reference to source entity.
+   * @return @ref msce::EntityHandle of the copy of source entity.
+   */
+  EntityHandle copy_entity(const Entity &other);
+
+  /**
    * @brief Destroys provided entity.
    * @param other @ref msce::EntityHandle of entity to be destroyed.
    * @note Note that it will also destroy all of this entity's components.
@@ -321,8 +328,15 @@ template <typename TComp> inline void Entity::detach_component() noexcept
 {
   detach_component(typeid(TComp));
 }
+
+namespace internal
+{
+using TypeComponentMap =
+    std::unordered_map<std::type_index, ComponentHandle<IComponent>>;
+}
 } // namespace msce
 
-MSCE_REFLECT_CLASS(msce::Entity, entity_id_, active)
+MSCE_REFLECT_CLASS(TypeComponentMap)
+MSCE_REFLECT_CLASS(msce::Entity, entity_id_, active, components_)
 MSCE_REFLECT_CLASS(msce::EntityHandle)
 #endif // MSCE_ENTITY_H_

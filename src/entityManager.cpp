@@ -67,6 +67,19 @@ msce::EntityHandle msce::EntityManager::copy_entity(EntityHandle other)
 
   return copy;
 }
+msce::EntityHandle msce::EntityManager::copy_entity(const Entity &other)
+{
+
+  auto copy = this->create_entity();
+  copy->active = other.active;
+  for (auto &[t, comp] : other.components_)
+  {
+    auto cc = ComponentManager::instance->clone_component(comp);
+    copy->force_attach_component(t, cc);
+  }
+
+  return copy;
+}
 bool msce::EntityManager::destroy_entity(EntityHandle other)
 {
   for (auto &[_, comp] : other.get()->components_)

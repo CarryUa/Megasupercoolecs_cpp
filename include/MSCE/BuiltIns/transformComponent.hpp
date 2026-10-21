@@ -61,6 +61,10 @@ public:
   std::vector<vec2d> get_transformed_verts();
 
 public:
+  virtual constexpr const msce::Type &polymorphic_type() const override
+  {
+    return typeof(TransformComponent);
+  }
   virtual void polymophic_save(SerializationOutArchive &ar) const override
   {
     this->save(ar);

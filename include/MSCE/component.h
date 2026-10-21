@@ -11,11 +11,12 @@
 #include <typeindex>
 
 #pragma region Components Macros
-#define MSCE_DEFINE_COMPONENT(Type, ...)                                       \
+#define MSCE_DEFINE_COMPONENT(CType, ...)                                      \
 public:                                                                        \
-  friend class ::msce::internal::StaticComponentRegistration<Type>;            \
+  friend class ::msce::internal::StaticComponentRegistration<CType>;           \
   friend class ::msce::ComponentManager;                                       \
   friend class ::cereal::access;                                               \
+  MSCE_REFLECTION_ALLOW_PRIVATE(CType);                                        \
   /**  @brief Cereal's save function. Refer to their docs for more info.*/     \
   template <class Archive> void save(Archive &ar) const                        \
   {                                                                            \
@@ -32,6 +33,10 @@ public:                                                                        \
   }                                                                            \
                                                                                \
 public:                                                                        \
+  virtual constexpr const msce::Type &polymorphic_type() const override        \
+  {                                                                            \
+    return typeof(CType);                                                      \
+  }                                                                            \
   virtual void polymophic_save(SerializationOutArchive &ar) const override     \
   {                                                                            \
     this->save(ar);                                                            \
@@ -43,7 +48,7 @@ public:                                                                        \
                                                                                \
   /**  @brief This overload is used by cereal. All components must be          \
    * instantiated using ComponentManager. */                                   \
-  Type() {}
+  CType() {}
 
 #define MSCE_REGISTER_COMPONENT(Type, ...)                                     \
   MSCE_REFLECT_CLASS(Type, __VA_ARGS__)                                        \
@@ -67,10 +72,10 @@ public:                                                                        \
   }
 
 /** @brief Macro for defining components inheriting another component. */
-#define MSCE_DEFINE_DERIVED_COMPONENT(Type, Parent, ...)                       \
+#define MSCE_DEFINE_DERIVED_COMPONENT(CType, Parent, ...)                      \
 public:                                                                        \
   friend class ::msce::ComponentManager;                                       \
-  friend class ::msce::internal::StaticComponentRegistration<Type>;            \
+  friend class ::msce::internal::StaticComponentRegistration<CType>;           \
   friend class ::cereal::access;                                               \
   /**  @brief Cereal's save function. Refer to their docs for more info.*/     \
   template <class Archive> void save(Archive &ar) const                        \
@@ -92,10 +97,14 @@ public:                                                                        \
 protected:                                                                     \
   IComponent *clone() override                                                 \
   {                                                                            \
-    return new Type(static_cast<const Type &>(*this));                         \
+    return new CType(static_cast<const CType &>(*this));                       \
   }                                                                            \
                                                                                \
 public:                                                                        \
+  virtual constexpr const msce::Type &polymorphic_type() const override        \
+  {                                                                            \
+    return typeof(CType);                                                      \
+  }                                                                            \
   virtual void polymophic_save(SerializationOutArchive &ar) const override     \
   {                                                                            \
     this->save(ar);                                                            \
@@ -106,7 +115,7 @@ public:                                                                        \
   }                                                                            \
   /**  @brief This overload is used by cereal. All components must be          \
    * instantiated using ComponentManager. */                                   \
-  Type() {}
+  CType() {}
 
 /** @brief Macro for registering components inheriting another component. */
 #define MSCE_REGISTER_DERIVED_COMPONENT(Type, Parent, ...)                     \
@@ -164,6 +173,7 @@ public:
   {
   }
 
+  virtual constexpr const msce::Type &polymorphic_type() const = 0;
   virtual void polymophic_save(SerializationOutArchive &ar) const = 0;
   virtual void polymophic_load(SerializationInArchive &ar) = 0;
 };
@@ -207,6 +217,7 @@ protected:
   {
     return new TComp(static_cast<const TComp &>(*this));
   }
+
   /// @brief This overload is used by cereal. All components must be
   /// instantiated using ComponentManager.
   BaseComponent() {}
@@ -255,11 +266,14 @@ public:
    */
   template <typename TComp> ComponentHandle<TComp> create_component();
 
+  std::vector<std::reference_wrapper<const Type>> component_types() const;
+
   /**
    * @brief Creates new component.
-   * @param type A @ref msce::Type of component that will be created. Use typeof
-   * macro to get it.
-   * @return @ref msce::ComponentHandle of newly created component.
+   * @param type A @ref msce::Type of component that will be
+   * created. Use typeof macro to get it.
+   * @return @ref msce::ComponentHandle of newly created
+   * component.
    */
   ComponentHandle<IComponent> create_component(const msce::Type &type);
 

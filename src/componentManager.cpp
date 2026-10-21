@@ -8,6 +8,17 @@ msce::ComponentManager::ComponentManager()
   logger.log_info("Initializing manager...");
 }
 
+std::vector<std::reference_wrapper<const Type>>
+msce::ComponentManager::component_types() const
+{
+  std::vector<std::reference_wrapper<const Type>> res;
+  for (const auto &[t, f] : component_factories())
+  {
+    res.push_back(t);
+  }
+  return res;
+}
+
 ComponentHandle<IComponent>
 msce::ComponentManager::create_component(const msce::Type &type)
 {

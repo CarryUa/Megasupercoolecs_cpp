@@ -8,25 +8,23 @@ namespace msce
 /// @brief Prototype for all entities. Think of it as of Unity prefabs maybe?
 struct EntityPrototype : public IPrototype
 {
-  /// @brief List of components for serialization.
-  EntityHandle entity = EntityHandle::create_nullptr();
+
+  Entity entity;
+  // EntityHandle entity = EntityHandle::create_nullptr();
 
 public:
   friend class ::cereal::access;
   void save(SerializationOutArchive &ar) const
   {
-    if (!entity) return;
+    // if (!entity) return;
 
     ar(cereal::base_class<::msce::IPrototype>(this),
-       ::cereal::make_nvp("entity", *entity.get()));
+       ::cereal::make_nvp("entity", entity));
   }
   void load(SerializationInArchive &ar)
   {
-    if (entity != nullptr) EntityManager::instance->destroy_entity(entity);
-    entity = EntityManager::instance->create_entity();
-
     ar(cereal::base_class<::msce::IPrototype>(this),
-       ::cereal::make_nvp("entity", *entity.get()));
+       ::cereal::make_nvp("entity", entity));
   }
 
 public:
