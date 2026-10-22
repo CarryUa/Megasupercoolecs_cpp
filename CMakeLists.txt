@@ -61,6 +61,7 @@ add_subdirectory(src/Platform)
 add_subdirectory(src/BuiltIns)
 add_subdirectory(src/Types)
 add_subdirectory(src/ABI)
+add_subdirectory(tooling)
 
 
 
