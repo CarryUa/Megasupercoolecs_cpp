@@ -74,14 +74,6 @@ add_subdirectory(lib/libglad)
 add_subdirectory(lib/libglfw)
 add_subdirectory(lib/boost/preprocessor)
 
-set(ZLIB_BUILD_STATIC off CACHE BOOL "" FORCE)
-set(ZLIB_BUILD_SHARED on CACHE BOOL "" FORCE)
-set(ZLIB_BUILD_TESTING off CACHE BOOL "" FORCE)
-add_subdirectory(lib/zlib)
-set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zlib" CACHE PATH "" FORCE)
-set(ZLIB_LIBRARY "$<TARGET_FILE:zlib>" CACHE FILEPATH "" FORCE)
-
-
 set(PNG_STATIC on CACHE BOOL "" FORCE)
 set(PNG_SHARED off CACHE BOOL "" FORCE)
 add_subdirectory(lib/libpng)
@@ -122,7 +114,6 @@ target_link_libraries(${MSCE_TARGET}
                         boost_preprocessor
                         dl
                         dw
-                        zlib
                         png_static
                         jpeg
                         )    
