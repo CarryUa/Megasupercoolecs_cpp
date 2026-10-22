@@ -12,9 +12,6 @@
 [submodule "lib/boost/preprocessor"]
 	path = lib/boost/preprocessor
 	url = https://github.com/boostorg/preprocessor.git
-[submodule "lib/zlib"]
-	path = lib/zlib
-	url = https://github.com/madler/zlib.git
 [submodule "lib/libpng"]
 	path = lib/libpng
 	url = https://github.com/pnggroup/libpng
